@@ -109,6 +109,7 @@
     .dashboard {
       display: grid;
       grid-template-columns: 260px minmax(0, 1fr) 300px;
+      grid-template-rows: auto auto;
       gap: 18px;
       margin-top: 18px;
       align-items: start;
@@ -125,6 +126,20 @@
       padding: 12px;
       display: grid;
       gap: 10px;
+    }
+
+    .ocean-scene {
+      min-height: 210px;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .ocean-scene img {
+      width: 100%;
+      height: 100%;
+      min-height: 210px;
+      display: block;
+      object-fit: cover;
     }
 
     .child-button {
@@ -376,12 +391,24 @@
     }
 
     @media (min-width: 941px) {
+      .children {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+      }
+
+      .ocean-scene {
+        grid-column: 2 / 4;
+        grid-row: 1;
+      }
+
       .main {
-        margin-top: 228px;
+        grid-column: 2;
+        grid-row: 2;
       }
 
       .side {
-        margin-top: 228px;
+        grid-column: 3;
+        grid-row: 2;
       }
     }
 
@@ -510,6 +537,14 @@
       .children {
         grid-template-columns: 1fr 1fr;
       }
+
+      .ocean-scene {
+        min-height: 180px;
+      }
+
+      .ocean-scene img {
+        min-height: 180px;
+      }
     }
 
     @media (max-width: 620px) {
@@ -533,6 +568,14 @@
 
       .task {
         min-height: 100px;
+      }
+
+      .ocean-scene {
+        min-height: 150px;
+      }
+
+      .ocean-scene img {
+        min-height: 150px;
       }
     }
   </style>
@@ -582,6 +625,10 @@
           <div class="bar" aria-hidden="true"><div class="bar-fill" id="familyBar"></div></div>
         </div>
       </aside>
+
+      <section class="panel ocean-scene" aria-label="Vandenyno dugno vaizdas">
+        <img src="assets/ocean-boardwalk.png" alt="Vandenyno dugnas su kriauklėmis, koralais, žuvytėmis ir krabiukais">
+      </section>
 
       <section class="panel main">
         <div class="section-head">
