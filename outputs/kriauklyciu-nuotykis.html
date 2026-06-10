@@ -427,10 +427,24 @@
     }
 
     .log-item {
+      width: 100%;
+      border: 0;
       padding: 10px;
       border-radius: 8px;
       background: #f4f8fa;
+      color: var(--ink);
       font-size: .95rem;
+      text-align: left;
+    }
+
+    .log-item.clickable {
+      cursor: pointer;
+    }
+
+    .log-item.undone {
+      color: var(--muted);
+      text-decoration: line-through;
+      opacity: .72;
     }
 
     .empty {
@@ -796,9 +810,36 @@
       return childNames[state.active];
     }
 
-    function addLog(child, text) {
-      child.log.unshift(text);
+    function addLog(child, entry) {
+      const normalized = typeof entry === "string"
+        ? entry
+        : { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, undone: false, ...entry };
+      child.log.unshift(normalized);
       child.log = child.log.slice(0, 12);
+    }
+
+    function logText(item) {
+      return typeof item === "string" ? item : item.text;
+    }
+
+    function undoLogItem(item) {
+      if (typeof item === "string" || item.undone || item.kind === "undoNotice") return;
+
+      const child = activeChild();
+      child.shells = Math.max(0, child.shells - (item.delta || 0));
+
+      if (item.taskId && item.kind === "complete") child.done[item.taskId] = false;
+      if (item.taskId && item.kind === "toggleOff") child.done[item.taskId] = true;
+
+      item.undone = true;
+      addLog(child, {
+        text: `${activeName()}: atšauktas istorijos įrašas`,
+        delta: 0,
+        kind: "undoNotice"
+      });
+      save();
+      render();
+      showToast("Istorijos įrašas atšauktas.");
     }
 
     function completeTask(task) {
@@ -806,7 +847,12 @@
       if (child.done[task.id]) {
         child.done[task.id] = false;
         child.shells = Math.max(0, child.shells - task.shells);
-        addLog(child, `${activeName()}: atšaukta - ${task.title} (-${task.shells})`);
+        addLog(child, {
+          text: `${activeName()}: atšaukta - ${task.title} (-${task.shells})`,
+          delta: -task.shells,
+          taskId: task.id,
+          kind: "toggleOff"
+        });
         save();
         render();
         showToast(`${task.title} atšaukta: -${task.shells} ${shellWord(task.shells)}.`);
@@ -814,7 +860,12 @@
       }
       child.done[task.id] = true;
       child.shells += task.shells;
-      addLog(child, `${activeName()}: ${task.title} (+${task.shells})`);
+      addLog(child, {
+        text: `${activeName()}: ${task.title} (+${task.shells})`,
+        delta: task.shells,
+        taskId: task.id,
+        kind: "complete"
+      });
       save();
       render();
       showToast(`${activeName()} gavo ${task.shells} ${shellWord(task.shells)}!`);
@@ -849,9 +900,15 @@
         return;
       }
       child.log.forEach(item => {
-        const row = document.createElement("div");
-        row.className = "log-item";
-        row.textContent = item;
+        const reversible = typeof item !== "string" && !item.undone && item.kind !== "undoNotice";
+        const row = document.createElement(reversible ? "button" : "div");
+        row.className = `log-item${reversible ? " clickable" : ""}${typeof item !== "string" && item.undone ? " undone" : ""}`;
+        row.textContent = logText(item);
+        if (reversible) {
+          row.type = "button";
+          row.title = "Paspauskite, jei norite atšaukti šį įrašą";
+          row.addEventListener("click", () => undoLogItem(item));
+        }
         log.appendChild(row);
       });
     }
@@ -998,7 +1055,11 @@
     document.getElementById("bonusButton").addEventListener("click", () => {
       const child = activeChild();
       child.shells += 3;
-      addLog(child, `${activeName()}: pagyrimas darželyje arba namie (+3)`);
+      addLog(child, {
+        text: `${activeName()}: pagyrimas darželyje arba namie (+3)`,
+        delta: 3,
+        kind: "bonus"
+      });
       save();
       render();
       showToast("Pagyrimas pridėtas: +3 kriauklytės!");
@@ -1011,7 +1072,11 @@
       const removed = Math.min(child.shells, penalty.shells);
 
       if (removed === 0) {
-        addLog(child, `${activeName()}: ${penalty.text} (0)`);
+        addLog(child, {
+          text: `${activeName()}: ${penalty.text} (0)`,
+          delta: 0,
+          kind: "penalty"
+        });
         save();
         render();
         showToast("Kriauklyčių dar nėra, todėl nieko neatimta.");
@@ -1019,7 +1084,11 @@
       }
 
       child.shells -= removed;
-      addLog(child, `${activeName()}: ${penalty.text} (-${removed})`);
+      addLog(child, {
+        text: `${activeName()}: ${penalty.text} (-${removed})`,
+        delta: -removed,
+        kind: "penalty"
+      });
       save();
       render();
       showToast(`${activeName()} prarado ${removed} ${shellWord(removed)}.`);
