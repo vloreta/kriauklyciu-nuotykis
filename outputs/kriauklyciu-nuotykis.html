@@ -297,6 +297,38 @@
       background: #52616d;
     }
 
+    .penalty-box {
+      padding: 14px;
+      border-radius: 8px;
+      background: #fff1f1;
+      border: 1px solid #f0c1c1;
+      display: grid;
+      gap: 10px;
+    }
+
+    .penalty-box label {
+      font-weight: 800;
+    }
+
+    .penalty-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 92px;
+      gap: 10px;
+    }
+
+    .penalty-controls select {
+      min-width: 0;
+      border: 2px solid #e3d6d6;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 10px;
+    }
+
+    .action.warning {
+      background: var(--reef);
+    }
+
     .log {
       display: grid;
       gap: 8px;
@@ -359,7 +391,7 @@
         padding: 20px;
       }
 
-      .mascots, .children, .task-grid, .actions {
+      .mascots, .children, .task-grid, .actions, .penalty-controls {
         grid-template-columns: 1fr;
       }
 
@@ -440,6 +472,20 @@
           <button class="action" id="bonusButton" type="button">+ Pagyrimas</button>
           <button class="action secondary" id="resetButton" type="button">Nauja savaitė</button>
         </div>
+        <div class="penalty-box">
+          <label for="penaltySelect">Neįvykdyta / reikia pasitaisyti</label>
+          <div class="penalty-controls">
+            <select id="penaltySelect">
+              <option value="toys">Žaislai liko nesutvarkyti (-1)</option>
+              <option value="books">Knygutės ne vietoje (-1)</option>
+              <option value="clothes">Rūbai nesulankstyti (-2)</option>
+              <option value="closet">Rūbai ne spintoje (-2)</option>
+              <option value="behavior">Reikėjo daug priminimų (-1)</option>
+              <option value="kindness">Nedraugiškas elgesys (-2)</option>
+            </select>
+            <button class="action warning" id="penaltyButton" type="button">Atimti</button>
+          </div>
+        </div>
         <div>
           <h2>Šiandien</h2>
           <div class="log" id="log"></div>
@@ -468,6 +514,15 @@
       { at: 30, text: "30 kriauklyčių: Undinė ir Drakonas atidaro bendrą staigmeną." },
       { at: 50, text: "50 kriauklyčių: ypatinga išvyka arba didesnis prizas." }
     ];
+
+    const penalties = {
+      toys: { text: "žaislai liko nesutvarkyti", shells: 1 },
+      books: { text: "knygutės ne vietoje", shells: 1 },
+      clothes: { text: "rūbai nesulankstyti", shells: 2 },
+      closet: { text: "rūbai ne spintoje", shells: 2 },
+      behavior: { text: "reikėjo daug priminimų", shells: 1 },
+      kindness: { text: "nedraugiškas elgesys", shells: 2 }
+    };
 
     const initialState = {
       active: "olivia",
@@ -609,6 +664,27 @@
       save();
       render();
       showToast("Pagyrimas pridėtas: +3 kriauklytės!");
+    });
+
+    document.getElementById("penaltyButton").addEventListener("click", () => {
+      const child = activeChild();
+      const key = document.getElementById("penaltySelect").value;
+      const penalty = penalties[key];
+      const removed = Math.min(child.shells, penalty.shells);
+
+      if (removed === 0) {
+        addLog(child, `${child.name}: ${penalty.text} (0)`);
+        save();
+        render();
+        showToast("Kriauklyčių dar nėra, todėl nieko neatimta.");
+        return;
+      }
+
+      child.shells -= removed;
+      addLog(child, `${child.name}: ${penalty.text} (-${removed})`);
+      save();
+      render();
+      showToast(`${child.name} prarado ${removed} ${shellWord(removed)}.`);
     });
 
     document.getElementById("resetButton").addEventListener("click", () => {
