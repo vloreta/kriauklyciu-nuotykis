@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kriauklyciu nuotykis</title>
+  <style>
+    :root {
+      --sea: #0d8aa8;
+      --reef: #f15f5f;
+      --sun: #ffd166;
+      --leaf: #3bb273;
+      --ink: #25313b;
+      --muted: #66727d;
+      --paper: #fffaf0;
+      --panel: #ffffff;
+      --shadow: 0 16px 40px rgba(31, 54, 71, .16);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255, 209, 102, .55), transparent 24rem),
+        radial-gradient(circle at 86% 14%, rgba(241, 95, 95, .28), transparent 22rem),
+        linear-gradient(180deg, #c9f3ff 0%, #f7fffb 48%, #fff4df 100%);
+    }
+
+    button, input, select { font: inherit; }
+
+    .app {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 30px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 18px;
+      align-items: stretch;
+      min-height: 210px;
+    }
+
+    .title-block {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .78);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .7);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.5rem);
+      line-height: .95;
+      letter-spacing: 0;
+      max-width: 680px;
+    }
+
+    .subtitle {
+      margin: 14px 0 0;
+      font-size: 1.1rem;
+      color: #3d5966;
+      max-width: 680px;
+    }
+
+    .mascots {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .mascot {
+      min-height: 210px;
+      border-radius: 8px;
+      padding: 16px;
+      background: rgba(255, 255, 255, .82);
+      box-shadow: var(--shadow);
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .face {
+      width: 92px;
+      height: 92px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      font-size: 3.5rem;
+      margin-bottom: 10px;
+      background: #e2fbff;
+      border: 4px solid #fff;
+      box-shadow: 0 8px 20px rgba(31, 54, 71, .14);
+    }
+
+    .dragon .face { background: #e4f8df; }
+    .mascot strong { font-size: 1.05rem; }
+    .mascot span { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr) 300px;
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .9);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .7);
+    }
+
+    .children {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .child-button {
+      width: 100%;
+      min-height: 84px;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      background: #f6fbff;
+      color: var(--ink);
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .child-button.active {
+      border-color: var(--sea);
+      background: #e7f9ff;
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff;
+      font-size: 1.9rem;
+      box-shadow: inset 0 0 0 3px rgba(13, 138, 168, .18);
+    }
+
+    .child-name { font-weight: 800; font-size: 1.15rem; }
+    .shell-count { color: var(--muted); font-size: .95rem; }
+
+    .progress-box {
+      padding: 14px;
+      background: #fff7df;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
+
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .bar {
+      height: 16px;
+      border-radius: 999px;
+      background: #eadfc6;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--sea), var(--leaf), var(--sun));
+      transition: width .25s ease;
+    }
+
+    .main {
+      padding: 18px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      letter-spacing: 0;
+    }
+
+    .today {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .task {
+      min-height: 112px;
+      border: 2px solid #e7edf1;
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .task.done {
+      border-color: var(--leaf);
+      background: #ecfff4;
+    }
+
+    .task-icon {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #eff9ff;
+      font-size: 1.9rem;
+    }
+
+    .task-title {
+      font-weight: 800;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .task-shells {
+      color: #0c718a;
+      font-weight: 800;
+      font-size: .95rem;
+    }
+
+    .side {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .reward {
+      padding: 14px;
+      border-radius: 8px;
+      background: #fff8e7;
+      border: 1px solid #f0dfb7;
+    }
+
+    .reward strong { display: block; margin-bottom: 6px; }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .action {
+      min-height: 46px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 800;
+      color: #fff;
+      background: var(--sea);
+    }
+
+    .action.secondary {
+      background: #52616d;
+    }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .log-item {
+      padding: 10px;
+      border-radius: 8px;
+      background: #f4f8fa;
+      font-size: .95rem;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 10px 0;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%) translateY(80px);
+      background: #25313b;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: .25s ease;
+      font-weight: 800;
+      max-width: calc(100% - 24px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 940px) {
+      .hero, .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .children {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app {
+        width: min(100% - 18px, 1180px);
+        padding-top: 10px;
+      }
+
+      .title-block {
+        padding: 20px;
+      }
+
+      .mascots, .children, .task-grid, .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .task {
+        min-height: 100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero" aria-label="Kriauklyciu nuotykio pradzia">
+      <div class="title-block">
+        <h1>Kriauklyciu nuotykis</h1>
+        <p class="subtitle">Olivia ir Dominik renka Jūros kriauklytes už gerus darbelius, tvarką ir pagyrimus.</p>
+      </div>
+      <div class="mascots">
+        <div class="mascot">
+          <div class="face" aria-hidden="true">🧜‍♀️</div>
+          <strong>Undinė</strong>
+          <span>saugo kriauklytes</span>
+        </div>
+        <div class="mascot dragon">
+          <div class="face" aria-hidden="true">🐉</div>
+          <strong>Drakonas</strong>
+          <span>atrakina staigmenas</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <aside class="panel children" aria-label="Vaikai">
+        <button class="child-button active" data-child="olivia" type="button">
+          <span class="avatar" aria-hidden="true">🧒</span>
+          <span>
+            <span class="child-name">Olivia</span><br>
+            <span class="shell-count" id="oliviaCount">0 kriauklyčių</span>
+          </span>
+        </button>
+        <button class="child-button" data-child="dominik" type="button">
+          <span class="avatar" aria-hidden="true">👦</span>
+          <span>
+            <span class="child-name">Dominik</span><br>
+            <span class="shell-count" id="dominikCount">0 kriauklyčių</span>
+          </span>
+        </button>
+        <div class="progress-box">
+          <div class="progress-row">
+            <span>Bendras lobis</span>
+            <span id="familyTotal">0 / 30</span>
+          </div>
+          <div class="bar" aria-hidden="true"><div class="bar-fill" id="familyBar"></div></div>
+        </div>
+      </aside>
+
+      <section class="panel main">
+        <div class="section-head">
+          <div>
+            <h2 id="activeName">Olivia</h2>
+            <div class="today" id="todayText"></div>
+          </div>
+          <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
+        </div>
+        <div class="task-grid" id="taskGrid"></div>
+      </section>
+
+      <aside class="panel side">
+        <div class="reward">
+          <strong>Artimiausia staigmena</strong>
+          <span id="rewardText">Surinkus 10 kriauklyčių galima rinktis vakaro pasaką.</span>
+        </div>
+        <div class="actions">
+          <button class="action" id="bonusButton" type="button">+ Pagyrimas</button>
+          <button class="action secondary" id="resetButton" type="button">Nauja savaitė</button>
+        </div>
+        <div>
+          <h2>Šiandien</h2>
+          <div class="log" id="log"></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const tasks = [
+      { id: "toys", icon: "🧸", title: "Susidėjau žaislus", shells: 2 },
+      { id: "books", icon: "📚", title: "Susidėjau knygutes", shells: 1 },
+      { id: "clothes", icon: "👕", title: "Susilanksčiau rūbus", shells: 2 },
+      { id: "closet", icon: "🚪", title: "Rūbai spintoje", shells: 2 },
+      { id: "garden", icon: "🌳", title: "Gražiai elgiausi lauke", shells: 2 },
+      { id: "nap", icon: "🌙", title: "Ramiai atsikėliau po miego", shells: 1 },
+      { id: "help", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+      { id: "creative", icon: "🎨", title: "Atlikau veiklą", shells: 1 }
+    ];
+
+    const rewards = [
+      { at: 10, text: "10 kriauklyčių: galima rinktis vakaro pasaką." },
+      { at: 20, text: "20 kriauklyčių: galima rinktis filmuką arba žaidimą." },
+      { at: 30, text: "30 kriauklyčių: Undinė ir Drakonas atidaro bendrą staigmeną." },
+      { at: 50, text: "50 kriauklyčių: ypatinga išvyka arba didesnis prizas." }
+    ];
+
+    const initialState = {
+      active: "olivia",
+      children: {
+        olivia: { name: "Olivia", shells: 0, done: {}, log: [] },
+        dominik: { name: "Dominik", shells: 0, done: {}, log: [] }
+      }
+    };
+
+    const saved = localStorage.getItem("kriauklyciu-nuotykis");
+    const state = saved ? JSON.parse(saved) : initialState;
+
+    const taskGrid = document.getElementById("taskGrid");
+    const log = document.getElementById("log");
+    const toast = document.getElementById("toast");
+
+    document.getElementById("todayText").textContent = new Intl.DateTimeFormat("lt-LT", {
+      weekday: "long",
+      month: "long",
+      day: "numeric"
+    }).format(new Date());
+
+    function save() {
+      localStorage.setItem("kriauklyciu-nuotykis", JSON.stringify(state));
+    }
+
+    function shellWord(count) {
+      const last = count % 10;
+      const lastTwo = count % 100;
+      if (lastTwo >= 10 && lastTwo <= 20) return "kriauklyčių";
+      if (last === 1) return "kriauklytė";
+      if (last > 1 && last < 10) return "kriauklytės";
+      return "kriauklyčių";
+    }
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function activeChild() {
+      return state.children[state.active];
+    }
+
+    function addLog(child, text) {
+      child.log.unshift(text);
+      child.log = child.log.slice(0, 12);
+    }
+
+    function completeTask(task) {
+      const child = activeChild();
+      if (child.done[task.id]) {
+        showToast("Ši užduotis jau pažymėta.");
+        return;
+      }
+      child.done[task.id] = true;
+      child.shells += task.shells;
+      addLog(child, `${child.name}: ${task.title} (+${task.shells})`);
+      save();
+      render();
+      showToast(`${child.name} gavo ${task.shells} ${shellWord(task.shells)}!`);
+    }
+
+    function renderTasks() {
+      const child = activeChild();
+      taskGrid.innerHTML = "";
+      tasks.forEach(task => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `task${child.done[task.id] ? " done" : ""}`;
+        button.innerHTML = `
+          <span class="task-icon" aria-hidden="true">${task.icon}</span>
+          <span>
+            <span class="task-title">${task.title}</span>
+            <span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span>
+          </span>
+        `;
+        button.addEventListener("click", () => completeTask(task));
+        taskGrid.appendChild(button);
+      });
+    }
+
+    function renderLog() {
+      const child = activeChild();
+      log.innerHTML = "";
+      if (!child.log.length) {
+        log.innerHTML = `<div class="empty">Dar nėra pažymėtų darbelių.</div>`;
+        return;
+      }
+      child.log.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "log-item";
+        row.textContent = item;
+        log.appendChild(row);
+      });
+    }
+
+    function renderReward(total) {
+      const next = rewards.find(reward => reward.at > activeChild().shells) || rewards[rewards.length - 1];
+      document.getElementById("rewardText").textContent = next.text;
+      document.getElementById("familyTotal").textContent = `${Math.min(total, 30)} / 30`;
+      document.getElementById("familyBar").style.width = `${Math.min(total / 30 * 100, 100)}%`;
+    }
+
+    function render() {
+      const olivia = state.children.olivia;
+      const dominik = state.children.dominik;
+      const child = activeChild();
+      const total = olivia.shells + dominik.shells;
+
+      document.querySelectorAll(".child-button").forEach(button => {
+        button.classList.toggle("active", button.dataset.child === state.active);
+      });
+
+      document.getElementById("oliviaCount").textContent = `${olivia.shells} ${shellWord(olivia.shells)}`;
+      document.getElementById("dominikCount").textContent = `${dominik.shells} ${shellWord(dominik.shells)}`;
+      document.getElementById("activeName").textContent = child.name;
+      document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)}`;
+
+      renderTasks();
+      renderLog();
+      renderReward(total);
+    }
+
+    document.querySelectorAll(".child-button").forEach(button => {
+      button.addEventListener("click", () => {
+        state.active = button.dataset.child;
+        save();
+        render();
+      });
+    });
+
+    document.getElementById("bonusButton").addEventListener("click", () => {
+      const child = activeChild();
+      child.shells += 3;
+      addLog(child, `${child.name}: pagyrimas darželyje arba namie (+3)`);
+      save();
+      render();
+      showToast("Pagyrimas pridėtas: +3 kriauklytės!");
+    });
+
+    document.getElementById("resetButton").addEventListener("click", () => {
+      const ok = confirm("Pradėti naują savaitę? Visi surinkti skaičiai bus išvalyti.");
+      if (!ok) return;
+      state.children.olivia.shells = 0;
+      state.children.olivia.done = {};
+      state.children.olivia.log = [];
+      state.children.dominik.shells = 0;
+      state.children.dominik.done = {};
+      state.children.dominik.log = [];
+      save();
+      render();
+      showToast("Pradėta nauja savaitė.");
+    });
+
+    render();
+  </script>
+</body>
+</html>
