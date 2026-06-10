@@ -307,6 +307,7 @@
       padding: 14px;
       display: grid;
       gap: 8px;
+      text-align: left;
     }
 
     .summary-card strong {
@@ -319,6 +320,20 @@
       gap: 12px;
       color: var(--muted);
       font-weight: 800;
+    }
+
+    .summary-button {
+      border: 0;
+      border-radius: 8px;
+      background: #f4f8fa;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .summary-button:hover, .month-day:hover {
+      background: #e7f9ff;
     }
 
     .month-grid {
@@ -336,6 +351,9 @@
       display: grid;
       gap: 6px;
       align-content: start;
+      cursor: pointer;
+      color: var(--ink);
+      text-align: left;
     }
 
     .month-day.muted {
@@ -924,6 +942,14 @@
       document.getElementById("familyBar").style.width = `${Math.min(total / 30 * 100, 100)}%`;
     }
 
+    function openDay(key, childId = state.active) {
+      state.selectedDate = key;
+      state.active = childId;
+      state.view = "day";
+      save();
+      render();
+    }
+
     function renderWeek() {
       const keys = getWeekKeys(state.selectedDate);
       contentArea.className = "summary-grid";
@@ -936,14 +962,11 @@
         card.className = "summary-card";
         card.innerHTML = `
           <strong>${formatDate(key)}</strong>
-          <div class="summary-line"><span>Olivia</span><span>${olivia} ${shellWord(olivia)}</span></div>
-          <div class="summary-line"><span>Dominik</span><span>${dominik} ${shellWord(dominik)}</span></div>
+          <button class="summary-button summary-line" data-child="olivia" type="button"><span>Olivia</span><span>${olivia} ${shellWord(olivia)}</span></button>
+          <button class="summary-button summary-line" data-child="dominik" type="button"><span>Dominik</span><span>${dominik} ${shellWord(dominik)}</span></button>
         `;
-        card.addEventListener("click", () => {
-          state.selectedDate = key;
-          state.view = "day";
-          save();
-          render();
+        card.querySelectorAll(".summary-button").forEach(button => {
+          button.addEventListener("click", () => openDay(key, button.dataset.child));
         });
         contentArea.appendChild(card);
       });
@@ -973,12 +996,8 @@
           <span>O: ${olivia}</span>
           <span>D: ${dominik}</span>
         `;
-        card.addEventListener("click", () => {
-          state.selectedDate = key;
-          state.view = "day";
-          save();
-          render();
-        });
+        card.title = "Paspauskite, kad matytumėte tos dienos istoriją";
+        card.addEventListener("click", () => openDay(key, state.active));
         contentArea.appendChild(card);
       }
     }
