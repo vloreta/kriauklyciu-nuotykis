@@ -215,6 +215,37 @@
       font-weight: 600;
     }
 
+    .date-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .date-button, .view-button {
+      min-height: 38px;
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 800;
+      padding: 0 12px;
+    }
+
+    .view-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .view-button.active {
+      border-color: var(--sea);
+      background: #e7f9ff;
+      color: #0c718a;
+    }
+
     .task-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -260,6 +291,64 @@
       color: #0c718a;
       font-weight: 800;
       font-size: .95rem;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .summary-card {
+      min-height: 104px;
+      border: 2px solid #e7edf1;
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .summary-card strong {
+      font-size: 1.05rem;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .month-day {
+      min-height: 92px;
+      border: 2px solid #e7edf1;
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+    }
+
+    .month-day.muted {
+      opacity: .48;
+    }
+
+    .month-day.today-mark {
+      border-color: var(--sea);
+      background: #e7f9ff;
+    }
+
+    .month-date {
+      font-weight: 900;
     }
 
     .side {
@@ -458,9 +547,19 @@
             <h2 id="activeName">Olivia</h2>
             <div class="today" id="todayText"></div>
           </div>
-          <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
+          <div class="date-nav">
+            <button class="date-button" id="prevDayButton" type="button">‹</button>
+            <button class="date-button" id="todayButton" type="button">Šiandien</button>
+            <button class="date-button" id="nextDayButton" type="button">›</button>
+          </div>
         </div>
-        <div class="task-grid" id="taskGrid"></div>
+        <div class="view-tabs" aria-label="Laikotarpio pasirinkimas">
+          <button class="view-button active" data-view="day" type="button">Diena</button>
+          <button class="view-button" data-view="week" type="button">Savaitė</button>
+          <button class="view-button" data-view="month" type="button">Mėnuo</button>
+        </div>
+        <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
+        <div id="contentArea"></div>
       </section>
 
       <aside class="panel side">
@@ -499,7 +598,7 @@
           </div>
         </div>
         <div>
-          <h2>Šiandien</h2>
+          <h2 id="logTitle">Šiandien</h2>
           <div class="log" id="log"></div>
         </div>
       </aside>
@@ -566,29 +665,111 @@
       morning: { text: "sunku greitai atsikelti ryte", shells: 5 }
     };
 
+    const childNames = {
+      olivia: "Olivia",
+      dominik: "Dominik"
+    };
+
     const initialState = {
       active: "olivia",
-      children: {
-        olivia: { name: "Olivia", shells: 0, done: {}, log: [] },
-        dominik: { name: "Dominik", shells: 0, done: {}, log: [] }
-      }
+      view: "day",
+      selectedDate: todayKey(),
+      records: {}
     };
 
     const saved = localStorage.getItem("kriauklyciu-nuotykis");
-    const state = saved ? JSON.parse(saved) : initialState;
+    const state = normalizeState(saved ? JSON.parse(saved) : initialState);
 
-    const taskGrid = document.getElementById("taskGrid");
+    const contentArea = document.getElementById("contentArea");
     const log = document.getElementById("log");
     const toast = document.getElementById("toast");
 
-    document.getElementById("todayText").textContent = new Intl.DateTimeFormat("lt-LT", {
-      weekday: "long",
-      month: "long",
-      day: "numeric"
-    }).format(new Date());
-
     function save() {
       localStorage.setItem("kriauklyciu-nuotykis", JSON.stringify(state));
+    }
+
+    function todayKey() {
+      return dateKey(new Date());
+    }
+
+    function dateKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseDate(key) {
+      const [year, month, day] = key.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function addDays(key, amount) {
+      const date = parseDate(key);
+      date.setDate(date.getDate() + amount);
+      return dateKey(date);
+    }
+
+    function monthKey(key) {
+      return key.slice(0, 7);
+    }
+
+    function formatDate(key, mode = "full") {
+      const date = parseDate(key);
+      const options = mode === "month"
+        ? { month: "long", year: "numeric" }
+        : { month: "long", day: "numeric", weekday: "long" };
+      return new Intl.DateTimeFormat("lt-LT", options).format(date);
+    }
+
+    function startOfWeek(key) {
+      const date = parseDate(key);
+      const day = date.getDay() || 7;
+      date.setDate(date.getDate() - day + 1);
+      return dateKey(date);
+    }
+
+    function getWeekKeys(key) {
+      const start = startOfWeek(key);
+      return Array.from({ length: 7 }, (_, index) => addDays(start, index));
+    }
+
+    function normalizeState(raw) {
+      const next = {
+        active: raw.active || "olivia",
+        view: raw.view || "day",
+        selectedDate: raw.selectedDate || todayKey(),
+        records: raw.records || {}
+      };
+
+      if (raw.children && !raw.records) {
+        const key = todayKey();
+        next.records[key] = {
+          olivia: {
+            shells: raw.children.olivia?.shells || 0,
+            done: raw.children.olivia?.done || {},
+            log: raw.children.olivia?.log || []
+          },
+          dominik: {
+            shells: raw.children.dominik?.shells || 0,
+            done: raw.children.dominik?.done || {},
+            log: raw.children.dominik?.log || []
+          }
+        };
+      }
+
+      ensureDay(next.selectedDate, next);
+      return next;
+    }
+
+    function ensureDay(key, targetState = state) {
+      if (!targetState.records[key]) targetState.records[key] = {};
+      Object.keys(childNames).forEach(childId => {
+        if (!targetState.records[key][childId]) {
+          targetState.records[key][childId] = { shells: 0, done: {}, log: [] };
+        }
+      });
+      return targetState.records[key];
     }
 
     function shellWord(count) {
@@ -608,7 +789,11 @@
     }
 
     function activeChild() {
-      return state.children[state.active];
+      return ensureDay(state.selectedDate)[state.active];
+    }
+
+    function activeName() {
+      return childNames[state.active];
     }
 
     function addLog(child, text) {
@@ -624,15 +809,16 @@
       }
       child.done[task.id] = true;
       child.shells += task.shells;
-      addLog(child, `${child.name}: ${task.title} (+${task.shells})`);
+      addLog(child, `${activeName()}: ${task.title} (+${task.shells})`);
       save();
       render();
-      showToast(`${child.name} gavo ${task.shells} ${shellWord(task.shells)}!`);
+      showToast(`${activeName()} gavo ${task.shells} ${shellWord(task.shells)}!`);
     }
 
     function renderTasks() {
       const child = activeChild();
-      taskGrid.innerHTML = "";
+      contentArea.className = "task-grid";
+      contentArea.innerHTML = "";
       tasks.forEach(task => {
         const button = document.createElement("button");
         button.type = "button";
@@ -645,13 +831,14 @@
           </span>
         `;
         button.addEventListener("click", () => completeTask(task));
-        taskGrid.appendChild(button);
+        contentArea.appendChild(button);
       });
     }
 
     function renderLog() {
       const child = activeChild();
       log.innerHTML = "";
+      document.getElementById("logTitle").textContent = formatDate(state.selectedDate);
       if (!child.log.length) {
         log.innerHTML = `<div class="empty">Dar nėra pažymėtų darbelių.</div>`;
         return;
@@ -664,31 +851,107 @@
       });
     }
 
-    function renderReward(total) {
-      const next = rewards.find(reward => reward.at > activeChild().shells) || rewards[rewards.length - 1];
+    function childTotal(childId, keys) {
+      return keys.reduce((sum, key) => sum + (ensureDay(key)[childId].shells || 0), 0);
+    }
+
+    function renderReward(total, activeWeekTotal) {
+      const next = rewards.find(reward => reward.at > activeWeekTotal) || rewards[rewards.length - 1];
       document.getElementById("rewardText").textContent = next.text;
       document.getElementById("familyTotal").textContent = `${Math.min(total, 30)} / 30`;
       document.getElementById("familyBar").style.width = `${Math.min(total / 30 * 100, 100)}%`;
     }
 
+    function renderWeek() {
+      const keys = getWeekKeys(state.selectedDate);
+      contentArea.className = "summary-grid";
+      contentArea.innerHTML = "";
+
+      keys.forEach(key => {
+        const olivia = childTotal("olivia", [key]);
+        const dominik = childTotal("dominik", [key]);
+        const card = document.createElement("div");
+        card.className = "summary-card";
+        card.innerHTML = `
+          <strong>${formatDate(key)}</strong>
+          <div class="summary-line"><span>Olivia</span><span>${olivia} ${shellWord(olivia)}</span></div>
+          <div class="summary-line"><span>Dominik</span><span>${dominik} ${shellWord(dominik)}</span></div>
+        `;
+        card.addEventListener("click", () => {
+          state.selectedDate = key;
+          state.view = "day";
+          save();
+          render();
+        });
+        contentArea.appendChild(card);
+      });
+    }
+
+    function renderMonth() {
+      const selected = parseDate(state.selectedDate);
+      const first = new Date(selected.getFullYear(), selected.getMonth(), 1);
+      const startDay = first.getDay() || 7;
+      const gridStart = new Date(first);
+      gridStart.setDate(first.getDate() - startDay + 1);
+      const selectedMonth = selected.getMonth();
+
+      contentArea.className = "month-grid";
+      contentArea.innerHTML = "";
+
+      for (let index = 0; index < 42; index += 1) {
+        const date = new Date(gridStart);
+        date.setDate(gridStart.getDate() + index);
+        const key = dateKey(date);
+        const olivia = childTotal("olivia", [key]);
+        const dominik = childTotal("dominik", [key]);
+        const card = document.createElement("div");
+        card.className = `month-day${date.getMonth() !== selectedMonth ? " muted" : ""}${key === todayKey() ? " today-mark" : ""}`;
+        card.innerHTML = `
+          <span class="month-date">${date.getDate()}</span>
+          <span>O: ${olivia}</span>
+          <span>D: ${dominik}</span>
+        `;
+        card.addEventListener("click", () => {
+          state.selectedDate = key;
+          state.view = "day";
+          save();
+          render();
+        });
+        contentArea.appendChild(card);
+      }
+    }
+
     function render() {
-      const olivia = state.children.olivia;
-      const dominik = state.children.dominik;
+      ensureDay(state.selectedDate);
+      const weekKeys = getWeekKeys(state.selectedDate);
+      const oliviaToday = childTotal("olivia", [state.selectedDate]);
+      const dominikToday = childTotal("dominik", [state.selectedDate]);
+      const oliviaWeek = childTotal("olivia", weekKeys);
+      const dominikWeek = childTotal("dominik", weekKeys);
       const child = activeChild();
-      const total = olivia.shells + dominik.shells;
+      const weekTotal = oliviaWeek + dominikWeek;
 
       document.querySelectorAll(".child-button").forEach(button => {
         button.classList.toggle("active", button.dataset.child === state.active);
       });
 
-      document.getElementById("oliviaCount").textContent = `${olivia.shells} ${shellWord(olivia.shells)}`;
-      document.getElementById("dominikCount").textContent = `${dominik.shells} ${shellWord(dominik.shells)}`;
-      document.getElementById("activeName").textContent = child.name;
-      document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)}`;
+      document.querySelectorAll(".view-button").forEach(button => {
+        button.classList.toggle("active", button.dataset.view === state.view);
+      });
 
-      renderTasks();
+      document.getElementById("todayText").textContent = state.view === "month"
+        ? formatDate(state.selectedDate, "month")
+        : formatDate(state.selectedDate);
+      document.getElementById("oliviaCount").textContent = `${oliviaToday} ${shellWord(oliviaToday)} pasirinktą dieną`;
+      document.getElementById("dominikCount").textContent = `${dominikToday} ${shellWord(dominikToday)} pasirinktą dieną`;
+      document.getElementById("activeName").textContent = activeName();
+      document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${state.active === "olivia" ? oliviaWeek : dominikWeek} ${shellWord(state.active === "olivia" ? oliviaWeek : dominikWeek)}.`;
+
+      if (state.view === "day") renderTasks();
+      if (state.view === "week") renderWeek();
+      if (state.view === "month") renderMonth();
       renderLog();
-      renderReward(total);
+      renderReward(weekTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
     }
 
     document.querySelectorAll(".child-button").forEach(button => {
@@ -699,10 +962,38 @@
       });
     });
 
+    document.querySelectorAll(".view-button").forEach(button => {
+      button.addEventListener("click", () => {
+        state.view = button.dataset.view;
+        save();
+        render();
+      });
+    });
+
+    document.getElementById("prevDayButton").addEventListener("click", () => {
+      const step = state.view === "month" ? -30 : state.view === "week" ? -7 : -1;
+      state.selectedDate = addDays(state.selectedDate, step);
+      save();
+      render();
+    });
+
+    document.getElementById("todayButton").addEventListener("click", () => {
+      state.selectedDate = todayKey();
+      save();
+      render();
+    });
+
+    document.getElementById("nextDayButton").addEventListener("click", () => {
+      const step = state.view === "month" ? 30 : state.view === "week" ? 7 : 1;
+      state.selectedDate = addDays(state.selectedDate, step);
+      save();
+      render();
+    });
+
     document.getElementById("bonusButton").addEventListener("click", () => {
       const child = activeChild();
       child.shells += 3;
-      addLog(child, `${child.name}: pagyrimas darželyje arba namie (+3)`);
+      addLog(child, `${activeName()}: pagyrimas darželyje arba namie (+3)`);
       save();
       render();
       showToast("Pagyrimas pridėtas: +3 kriauklytės!");
@@ -715,7 +1006,7 @@
       const removed = Math.min(child.shells, penalty.shells);
 
       if (removed === 0) {
-        addLog(child, `${child.name}: ${penalty.text} (0)`);
+        addLog(child, `${activeName()}: ${penalty.text} (0)`);
         save();
         render();
         showToast("Kriauklyčių dar nėra, todėl nieko neatimta.");
@@ -723,21 +1014,19 @@
       }
 
       child.shells -= removed;
-      addLog(child, `${child.name}: ${penalty.text} (-${removed})`);
+      addLog(child, `${activeName()}: ${penalty.text} (-${removed})`);
       save();
       render();
-      showToast(`${child.name} prarado ${removed} ${shellWord(removed)}.`);
+      showToast(`${activeName()} prarado ${removed} ${shellWord(removed)}.`);
     });
 
     document.getElementById("resetButton").addEventListener("click", () => {
-      const ok = confirm("Pradėti naują savaitę? Visi surinkti skaičiai bus išvalyti.");
+      const ok = confirm("Pradėti naują savaitę? Šios savaitės įrašai bus išvalyti.");
       if (!ok) return;
-      state.children.olivia.shells = 0;
-      state.children.olivia.done = {};
-      state.children.olivia.log = [];
-      state.children.dominik.shells = 0;
-      state.children.dominik.done = {};
-      state.children.dominik.log = [];
+      getWeekKeys(state.selectedDate).forEach(key => {
+        delete state.records[key];
+      });
+      ensureDay(state.selectedDate);
       save();
       render();
       showToast("Pradėta nauja savaitė.");
