@@ -804,7 +804,12 @@
     function completeTask(task) {
       const child = activeChild();
       if (child.done[task.id]) {
-        showToast("Ši užduotis jau pažymėta.");
+        child.done[task.id] = false;
+        child.shells = Math.max(0, child.shells - task.shells);
+        addLog(child, `${activeName()}: atšaukta - ${task.title} (-${task.shells})`);
+        save();
+        render();
+        showToast(`${task.title} atšaukta: -${task.shells} ${shellWord(task.shells)}.`);
         return;
       }
       child.done[task.id] = true;
