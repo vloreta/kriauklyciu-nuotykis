@@ -131,6 +131,9 @@
     }
 
     .ocean-scene {
+      position: sticky;
+      top: 10px;
+      z-index: 20;
       height: 340px;
       overflow: hidden;
       padding: 0;
@@ -142,6 +145,7 @@
       background-size: cover;
       display: grid;
       grid-template-rows: 1fr 1fr;
+      box-shadow: 0 12px 28px rgba(25, 68, 90, 0.18);
     }
 
     .ocean-half {
@@ -835,6 +839,7 @@
 
       .ocean-scene {
         height: 330px;
+        position: static;
       }
 
       .ocean-label {
