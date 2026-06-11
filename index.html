@@ -951,6 +951,7 @@
       active: "olivia",
       view: "day",
       selectedDate: todayKey(),
+      lastCalendarDate: todayKey(),
       records: {}
     };
 
@@ -1012,15 +1013,23 @@
     }
 
     function normalizeState(raw) {
+      const currentDay = todayKey();
       const next = {
         active: raw.active || "olivia",
         view: raw.view || "day",
-        selectedDate: raw.selectedDate || todayKey(),
+        selectedDate: raw.selectedDate || currentDay,
+        lastCalendarDate: raw.lastCalendarDate || currentDay,
         records: raw.records || {}
       };
 
+      if (next.lastCalendarDate !== currentDay) {
+        next.selectedDate = currentDay;
+        next.view = "day";
+        next.lastCalendarDate = currentDay;
+      }
+
       if (raw.children && !raw.records) {
-        const key = todayKey();
+        const key = currentDay;
         next.records[key] = {
           olivia: {
             shells: raw.children.olivia?.shells || 0,
@@ -1208,6 +1217,19 @@
       render();
     }
 
+    function refreshCalendarDay() {
+      const currentDay = todayKey();
+      if (state.lastCalendarDate === currentDay) return;
+
+      state.selectedDate = currentDay;
+      state.view = "day";
+      state.lastCalendarDate = currentDay;
+      ensureDay(currentDay);
+      save();
+      render();
+      showToast("Prasidėjo nauja diena.");
+    }
+
     function renderWeek() {
       const keys = getWeekKeys(state.selectedDate);
       contentArea.className = "summary-grid";
@@ -1385,6 +1407,12 @@
     });
 
     render();
+    save();
+    setInterval(refreshCalendarDay, 60000);
+    window.addEventListener("focus", refreshCalendarDay);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) refreshCalendarDay();
+    });
   </script>
 </body>
 </html>
