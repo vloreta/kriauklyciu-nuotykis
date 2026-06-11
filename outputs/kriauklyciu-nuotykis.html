@@ -129,7 +129,7 @@
     }
 
     .ocean-scene {
-      height: 210px;
+      height: 340px;
       overflow: hidden;
       padding: 0;
       background: #bfefff;
@@ -159,7 +159,7 @@
     .ocean-label {
       position: absolute;
       left: 18px;
-      top: 50%;
+      top: 22px;
       transform: translateY(-50%);
       display: inline-flex;
       align-items: center;
@@ -188,13 +188,13 @@
       position: absolute;
       left: 154px;
       right: 76px;
-      top: 50%;
+      top: 66%;
       height: 34px;
       transform: translateY(-50%);
     }
 
     .ocean-half.olivia .race-track {
-      top: 82%;
+      top: 74%;
     }
 
     .race-path {
@@ -233,10 +233,10 @@
 
     .treasure-shell {
       position: absolute;
-      right: -58px;
+      right: -76px;
       top: 50%;
-      width: 48px;
-      height: 40px;
+      width: 68px;
+      height: 58px;
       transform: translateY(-50%);
     }
 
@@ -244,12 +244,14 @@
     .treasure-shell::after {
       content: "";
       position: absolute;
-      left: 5px;
-      width: 38px;
-      height: 20px;
+      left: 6px;
+      width: 56px;
+      height: 30px;
       border-radius: 50% 50% 10px 10px;
-      background: linear-gradient(135deg, #fff4c7, #f5a7bd 58%, #c77bd9);
-      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.48), 0 7px 12px rgba(20, 73, 93, 0.25);
+      background:
+        radial-gradient(circle at 24% 28%, rgba(255,255,255,0.9), transparent 18%),
+        linear-gradient(135deg, #fff6c9, #ffb2c8 54%, #bd72dd);
+      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.52), 0 9px 16px rgba(20, 73, 93, 0.3);
     }
 
     .treasure-shell::before {
@@ -265,20 +267,20 @@
 
     .pearl {
       position: absolute;
-      left: 18px;
-      top: 14px;
+      left: 23px;
+      top: 20px;
       z-index: 1;
-      width: 14px;
-      height: 14px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      background: radial-gradient(circle at 32% 28%, #ffffff, #dff9ff 45%, #9ad8f1);
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+      background: radial-gradient(circle at 30% 25%, #ffffff, #e5fbff 42%, #8bd4f2 78%);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.95), 0 0 8px rgba(105, 205, 240, 0.75);
     }
 
     .race-score {
       position: absolute;
       right: 18px;
-      bottom: 8px;
+      bottom: 12px;
       padding: 4px 8px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.76);
@@ -291,7 +293,7 @@
     .milestone-badge {
       position: absolute;
       left: 50%;
-      top: 42%;
+      top: 48%;
       z-index: 4;
       display: none;
       align-items: center;
@@ -314,7 +316,7 @@
 
     .milestone-badge.full {
       left: auto;
-      right: 72px;
+      right: 86px;
       transform: translateY(-50%);
       background: rgba(255, 247, 202, 0.94);
       color: #4a3200;
@@ -323,13 +325,13 @@
     .guide-bubble {
       position: absolute;
       right: 18px;
-      top: 6px;
+      top: 12px;
       z-index: 3;
       display: grid;
       grid-template-columns: 30px minmax(0, 1fr);
       gap: 8px;
       align-items: center;
-      max-width: min(410px, 46%);
+      max-width: min(520px, 58%);
       min-height: 40px;
       padding: 6px 10px;
       border: 1px solid rgba(255, 255, 255, 0.84);
@@ -754,16 +756,16 @@
       }
 
       .ocean-scene {
-        height: 180px;
+        height: 310px;
       }
 
       .race-track {
         left: 132px;
-        right: 64px;
+        right: 88px;
       }
 
       .guide-bubble {
-        max-width: 48%;
+        max-width: 56%;
       }
 
       .milestone-badge {
@@ -795,12 +797,12 @@
       }
 
       .ocean-scene {
-        height: 190px;
+        height: 330px;
       }
 
       .ocean-label {
         left: 10px;
-        top: 10px;
+        top: 20px;
         transform: none;
         padding: 6px 10px;
       }
@@ -812,12 +814,12 @@
 
       .race-track {
         left: 18px;
-        right: 58px;
+        right: 76px;
         top: 62%;
       }
 
       .ocean-half.olivia .race-track {
-        top: 74%;
+        top: 76%;
       }
 
       .guide-bubble {
@@ -847,7 +849,7 @@
 
       .race-score {
         right: 8px;
-        bottom: 6px;
+        bottom: 10px;
         font-size: 0.7rem;
       }
 
@@ -858,7 +860,26 @@
       }
 
       .milestone-badge.full {
-        right: 52px;
+        right: 72px;
+      }
+
+      .treasure-shell {
+        right: -70px;
+        width: 62px;
+        height: 52px;
+      }
+
+      .treasure-shell::before,
+      .treasure-shell::after {
+        width: 50px;
+        height: 27px;
+      }
+
+      .pearl {
+        left: 21px;
+        top: 18px;
+        width: 19px;
+        height: 19px;
       }
     }
   </style>
