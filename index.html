@@ -359,6 +359,10 @@
       backdrop-filter: blur(5px);
     }
 
+    .dominik-guide {
+      background: rgba(232, 247, 255, 0.86);
+    }
+
     .guide-avatar {
       width: 30px;
       height: 30px;
@@ -368,6 +372,10 @@
       background: linear-gradient(135deg, #e4fbff, #f7edff);
       box-shadow: inset 0 0 0 2px rgba(19, 159, 190, 0.18);
       font-size: 1.1rem;
+    }
+
+    .dominik-guide .guide-avatar {
+      background: linear-gradient(135deg, #dff6ff, #e9ffe2);
     }
 
     .guide-text {
@@ -966,6 +974,10 @@
         </div>
         <div class="ocean-half dominik" role="img" aria-label="Dominik vandenyno dalis su kriauklėmis ir krabiukais">
           <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">🐉</span>Dominik</span>
+          <div class="guide-bubble dominik-guide" aria-live="polite">
+            <span class="guide-avatar" aria-hidden="true">🐉</span>
+            <span class="guide-text" id="dominikGuideText">Drakonas laukia pirmosios Dominik kriauklytės.</span>
+          </div>
           <span class="milestone-badge dominik-badge" id="dominikMilestoneBadge">⭐ Pusė kelio!</span>
           <div class="race-track" id="dominikRaceTrack" aria-hidden="true">
             <span class="race-path"></span>
@@ -1116,6 +1128,7 @@
       selectedDate: todayKey(),
       lastCalendarDate: todayKey(),
       oliviaGuide: null,
+      dominikGuide: null,
       records: {}
     };
 
@@ -1184,6 +1197,7 @@
         selectedDate: raw.selectedDate || currentDay,
         lastCalendarDate: raw.lastCalendarDate || currentDay,
         oliviaGuide: raw.oliviaGuide || null,
+        dominikGuide: raw.dominikGuide || null,
         records: raw.records || {}
       };
 
@@ -1192,6 +1206,7 @@
         next.view = "day";
         next.lastCalendarDate = currentDay;
         next.oliviaGuide = null;
+        next.dominikGuide = null;
       }
 
       if (raw.children && !raw.records) {
@@ -1248,15 +1263,34 @@
       return "Puiki pradžia, Olivia. Kiekviena kriauklytė artina prie perlo.";
     }
 
+    function dominikDefaultGuide(shells) {
+      if (shells <= 0) return "Drakonas laukia pirmosios Dominik kriauklytės.";
+      if (shells >= maxDailyShells) return "Dominik pasiekė perlą! Drakonas atrakino perlo kriauklę.";
+      if (shells >= maxDailyShells * 0.75) return "Dominik jau labai arti lobio. Drakonas ruošia raktą!";
+      if (shells >= maxDailyShells * 0.35) return "Dominik stipriai juda pirmyn. Drakonas saugo kelią iki perlo.";
+      return "Gera pradžia, Dominik. Drakonas mato pirmas kriauklytes.";
+    }
+
     function setOliviaGuide(text) {
       state.oliviaGuide = { date: state.selectedDate, text };
       const guide = document.getElementById("oliviaGuideText");
       if (guide) guide.textContent = text;
     }
 
+    function setDominikGuide(text) {
+      state.dominikGuide = { date: state.selectedDate, text };
+      const guide = document.getElementById("dominikGuideText");
+      if (guide) guide.textContent = text;
+    }
+
     function renderOliviaGuide(oliviaToday) {
       const savedGuide = state.oliviaGuide?.date === state.selectedDate ? state.oliviaGuide.text : "";
       document.getElementById("oliviaGuideText").textContent = savedGuide || oliviaDefaultGuide(oliviaToday);
+    }
+
+    function renderDominikGuide(dominikToday) {
+      const savedGuide = state.dominikGuide?.date === state.selectedDate ? state.dominikGuide.text : "";
+      document.getElementById("dominikGuideText").textContent = savedGuide || dominikDefaultGuide(dominikToday);
     }
 
     function renderMilestoneBadge(childId, shells) {
@@ -1294,6 +1328,8 @@
         });
         if (isOlivia) {
           setOliviaGuide("Olivia surinko visas kriauklytes! Undinė atvėrė perlo kriauklę - šiandien priklauso ypatingas prizas.");
+        } else {
+          setDominikGuide("Dominik surinko visas kriauklytes! Drakonas atrakino perlo kriauklę - šiandien priklauso ypatingas prizas.");
         }
         return "full";
       }
@@ -1307,6 +1343,8 @@
         });
         if (isOlivia) {
           setOliviaGuide("Olivia jau nuėjo pusę kelio iki perlo! Undinė mato, kaip gražiai juda krabiukas.");
+        } else {
+          setDominikGuide("Dominik jau nuėjo pusę kelio iki perlo! Drakonas mato, kaip drąsiai juda krabiukas.");
         }
         return "half";
       }
@@ -1370,6 +1408,9 @@
         if (state.active === "olivia") {
           setOliviaGuide(`Nieko tokio, Olivia. Galime pabandyti dar kartą ir kriauklytė sugrįš.`);
           save();
+        } else if (state.active === "dominik") {
+          setDominikGuide("Nieko tokio, Dominik. Drakonas saugo kelią - galima pabandyti dar kartą.");
+          save();
         }
         showToast(`${task.title} atšaukta: -${task.shells} ${shellWord(task.shells)}.`);
         return;
@@ -1386,6 +1427,10 @@
       if (state.active === "olivia") {
         if (!milestone) {
           setOliviaGuide(`Puiku, Olivia! Undinė įdėjo ${task.shells} ${shellWord(task.shells)} į tavo lobį.`);
+        }
+      } else if (state.active === "dominik") {
+        if (!milestone) {
+          setDominikGuide(`Šaunu, Dominik! Drakonas pridėjo ${task.shells} ${shellWord(task.shells)} prie tavo kelio.`);
         }
       }
       save();
@@ -1570,6 +1615,7 @@
       renderReward(familyTodayTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
       renderRace(oliviaToday, dominikToday);
       renderOliviaGuide(oliviaToday);
+      renderDominikGuide(dominikToday);
       renderMilestoneBadge("olivia", oliviaToday);
       renderMilestoneBadge("dominik", dominikToday);
     }
@@ -1623,6 +1669,9 @@
       if (state.active === "olivia") {
         setOliviaGuide("Olivia gavo ypatingą pagyrimą! Undinė padovanojo dar tris spindinčias kriauklytes.");
         save();
+      } else if (state.active === "dominik") {
+        setDominikGuide("Dominik gavo ypatingą pagyrimą! Drakonas pridėjo tris stiprias kriauklytes.");
+        save();
       }
       showToast("Pagyrimas pridėtas: +3 kriauklytės!");
     });
@@ -1644,6 +1693,9 @@
         if (state.active === "olivia") {
           setOliviaGuide("Viskas gerai, Olivia. Undinė laukia pirmos kriauklytės ir tiki tavimi.");
           save();
+        } else if (state.active === "dominik") {
+          setDominikGuide("Viskas gerai, Dominik. Drakonas laukia pirmos kriauklytės ir saugo kelią.");
+          save();
         }
         showToast("Kriauklyčių dar nėra, todėl nieko neatimta.");
         return;
@@ -1659,6 +1711,9 @@
       render();
       if (state.active === "olivia") {
         setOliviaGuide("Nieko tokio, Olivia. Undinė primena: galima pasitaisyti ir vėl rinkti kriauklytes.");
+        save();
+      } else if (state.active === "dominik") {
+        setDominikGuide("Nieko tokio, Dominik. Drakonas primena: galima pasitaisyti ir vėl judėti link perlo.");
         save();
       }
       showToast(`${activeName()} prarado ${removed} ${shellWord(removed)}.`);
