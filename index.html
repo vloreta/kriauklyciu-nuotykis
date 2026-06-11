@@ -108,7 +108,7 @@
 
     .dashboard {
       display: grid;
-      grid-template-columns: 260px minmax(0, 1fr) 300px;
+      grid-template-columns: 260px minmax(0, 1fr);
       grid-template-rows: auto auto;
       gap: 18px;
       margin-top: 18px;
@@ -632,19 +632,24 @@
     }
 
     .side {
-      padding: 16px;
+      padding: 0;
       display: grid;
-      gap: 14px;
+      gap: 10px;
+    }
+
+    .side h2 {
+      margin: 2px 0 0;
+      font-size: 1.05rem;
     }
 
     @media (min-width: 941px) {
       .children {
         grid-column: 1;
-        grid-row: 1;
+        grid-row: 1 / span 2;
       }
 
       .ocean-scene {
-        grid-column: 2 / 4;
+        grid-column: 2;
         grid-row: 1;
       }
 
@@ -652,18 +657,14 @@
         grid-column: 2;
         grid-row: 2;
       }
-
-      .side {
-        grid-column: 3;
-        grid-row: 2;
-      }
     }
 
     .reward {
-      padding: 14px;
+      padding: 10px;
       border-radius: 8px;
       background: #fff8e7;
       border: 1px solid #f0dfb7;
+      font-size: 0.88rem;
     }
 
     .reward strong { display: block; margin-bottom: 6px; }
@@ -671,11 +672,11 @@
     .actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
 
     .action {
-      min-height: 46px;
+      min-height: 40px;
       border: 0;
       border-radius: 8px;
       cursor: pointer;
@@ -689,12 +690,13 @@
     }
 
     .penalty-box {
-      padding: 14px;
+      padding: 10px;
       border-radius: 8px;
       background: #fff1f1;
       border: 1px solid #f0c1c1;
       display: grid;
-      gap: 10px;
+      gap: 8px;
+      font-size: 0.88rem;
     }
 
     .penalty-box label {
@@ -703,8 +705,8 @@
 
     .penalty-controls {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 92px;
-      gap: 10px;
+      grid-template-columns: 1fr;
+      gap: 8px;
     }
 
     .penalty-controls select {
@@ -723,7 +725,7 @@
     .log {
       display: grid;
       gap: 8px;
-      max-height: 260px;
+      max-height: 210px;
       overflow: auto;
       padding-right: 4px;
     }
@@ -731,11 +733,11 @@
     .log-item {
       width: 100%;
       border: 0;
-      padding: 10px;
+      padding: 8px;
       border-radius: 8px;
       background: #f4f8fa;
       color: var(--ink);
-      font-size: .95rem;
+      font-size: .84rem;
       text-align: left;
     }
 
@@ -784,6 +786,10 @@
       .children {
         grid-template-columns: 1fr 1fr;
         align-content: normal;
+      }
+
+      .children .side {
+        grid-column: 1 / -1;
       }
 
       .ocean-scene {
@@ -959,6 +965,46 @@
           </div>
           <div class="bar" aria-hidden="true"><div class="bar-fill" id="familyBar"></div></div>
         </div>
+        <div class="side" aria-label="Staigmenos ir istorija">
+          <div class="reward">
+            <strong>Artimiausia staigmena</strong>
+            <span id="rewardText">Surinkus 10 kriauklyčių galima rinktis vakaro pasaką.</span>
+          </div>
+          <div class="actions">
+            <button class="action" id="bonusButton" type="button">+ Pagyrimas</button>
+            <button class="action secondary" id="resetButton" type="button">Nauja savaitė</button>
+          </div>
+          <div class="penalty-box">
+            <label for="penaltySelect">Neįvykdyta / reikia pasitaisyti</label>
+            <div class="penalty-controls">
+              <select id="penaltySelect">
+                <option value="toys">Žaislai liko nesutvarkyti (-1)</option>
+                <option value="books">Knygutės ne vietoje (-1)</option>
+                <option value="clothes">Rūbai nesulankstyti (-2)</option>
+                <option value="closet">Rūbai ne spintoje (-2)</option>
+                <option value="bag">Kuprinė / maišelis ne vietoje (-1)</option>
+                <option value="hands">Rankos nenuplautos be priminimo (-1)</option>
+                <option value="meal">Sunku gražiai sėdėti valgant (-1)</option>
+                <option value="dishes">Indai nenunešti po valgio (-1)</option>
+                <option value="thanks">Nepasakyta ačiū po valgio (-1)</option>
+                <option value="sorry">Neatsiprašyta, kai reikėjo (-2)</option>
+                <option value="turn">Nekantriai laukė savo eilės (-2)</option>
+                <option value="behavior">Reikėjo daug priminimų (-1)</option>
+                <option value="kindness">Nedraugiškas elgesys (-2)</option>
+                <option value="quiet">Nepasirinko ramios veiklos (-1)</option>
+                <option value="afterActivity">Nesutvarkė po veiklos (-2)</option>
+                <option value="newThing">Nenorėjo pabandyti naujo dalyko (-2)</option>
+                <option value="sleepAlone">Neužmigo be tėvų (-5)</option>
+                <option value="morning">Sunku greitai atsikelti ryte (-5)</option>
+              </select>
+              <button class="action warning" id="penaltyButton" type="button">Atimti</button>
+            </div>
+          </div>
+          <div>
+            <h2 id="logTitle">Šiandien</h2>
+            <div class="log" id="log"></div>
+          </div>
+        </div>
       </aside>
 
       <section class="panel ocean-scene" aria-label="Vandenyno dugno vaizdas">
@@ -1015,46 +1061,6 @@
         <div id="contentArea"></div>
       </section>
 
-      <aside class="panel side">
-        <div class="reward">
-          <strong>Artimiausia staigmena</strong>
-          <span id="rewardText">Surinkus 10 kriauklyčių galima rinktis vakaro pasaką.</span>
-        </div>
-        <div class="actions">
-          <button class="action" id="bonusButton" type="button">+ Pagyrimas</button>
-          <button class="action secondary" id="resetButton" type="button">Nauja savaitė</button>
-        </div>
-        <div class="penalty-box">
-          <label for="penaltySelect">Neįvykdyta / reikia pasitaisyti</label>
-          <div class="penalty-controls">
-            <select id="penaltySelect">
-              <option value="toys">Žaislai liko nesutvarkyti (-1)</option>
-              <option value="books">Knygutės ne vietoje (-1)</option>
-              <option value="clothes">Rūbai nesulankstyti (-2)</option>
-              <option value="closet">Rūbai ne spintoje (-2)</option>
-              <option value="bag">Kuprinė / maišelis ne vietoje (-1)</option>
-              <option value="hands">Rankos nenuplautos be priminimo (-1)</option>
-              <option value="meal">Sunku gražiai sėdėti valgant (-1)</option>
-              <option value="dishes">Indai nenunešti po valgio (-1)</option>
-              <option value="thanks">Nepasakyta ačiū po valgio (-1)</option>
-              <option value="sorry">Neatsiprašyta, kai reikėjo (-2)</option>
-              <option value="turn">Nekantriai laukė savo eilės (-2)</option>
-              <option value="behavior">Reikėjo daug priminimų (-1)</option>
-              <option value="kindness">Nedraugiškas elgesys (-2)</option>
-              <option value="quiet">Nepasirinko ramios veiklos (-1)</option>
-              <option value="afterActivity">Nesutvarkė po veiklos (-2)</option>
-              <option value="newThing">Nenorėjo pabandyti naujo dalyko (-2)</option>
-              <option value="sleepAlone">Neužmigo be tėvų (-5)</option>
-              <option value="morning">Sunku greitai atsikelti ryte (-5)</option>
-            </select>
-            <button class="action warning" id="penaltyButton" type="button">Atimti</button>
-          </div>
-        </div>
-        <div>
-          <h2 id="logTitle">Šiandien</h2>
-          <div class="log" id="log"></div>
-        </div>
-      </aside>
     </section>
   </main>
 
