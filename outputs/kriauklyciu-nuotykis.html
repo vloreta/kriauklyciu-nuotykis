@@ -288,6 +288,38 @@
       box-shadow: 0 4px 12px rgba(23, 87, 112, 0.13);
     }
 
+    .milestone-badge {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      z-index: 4;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.9);
+      color: #123044;
+      font-size: 0.78rem;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(21, 78, 104, 0.2);
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+    }
+
+    .milestone-badge.show {
+      display: inline-flex;
+    }
+
+    .milestone-badge.full {
+      left: auto;
+      right: 72px;
+      transform: translateY(-50%);
+      background: rgba(255, 247, 202, 0.94);
+      color: #4a3200;
+    }
+
     .guide-bubble {
       position: absolute;
       right: 18px;
@@ -733,6 +765,10 @@
       .guide-bubble {
         max-width: 48%;
       }
+
+      .milestone-badge {
+        top: 48%;
+      }
     }
 
     @media (max-width: 620px) {
@@ -814,6 +850,16 @@
         bottom: 6px;
         font-size: 0.7rem;
       }
+
+      .milestone-badge {
+        top: 51%;
+        font-size: 0.7rem;
+        padding: 4px 8px;
+      }
+
+      .milestone-badge.full {
+        right: 52px;
+      }
     }
   </style>
 </head>
@@ -870,6 +916,7 @@
             <span class="guide-avatar" aria-hidden="true">🧜‍♀️</span>
             <span class="guide-text" id="oliviaGuideText">Undinė laukia pirmosios Olivijos kriauklytės.</span>
           </div>
+          <span class="milestone-badge" id="oliviaMilestoneBadge">⭐ Pusė kelio!</span>
           <div class="race-track" id="oliviaRaceTrack" aria-hidden="true">
             <span class="race-path"></span>
             <span class="race-progress"></span>
@@ -1172,6 +1219,23 @@
       document.getElementById("oliviaGuideText").textContent = savedGuide || oliviaDefaultGuide(oliviaToday);
     }
 
+    function renderOliviaMilestoneBadge(oliviaToday) {
+      const badge = document.getElementById("oliviaMilestoneBadge");
+      const halfway = Math.ceil(maxDailyShells / 2);
+      badge.classList.remove("show", "full");
+
+      if (oliviaToday >= maxDailyShells) {
+        badge.textContent = "🏆 Perlas pasiektas!";
+        badge.classList.add("show", "full");
+        return;
+      }
+
+      if (oliviaToday >= halfway) {
+        badge.textContent = "⭐ Pusė kelio!";
+        badge.classList.add("show");
+      }
+    }
+
     function checkOliviaMilestones() {
       const day = ensureDay(state.selectedDate);
       const olivia = day.olivia;
@@ -1457,6 +1521,7 @@
       renderReward(familyTodayTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
       renderRace(oliviaToday, dominikToday);
       renderOliviaGuide(oliviaToday);
+      renderOliviaMilestoneBadge(oliviaToday);
     }
 
     document.querySelectorAll(".child-button").forEach(button => {
