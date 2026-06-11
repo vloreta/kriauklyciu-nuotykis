@@ -787,7 +787,7 @@
         <div class="progress-box">
           <div class="progress-row">
             <span>Bendras lobis</span>
-            <span id="familyTotal">0 / 30</span>
+            <span id="familyTotal">0 / 0</span>
           </div>
           <div class="bar" aria-hidden="true"><div class="bar-fill" id="familyBar"></div></div>
         </div>
@@ -946,6 +946,8 @@
       olivia: "Olivia",
       dominik: "Dominik"
     };
+
+    const maxFamilyDailyShells = maxDailyShells * Object.keys(childNames).length;
 
     const initialState = {
       active: "olivia",
@@ -1189,11 +1191,11 @@
       return keys.reduce((sum, key) => sum + (ensureDay(key)[childId].shells || 0), 0);
     }
 
-    function renderReward(total, activeWeekTotal) {
+    function renderReward(familyTodayTotal, activeWeekTotal) {
       const next = rewards.find(reward => reward.at > activeWeekTotal) || rewards[rewards.length - 1];
       document.getElementById("rewardText").textContent = next.text;
-      document.getElementById("familyTotal").textContent = `${Math.min(total, 30)} / 30`;
-      document.getElementById("familyBar").style.width = `${Math.min(total / 30 * 100, 100)}%`;
+      document.getElementById("familyTotal").textContent = `${familyTodayTotal} / ${maxFamilyDailyShells}`;
+      document.getElementById("familyBar").style.width = `${Math.min(familyTodayTotal / maxFamilyDailyShells * 100, 100)}%`;
     }
 
     function renderRace(oliviaToday, dominikToday) {
@@ -1290,7 +1292,7 @@
       const oliviaWeek = childTotal("olivia", weekKeys);
       const dominikWeek = childTotal("dominik", weekKeys);
       const child = activeChild();
-      const weekTotal = oliviaWeek + dominikWeek;
+      const familyTodayTotal = oliviaToday + dominikToday;
 
       document.querySelectorAll(".child-button").forEach(button => {
         button.classList.toggle("active", button.dataset.child === state.active);
@@ -1312,7 +1314,7 @@
       if (state.view === "week") renderWeek();
       if (state.view === "month") renderMonth();
       renderLog();
-      renderReward(weekTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
+      renderReward(familyTodayTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
       renderRace(oliviaToday, dominikToday);
     }
 
