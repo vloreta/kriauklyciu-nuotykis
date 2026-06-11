@@ -333,6 +333,12 @@
       color: #4a3200;
     }
 
+    .dominik-badge {
+      top: 36%;
+      background: rgba(232, 247, 255, 0.92);
+      color: #0b4768;
+    }
+
     .guide-bubble {
       position: absolute;
       right: 18px;
@@ -960,6 +966,7 @@
         </div>
         <div class="ocean-half dominik" role="img" aria-label="Dominik vandenyno dalis su kriauklėmis ir krabiukais">
           <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">🐉</span>Dominik</span>
+          <span class="milestone-badge dominik-badge" id="dominikMilestoneBadge">⭐ Pusė kelio!</span>
           <div class="race-track" id="dominikRaceTrack" aria-hidden="true">
             <span class="race-path"></span>
             <span class="race-progress"></span>
@@ -1252,47 +1259,55 @@
       document.getElementById("oliviaGuideText").textContent = savedGuide || oliviaDefaultGuide(oliviaToday);
     }
 
-    function renderOliviaMilestoneBadge(oliviaToday) {
-      const badge = document.getElementById("oliviaMilestoneBadge");
+    function renderMilestoneBadge(childId, shells) {
+      const badge = document.getElementById(`${childId}MilestoneBadge`);
       const halfway = Math.ceil(maxDailyShells / 2);
       badge.classList.remove("show", "full");
 
-      if (oliviaToday >= maxDailyShells) {
+      if (shells >= maxDailyShells) {
         badge.textContent = "🏆 Perlas pasiektas!";
         badge.classList.add("show", "full");
         return;
       }
 
-      if (oliviaToday >= halfway) {
+      if (shells >= halfway) {
         badge.textContent = "⭐ Pusė kelio!";
         badge.classList.add("show");
       }
     }
 
-    function checkOliviaMilestones() {
+    function checkChildMilestones(childId) {
       const day = ensureDay(state.selectedDate);
-      const olivia = day.olivia;
+      const child = day[childId];
+      const name = childNames[childId];
+      const isOlivia = childId === "olivia";
       const halfway = Math.ceil(maxDailyShells / 2);
 
-      if (olivia.shells >= maxDailyShells && !olivia.dailyTreasureAwarded) {
-        olivia.dailyTreasureAwarded = true;
-        addLog(olivia, {
-          text: "Olivia: dienos lobis pasiektas - Undinė atvėrė perlo kriauklę (prizas)",
+      if (child.shells >= maxDailyShells && !child.dailyTreasureAwarded) {
+        child.dailyTreasureAwarded = true;
+        addLog(child, {
+          text: isOlivia
+            ? "Olivia: dienos lobis pasiektas - Undinė atvėrė perlo kriauklę (prizas)"
+            : "Dominik: dienos lobis pasiektas - Drakonas atrakino perlo kriauklę (prizas)",
           delta: 0,
           kind: "dailyPrize"
         });
-        setOliviaGuide("Olivia surinko visas kriauklytes! Undinė atvėrė perlo kriauklę - šiandien priklauso ypatingas prizas.");
+        if (isOlivia) {
+          setOliviaGuide("Olivia surinko visas kriauklytes! Undinė atvėrė perlo kriauklę - šiandien priklauso ypatingas prizas.");
+        }
         return "full";
       }
 
-      if (olivia.shells >= halfway && !olivia.halfwayTreasureNoticed) {
-        olivia.halfwayTreasureNoticed = true;
-        addLog(olivia, {
-          text: "Olivia: pusė kelio iki perlo jau nueita",
+      if (child.shells >= halfway && !child.halfwayTreasureNoticed) {
+        child.halfwayTreasureNoticed = true;
+        addLog(child, {
+          text: `${name}: pusė kelio iki perlo jau nueita`,
           delta: 0,
           kind: "halfwayNotice"
         });
-        setOliviaGuide("Olivia jau nuėjo pusę kelio iki perlo! Undinė mato, kaip gražiai juda krabiukas.");
+        if (isOlivia) {
+          setOliviaGuide("Olivia jau nuėjo pusę kelio iki perlo! Undinė mato, kaip gražiai juda krabiukas.");
+        }
         return "half";
       }
 
@@ -1367,8 +1382,8 @@
         taskId: task.id,
         kind: "complete"
       });
+      const milestone = checkChildMilestones(state.active);
       if (state.active === "olivia") {
-        const milestone = checkOliviaMilestones();
         if (!milestone) {
           setOliviaGuide(`Puiku, Olivia! Undinė įdėjo ${task.shells} ${shellWord(task.shells)} į tavo lobį.`);
         }
@@ -1528,8 +1543,9 @@
       const dominikWeek = childTotal("dominik", weekKeys);
       const child = activeChild();
       const familyTodayTotal = oliviaToday + dominikToday;
-      const oliviaMilestone = checkOliviaMilestones();
-      if (oliviaMilestone) save();
+      const oliviaMilestone = checkChildMilestones("olivia");
+      const dominikMilestone = checkChildMilestones("dominik");
+      if (oliviaMilestone || dominikMilestone) save();
 
       document.querySelectorAll(".child-button").forEach(button => {
         button.classList.toggle("active", button.dataset.child === state.active);
@@ -1554,7 +1570,8 @@
       renderReward(familyTodayTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
       renderRace(oliviaToday, dominikToday);
       renderOliviaGuide(oliviaToday);
-      renderOliviaMilestoneBadge(oliviaToday);
+      renderMilestoneBadge("olivia", oliviaToday);
+      renderMilestoneBadge("dominik", dominikToday);
     }
 
     document.querySelectorAll(".child-button").forEach(button => {
