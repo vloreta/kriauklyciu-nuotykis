@@ -1377,7 +1377,8 @@
         oliviaGuide: raw.oliviaGuide || null,
         dominikGuide: raw.dominikGuide || null,
         records: raw.records || {},
-        weekendPrizes: raw.weekendPrizes || {}
+        weekendPrizes: raw.weekendPrizes || {},
+        legacyBonusPointsRemoved: Boolean(raw.legacyBonusPointsRemoved)
       };
 
       if (next.lastCalendarDate !== currentDay) {
@@ -1404,8 +1405,33 @@
         };
       }
 
+      migrateLegacyBonusPoints(next);
       ensureDay(next.selectedDate, next);
       return next;
+    }
+
+    function migrateLegacyBonusPoints(targetState) {
+      if (targetState.legacyBonusPointsRemoved) return;
+      Object.values(targetState.records || {}).forEach(day => {
+        Object.keys(childNames).forEach(childId => {
+          const child = day[childId];
+          if (!child || !Array.isArray(child.log)) return;
+          const legacyBonusTotal = child.log.reduce((sum, item) => {
+            if (typeof item === "string" || item.undone) return sum;
+            return item.kind === "bonus" && item.delta > 0 ? sum + item.delta : sum;
+          }, 0);
+          if (legacyBonusTotal > 0) {
+            child.shells = Math.max(0, (child.shells || 0) - legacyBonusTotal);
+            child.log.forEach(item => {
+              if (typeof item !== "string" && item.kind === "bonus" && item.delta > 0) {
+                item.delta = 0;
+                item.text = item.text.replace(/\(\+\d+\)/, "(staigmena)");
+              }
+            });
+          }
+        });
+      });
+      targetState.legacyBonusPointsRemoved = true;
     }
 
     function ensureDay(key, targetState = state) {
