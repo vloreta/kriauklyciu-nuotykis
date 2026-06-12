@@ -714,28 +714,22 @@
 
     .reward strong { display: block; margin-bottom: 6px; }
 
-    .surprise-choices {
+    .surprise-picker {
       display: grid;
-      gap: 6px;
-      max-height: 210px;
-      overflow: auto;
-      padding-right: 2px;
+      gap: 8px;
     }
 
-    .surprise-choice {
-      border: 1px solid #f0dfb7;
+    .surprise-picker select {
+      min-width: 0;
+      border: 2px solid #ead7a9;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.9);
       color: var(--ink);
-      cursor: pointer;
-      font-weight: 750;
-      line-height: 1.2;
-      min-height: 34px;
-      padding: 7px 9px;
-      text-align: left;
+      min-height: 40px;
+      padding: 0 10px;
     }
 
-    .surprise-choice:disabled {
+    .surprise-picker select:disabled {
       cursor: not-allowed;
       opacity: .54;
     }
@@ -1047,7 +1041,10 @@
             <strong>Staigmena už ypatingą pagyrimą</strong>
             <span id="surpriseText">Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.</span>
             <button class="action" id="bonusButton" type="button">Ypatingas pagyrimas</button>
-            <div class="surprise-choices" id="surpriseChoices" aria-label="Staigmenos pasirinkimai"></div>
+            <div class="surprise-picker">
+              <select id="surpriseSelect" aria-label="Staigmenos pasirinkimas"></select>
+              <button class="action" id="chooseSurpriseButton" type="button">Pasirinkti staigmeną</button>
+            </div>
           </div>
           <button class="action secondary reset-week" id="resetButton" type="button">Pradėti naują savaitę</button>
           <div class="penalty-box">
@@ -1605,7 +1602,8 @@
       const unlocked = Boolean(child.surpriseUnlocked);
       const text = document.getElementById("surpriseText");
       const button = document.getElementById("bonusButton");
-      const choices = document.getElementById("surpriseChoices");
+      const select = document.getElementById("surpriseSelect");
+      const chooseButton = document.getElementById("chooseSurpriseButton");
 
       if (unlocked) {
         text.textContent = `${activeName()} gavo ypatingą pagyrimą. Galima pasirinkti vieną staigmeną.`;
@@ -1621,16 +1619,15 @@
         button.disabled = false;
       }
 
-      choices.innerHTML = "";
+      select.innerHTML = "";
       surprises.forEach(surprise => {
-        const choice = document.createElement("button");
-        choice.className = "surprise-choice";
-        choice.type = "button";
-        choice.textContent = surprise;
-        choice.disabled = !unlocked;
-        choice.addEventListener("click", () => chooseSurprise(surprise));
-        choices.appendChild(choice);
+        const option = document.createElement("option");
+        option.value = surprise;
+        option.textContent = surprise;
+        select.appendChild(option);
       });
+      select.disabled = !unlocked;
+      chooseButton.disabled = !unlocked;
     }
 
     function chooseSurprise(surprise) {
@@ -1830,6 +1827,11 @@
         save();
       }
       showToast("Ypatingas pagyrimas atrakino staigmeną!");
+    });
+
+    document.getElementById("chooseSurpriseButton").addEventListener("click", () => {
+      const surprise = document.getElementById("surpriseSelect").value;
+      chooseSurprise(surprise);
     });
 
     document.getElementById("penaltyButton").addEventListener("click", () => {
