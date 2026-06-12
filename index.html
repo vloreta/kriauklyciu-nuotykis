@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kriauklyciu nuotykis</title>
+  <title>Krabukų nuotykiai</title>
   <style>
     :root {
       --sea: #0d8aa8;
@@ -43,32 +43,62 @@
       grid-template-columns: minmax(0, 1fr) 320px;
       gap: 18px;
       align-items: stretch;
-      min-height: 210px;
+      min-height: 220px;
     }
 
     .title-block {
       position: relative;
       overflow: hidden;
-      padding: 28px;
+      padding: 30px;
       border-radius: 8px;
-      background: rgba(255, 255, 255, .78);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(229, 250, 255, .78)),
+        linear-gradient(90deg, rgba(13, 138, 168, .14), rgba(255, 209, 102, .18));
       box-shadow: var(--shadow);
       border: 1px solid rgba(255, 255, 255, .7);
     }
 
+    .title-block::after {
+      content: "🦀  🐚  🫧  💎";
+      position: absolute;
+      right: 28px;
+      bottom: 20px;
+      font-size: clamp(1.7rem, 3vw, 2.8rem);
+      letter-spacing: 10px;
+      opacity: .88;
+      pointer-events: none;
+    }
+
     h1 {
       margin: 0;
-      font-size: clamp(2rem, 5vw, 4.5rem);
+      font-size: clamp(2.4rem, 5vw, 4.8rem);
       line-height: .95;
       letter-spacing: 0;
       max-width: 680px;
+      color: #1c2b36;
     }
 
     .subtitle {
       margin: 14px 0 0;
       font-size: 1.1rem;
       color: #3d5966;
-      max-width: 680px;
+      max-width: 600px;
+      font-weight: 600;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 248, 231, .92);
+      border: 1px solid rgba(255, 209, 102, .65);
+      color: #6c4b05;
+      font-weight: 900;
+      font-size: .92rem;
+      box-shadow: 0 8px 18px rgba(31, 54, 71, .1);
     }
 
     .mascots {
@@ -78,15 +108,17 @@
     }
 
     .mascot {
-      min-height: 210px;
+      min-height: 220px;
       border-radius: 8px;
       padding: 16px;
-      background: rgba(255, 255, 255, .82);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.94), rgba(238, 251, 255, .86));
       box-shadow: var(--shadow);
       display: grid;
       align-content: center;
       justify-items: center;
       text-align: center;
+      border: 1px solid rgba(255,255,255,.78);
     }
 
     .face {
@@ -103,8 +135,8 @@
     }
 
     .dragon .face { background: #e4f8df; }
-    .mascot strong { font-size: 1.05rem; }
-    .mascot span { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+    .mascot strong { font-size: 1.08rem; }
+    .mascot span { color: var(--muted); font-size: .92rem; margin-top: 4px; }
 
     .dashboard {
       display: grid;
@@ -928,10 +960,11 @@
 </head>
 <body>
   <main class="app">
-    <section class="hero" aria-label="Kriauklyciu nuotykio pradzia">
+    <section class="hero" aria-label="Krabukų nuotykių pradžia">
       <div class="title-block">
-        <h1>Kriauklyciu nuotykis</h1>
-        <p class="subtitle">Olivia ir Dominik renka Jūros kriauklytes už gerus darbelius, tvarką ir pagyrimus.</p>
+        <div class="hero-badge">🦀 Dienos kelionė iki perlo</div>
+        <h1>Krabukų nuotykiai</h1>
+        <p class="subtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
       </div>
       <div class="mascots">
         <div class="mascot">
