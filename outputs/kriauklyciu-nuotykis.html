@@ -571,6 +571,11 @@
       background: #ecfff4;
     }
 
+    .task-grid.olivia .task.done {
+      border-color: #f4a8c8;
+      background: #fff0f7;
+    }
+
     .task-icon {
       width: 52px;
       height: 52px;
@@ -1495,7 +1500,7 @@
 
     function renderTasks() {
       const child = activeChild();
-      contentArea.className = "task-grid";
+      contentArea.className = `task-grid ${state.active}`;
       contentArea.innerHTML = "";
       tasks.forEach(task => {
         const title = taskTitle(task);
