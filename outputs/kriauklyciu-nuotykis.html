@@ -40,7 +40,7 @@
 
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
+      grid-template-columns: minmax(0, 1fr) 360px;
       gap: 18px;
       align-items: stretch;
       min-height: 220px;
@@ -103,42 +103,102 @@
       box-shadow: 0 8px 18px rgba(31, 54, 71, .1);
     }
 
-    .mascots {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .mascot {
+    .weekend-prize {
       min-height: 220px;
       border-radius: 8px;
       padding: 16px;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.94), rgba(238, 251, 255, .86));
+        radial-gradient(circle at 92% 8%, rgba(255, 230, 145, .34), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(239, 252, 255, .88));
       box-shadow: var(--shadow);
       display: grid;
-      align-content: center;
-      justify-items: center;
-      text-align: center;
+      gap: 10px;
+      align-content: start;
       border: 1px solid rgba(255,255,255,.78);
     }
 
-    .face {
-      width: 92px;
-      height: 92px;
+    .weekend-title {
+      display: grid;
+      gap: 3px;
+    }
+
+    .weekend-title strong {
+      font-size: 1.18rem;
+    }
+
+    .weekend-title span,
+    .weekend-status {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.3;
+    }
+
+    .weekend-icons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .weekend-icon {
+      width: 42px;
+      height: 42px;
       display: grid;
       place-items: center;
       border-radius: 50%;
-      font-size: 3.5rem;
-      margin-bottom: 10px;
+      font-size: 1.55rem;
       background: #e2fbff;
-      border: 4px solid #fff;
-      box-shadow: 0 8px 20px rgba(31, 54, 71, .14);
+      border: 3px solid #fff;
+      box-shadow: 0 7px 16px rgba(31, 54, 71, .12);
     }
 
-    .dragon .face { background: #e4f8df; }
-    .mascot strong { font-size: 1.08rem; }
-    .mascot span { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+    .weekend-icon.dragon {
+      background: #e4f8df;
+    }
+
+    .weekend-score {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .weekend-score span {
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .76);
+      border: 1px solid rgba(187, 219, 229, .72);
+      padding: 8px;
+      font-weight: 850;
+      color: #234454;
+    }
+
+    .weekend-picker {
+      display: grid;
+      gap: 8px;
+    }
+
+    .weekend-picker select {
+      min-width: 0;
+      min-height: 40px;
+      border: 2px solid #cfe1eb;
+      border-radius: 8px;
+      background: rgba(255,255,255,.94);
+      color: var(--ink);
+      padding: 0 10px;
+    }
+
+    .weekend-button {
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 900;
+      color: #fff;
+      background: linear-gradient(135deg, #0b8fa6, #35b78b);
+    }
+
+    .weekend-button:disabled {
+      cursor: not-allowed;
+      opacity: .58;
+    }
 
     .dashboard {
       display: grid;
@@ -889,7 +949,7 @@
         padding: 20px;
       }
 
-      .mascots, .children, .task-grid, .actions, .penalty-controls {
+      .children, .task-grid, .actions, .penalty-controls {
         grid-template-columns: 1fr;
       }
 
@@ -999,16 +1059,23 @@
         <h1>Krabukų nuotykiai</h1>
         <p class="subtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
       </div>
-      <div class="mascots">
-        <div class="mascot">
-          <div class="face" aria-hidden="true">🧜‍♀️</div>
-          <strong>Undinė</strong>
-          <span>saugo kriauklytes</span>
+      <div class="weekend-prize" aria-label="Didysis savaitgalio prizas">
+        <div class="weekend-icons" aria-hidden="true">
+          <span class="weekend-icon">🧜‍♀️</span>
+          <span class="weekend-icon dragon">🐉</span>
         </div>
-        <div class="mascot dragon">
-          <div class="face" aria-hidden="true">🐉</div>
-          <strong>Drakonas</strong>
-          <span>atrakina staigmenas</span>
+        <div class="weekend-title">
+          <strong>Didysis savaitgalio prizas</strong>
+          <span>Savaitės pabaigoje daugiausiai kriauklyčių surinkęs vaikas pasirenka prizą.</span>
+        </div>
+        <div class="weekend-score">
+          <span id="weekendOliviaScore">Olivia: 0</span>
+          <span id="weekendDominikScore">Dominik: 0</span>
+        </div>
+        <div class="weekend-status" id="weekendPrizeStatus">Dar renkami savaitės taškai.</div>
+        <div class="weekend-picker">
+          <select id="weekendPrizeSelect" aria-label="Didžiojo savaitgalio prizo pasirinkimas"></select>
+          <button class="weekend-button" id="weekendPrizeButton" type="button">Pasirinkti prizą</button>
         </div>
       </div>
     </section>
@@ -1191,6 +1258,19 @@
       "Pasirinkti stalo žaidimą"
     ];
 
+    const weekendPrizes = [
+      "Kinas",
+      "Zoologijos sodas",
+      "Pramogų parkas",
+      "Batutų parkas",
+      "Žaidimų kambarys",
+      "Išvyka į parką su pikniku",
+      "Ledainė / desertas kavinėje",
+      "Baseinas / vandens pramogos",
+      "Lėlių teatras",
+      "Boulingas"
+    ];
+
     const penalties = {
       toysBooks: { text: "žaislai ar knygutės liko ne vietoje", shells: 2 },
       clothes: { text: "rūbai nesulankstyti", shells: 2 },
@@ -1226,7 +1306,8 @@
       lastCalendarDate: todayKey(),
       oliviaGuide: null,
       dominikGuide: null,
-      records: {}
+      records: {},
+      weekendPrizes: {}
     };
 
     const saved = localStorage.getItem("kriauklyciu-nuotykis");
@@ -1295,7 +1376,8 @@
         lastCalendarDate: raw.lastCalendarDate || currentDay,
         oliviaGuide: raw.oliviaGuide || null,
         dominikGuide: raw.dominikGuide || null,
-        records: raw.records || {}
+        records: raw.records || {},
+        weekendPrizes: raw.weekendPrizes || {}
       };
 
       if (next.lastCalendarDate !== currentDay) {
@@ -1592,6 +1674,88 @@
       return keys.reduce((sum, key) => sum + (ensureDay(key)[childId].shells || 0), 0);
     }
 
+    function renderWeekendPrize(oliviaWeek, dominikWeek) {
+      const weekKey = startOfWeek(state.selectedDate);
+      const selected = state.weekendPrizes[weekKey];
+      const total = oliviaWeek + dominikWeek;
+      const winnerId = oliviaWeek > dominikWeek ? "olivia" : dominikWeek > oliviaWeek ? "dominik" : null;
+      const winnerName = winnerId ? childNames[winnerId] : "Olivia ir Dominik";
+      const status = document.getElementById("weekendPrizeStatus");
+      const select = document.getElementById("weekendPrizeSelect");
+      const button = document.getElementById("weekendPrizeButton");
+
+      document.getElementById("weekendOliviaScore").textContent = `Olivia: ${oliviaWeek} ${shellWord(oliviaWeek)}`;
+      document.getElementById("weekendDominikScore").textContent = `Dominik: ${dominikWeek} ${shellWord(dominikWeek)}`;
+
+      select.innerHTML = "";
+      weekendPrizes.forEach(prize => {
+        const option = document.createElement("option");
+        option.value = prize;
+        option.textContent = prize;
+        select.appendChild(option);
+      });
+
+      if (selected) {
+        status.textContent = `Šios savaitės prizas: ${selected.winner} pasirinko „${selected.prize}“.`;
+        button.textContent = "Prizas pasirinktas";
+        button.disabled = true;
+        select.disabled = true;
+        select.value = selected.prize;
+        return;
+      }
+
+      if (total === 0) {
+        status.textContent = "Dar renkami savaitės taškai.";
+        button.textContent = "Pasirinkti prizą";
+        button.disabled = true;
+        select.disabled = true;
+        return;
+      }
+
+      status.textContent = winnerId
+        ? `Šią savaitę renkasi: ${winnerName}.`
+        : "Šią savaitę abu surinko po tiek pat. Pasirinkite bendrą šeimos prizą.";
+      button.textContent = "Pasirinkti prizą";
+      button.disabled = false;
+      select.disabled = false;
+    }
+
+    function chooseWeekendPrize() {
+      const weekKey = startOfWeek(state.selectedDate);
+      if (state.weekendPrizes[weekKey]) return;
+
+      const weekKeys = getWeekKeys(state.selectedDate);
+      const oliviaWeek = childTotal("olivia", weekKeys);
+      const dominikWeek = childTotal("dominik", weekKeys);
+      const total = oliviaWeek + dominikWeek;
+      if (total === 0) return;
+
+      const winnerId = oliviaWeek > dominikWeek ? "olivia" : dominikWeek > oliviaWeek ? "dominik" : null;
+      const winner = winnerId ? childNames[winnerId] : "Olivia ir Dominik";
+      const prize = document.getElementById("weekendPrizeSelect").value;
+      state.weekendPrizes[weekKey] = { winner, prize };
+
+      if (winnerId) {
+        addLog(ensureDay(state.selectedDate)[winnerId], {
+          text: `${winner}: didysis savaitgalio prizas - ${prize}`,
+          delta: 0,
+          kind: "weekendPrize"
+        });
+      } else {
+        Object.keys(childNames).forEach(childId => {
+          addLog(ensureDay(state.selectedDate)[childId], {
+            text: `Bendras savaitgalio prizas - ${prize}`,
+            delta: 0,
+            kind: "weekendPrize"
+          });
+        });
+      }
+
+      save();
+      render();
+      showToast(`Pasirinktas savaitgalio prizas: ${prize}.`);
+    }
+
     function renderReward(familyTodayTotal, activeWeekTotal) {
       document.getElementById("familyTotal").textContent = `${familyTodayTotal} / ${maxFamilyDailyShells}`;
       document.getElementById("familyBar").style.width = `${Math.min(familyTodayTotal / maxFamilyDailyShells * 100, 100)}%`;
@@ -1765,6 +1929,7 @@
       if (state.view === "month") renderMonth();
       renderLog();
       renderReward(familyTodayTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
+      renderWeekendPrize(oliviaWeek, dominikWeek);
       renderSurprises();
       renderRace(oliviaToday, dominikToday);
       renderOliviaGuide(oliviaToday);
@@ -1833,6 +1998,8 @@
       const surprise = document.getElementById("surpriseSelect").value;
       chooseSurprise(surprise);
     });
+
+    document.getElementById("weekendPrizeButton").addEventListener("click", chooseWeekendPrize);
 
     document.getElementById("penaltyButton").addEventListener("click", () => {
       const child = activeChild();
