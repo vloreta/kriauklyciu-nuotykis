@@ -708,9 +708,41 @@
       background: #fff8e7;
       border: 1px solid #f0dfb7;
       font-size: 0.88rem;
+      display: grid;
+      gap: 9px;
     }
 
     .reward strong { display: block; margin-bottom: 6px; }
+
+    .surprise-choices {
+      display: grid;
+      gap: 6px;
+      max-height: 210px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .surprise-choice {
+      border: 1px solid #f0dfb7;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 750;
+      line-height: 1.2;
+      min-height: 34px;
+      padding: 7px 9px;
+      text-align: left;
+    }
+
+    .surprise-choice:disabled {
+      cursor: not-allowed;
+      opacity: .54;
+    }
+
+    .reset-week {
+      background: #52616d;
+    }
 
     .actions {
       display: grid;
@@ -1012,13 +1044,12 @@
         </div>
         <div class="side" aria-label="Staigmenos ir istorija">
           <div class="reward">
-            <strong>Artimiausia staigmena</strong>
-            <span id="rewardText">Surinkus 10 kriauklyčių galima rinktis vakaro pasaką.</span>
+            <strong>Staigmena už ypatingą pagyrimą</strong>
+            <span id="surpriseText">Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.</span>
+            <button class="action" id="bonusButton" type="button">Ypatingas pagyrimas</button>
+            <div class="surprise-choices" id="surpriseChoices" aria-label="Staigmenos pasirinkimai"></div>
           </div>
-          <div class="actions">
-            <button class="action" id="bonusButton" type="button">+ Pagyrimas</button>
-            <button class="action secondary" id="resetButton" type="button">Nauja savaitė</button>
-          </div>
+          <button class="action secondary reset-week" id="resetButton" type="button">Pradėti naują savaitę</button>
           <div class="penalty-box">
             <label for="penaltySelect">Neįvykdyta / reikia pasitaisyti</label>
             <div class="penalty-controls">
@@ -1144,6 +1175,23 @@
       { at: 20, text: "20 kriauklyčių: galima rinktis filmuką arba žaidimą." },
       { at: 30, text: "30 kriauklyčių: Undinė ir Drakonas atidaro bendrą staigmeną." },
       { at: 50, text: "50 kriauklyčių: ypatinga išvyka arba didesnis prizas." }
+    ];
+
+    const surprises = [
+      "1 pasirinktas filmukas",
+      "Pasaka prieš miegą",
+      "Mažas skanėstas",
+      "Kakava arba arbata",
+      "Kartu nupiešti piešinį",
+      "Pasirinkti vakarienės desertą",
+      "Mažas lobio akmenukas / perliukas į stiklainį",
+      "Pasirinkti dainelę šokiui",
+      "Mini piknikas namuose ant pledo",
+      "Pasivaikščiojimas iki mėgstamos vietos",
+      "Muilo burbulai lauke",
+      "Išsirinkti knygelę skaitymui",
+      "5 minutės kutuliukų / linksmo žaidimo",
+      "Pasirinkti stalo žaidimą"
     ];
 
     const penalties = {
@@ -1548,10 +1596,56 @@
     }
 
     function renderReward(familyTodayTotal, activeWeekTotal) {
-      const next = rewards.find(reward => reward.at > activeWeekTotal) || rewards[rewards.length - 1];
-      document.getElementById("rewardText").textContent = next.text;
       document.getElementById("familyTotal").textContent = `${familyTodayTotal} / ${maxFamilyDailyShells}`;
       document.getElementById("familyBar").style.width = `${Math.min(familyTodayTotal / maxFamilyDailyShells * 100, 100)}%`;
+    }
+
+    function renderSurprises() {
+      const child = activeChild();
+      const unlocked = Boolean(child.surpriseUnlocked);
+      const text = document.getElementById("surpriseText");
+      const button = document.getElementById("bonusButton");
+      const choices = document.getElementById("surpriseChoices");
+
+      if (unlocked) {
+        text.textContent = `${activeName()} gavo ypatingą pagyrimą. Galima pasirinkti vieną staigmeną.`;
+        button.textContent = "Staigmena atrakinta";
+        button.disabled = true;
+      } else if (child.lastSurprise) {
+        text.textContent = `Paskutinė pasirinkta staigmena: ${child.lastSurprise}.`;
+        button.textContent = "Ypatingas pagyrimas";
+        button.disabled = false;
+      } else {
+        text.textContent = "Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.";
+        button.textContent = "Ypatingas pagyrimas";
+        button.disabled = false;
+      }
+
+      choices.innerHTML = "";
+      surprises.forEach(surprise => {
+        const choice = document.createElement("button");
+        choice.className = "surprise-choice";
+        choice.type = "button";
+        choice.textContent = surprise;
+        choice.disabled = !unlocked;
+        choice.addEventListener("click", () => chooseSurprise(surprise));
+        choices.appendChild(choice);
+      });
+    }
+
+    function chooseSurprise(surprise) {
+      const child = activeChild();
+      if (!child.surpriseUnlocked) return;
+      child.surpriseUnlocked = false;
+      child.lastSurprise = surprise;
+      addLog(child, {
+        text: `${activeName()}: pasirinkta staigmena - ${surprise}`,
+        delta: 0,
+        kind: "surprise"
+      });
+      save();
+      render();
+      showToast(`Pasirinkta staigmena: ${surprise}.`);
     }
 
     function renderRace(oliviaToday, dominikToday) {
@@ -1674,6 +1768,7 @@
       if (state.view === "month") renderMonth();
       renderLog();
       renderReward(familyTodayTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
+      renderSurprises();
       renderRace(oliviaToday, dominikToday);
       renderOliviaGuide(oliviaToday);
       renderDominikGuide(dominikToday);
@@ -1719,22 +1814,22 @@
 
     document.getElementById("bonusButton").addEventListener("click", () => {
       const child = activeChild();
-      child.shells += 3;
+      child.surpriseUnlocked = true;
       addLog(child, {
-        text: `${activeName()}: pagyrimas darželyje arba namie (+3)`,
-        delta: 3,
-        kind: "bonus"
+        text: `${activeName()}: ypatingas pagyrimas - galima rinktis staigmeną`,
+        delta: 0,
+        kind: "bonusSurprise"
       });
       save();
       render();
       if (state.active === "olivia") {
-        setOliviaGuide("Olivia gavo ypatingą pagyrimą! Undinė padovanojo dar tris spindinčias kriauklytes.");
+        setOliviaGuide("Olivia gavo ypatingą pagyrimą! Undinė atrakino mažą staigmeną.");
         save();
       } else if (state.active === "dominik") {
-        setDominikGuide("Dominik gavo ypatingą pagyrimą! Drakonas pridėjo tris stiprias kriauklytes.");
+        setDominikGuide("Dominik gavo ypatingą pagyrimą! Drakonas atrakino mažą staigmeną.");
         save();
       }
-      showToast("Pagyrimas pridėtas: +3 kriauklytės!");
+      showToast("Ypatingas pagyrimas atrakino staigmeną!");
     });
 
     document.getElementById("penaltyButton").addEventListener("click", () => {
