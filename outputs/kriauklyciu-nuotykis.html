@@ -962,6 +962,58 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    .edit-dialog {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(28, 43, 54, .28);
+    }
+
+    .edit-dialog.open {
+      display: grid;
+    }
+
+    .edit-card {
+      width: min(420px, 100%);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(31, 54, 71, .22);
+      border: 1px solid #dce8ee;
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .edit-card h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .edit-card label {
+      display: grid;
+      gap: 6px;
+      font-weight: 850;
+      color: var(--ink);
+    }
+
+    .edit-card input {
+      min-height: 40px;
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      padding: 0 10px;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .edit-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
     @media (max-width: 940px) {
       .hero, .dashboard {
         grid-template-columns: 1fr;
@@ -1246,6 +1298,23 @@
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="edit-dialog" id="taskEditDialog" aria-hidden="true">
+    <form class="edit-card" id="taskEditForm">
+      <h3>Keisti užduotį</h3>
+      <label>
+        Užduoties tekstas
+        <input id="taskEditTitle" type="text" autocomplete="off">
+      </label>
+      <label>
+        Kriauklyčių skaičius
+        <input id="taskEditShells" type="number" min="0" step="1">
+      </label>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="taskEditCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
 
   <script>
     const defaultChildTasks = {
@@ -1386,6 +1455,11 @@
     const contentArea = document.getElementById("contentArea");
     const log = document.getElementById("log");
     const toast = document.getElementById("toast");
+    const taskEditDialog = document.getElementById("taskEditDialog");
+    const taskEditForm = document.getElementById("taskEditForm");
+    const taskEditTitle = document.getElementById("taskEditTitle");
+    const taskEditShells = document.getElementById("taskEditShells");
+    let editingTaskId = null;
 
     function save() {
       localStorage.setItem(storageKey, JSON.stringify(state));
@@ -1764,11 +1838,28 @@
       const tasks = tasksForChild();
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
-      const nextTitle = prompt("Užduoties tekstas:", taskTitle(task));
-      if (nextTitle === null) return;
-      const cleanTitle = nextTitle.trim();
+      editingTaskId = taskId;
+      taskEditTitle.value = taskTitle(task);
+      taskEditShells.value = task.shells;
+      taskEditDialog.classList.add("open");
+      taskEditDialog.setAttribute("aria-hidden", "false");
+      taskEditTitle.focus();
+    }
+
+    function closeTaskEditor() {
+      taskEditDialog.classList.remove("open");
+      taskEditDialog.setAttribute("aria-hidden", "true");
+      editingTaskId = null;
+    }
+
+    function saveEditedTask() {
+      if (!editingTaskId) return;
+      const tasks = tasksForChild();
+      const task = tasks.find(item => item.id === editingTaskId);
+      if (!task) return;
+      const cleanTitle = taskEditTitle.value.trim();
       if (!cleanTitle) return;
-      const nextShells = Number(prompt("Kiek kriauklyčių?", String(task.shells)));
+      const nextShells = Number(taskEditShells.value);
       if (!Number.isFinite(nextShells) || nextShells < 0) return;
       const oldShells = task.shells;
       task.title = cleanTitle;
@@ -1777,6 +1868,7 @@
       if (child.done[task.id]) {
         child.shells = Math.max(0, child.shells + task.shells - oldShells);
       }
+      closeTaskEditor();
       save();
       render();
       showToast("Užduotis pakeista.");
@@ -2189,6 +2281,17 @@
     });
 
     document.getElementById("addTaskButton").addEventListener("click", addTask);
+
+    taskEditForm.addEventListener("submit", event => {
+      event.preventDefault();
+      saveEditedTask();
+    });
+
+    document.getElementById("taskEditCancel").addEventListener("click", closeTaskEditor);
+
+    taskEditDialog.addEventListener("click", event => {
+      if (event.target === taskEditDialog) closeTaskEditor();
+    });
 
     document.getElementById("prevDayButton").addEventListener("click", () => {
       const step = state.view === "month" ? -30 : state.view === "week" ? -7 : -1;
