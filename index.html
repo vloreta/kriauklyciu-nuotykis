@@ -600,6 +600,31 @@
       margin-bottom: 14px;
     }
 
+    .task-tools {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: -2px 0 12px;
+    }
+
+    .tool-button {
+      min-height: 34px;
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 850;
+      padding: 0 10px;
+    }
+
+    .tool-button.primary {
+      border-color: var(--sea);
+      background: #e7f9ff;
+      color: #0c718a;
+    }
+
     .view-button.active {
       border-color: var(--sea);
       background: #e7f9ff;
@@ -613,6 +638,7 @@
     }
 
     .task {
+      position: relative;
       min-height: 112px;
       border: 2px solid #e7edf1;
       border-radius: 8px;
@@ -624,6 +650,35 @@
       align-items: center;
       cursor: pointer;
       text-align: left;
+    }
+
+    .task.editing {
+      cursor: default;
+      padding-right: 78px;
+    }
+
+    .task-edit-actions {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .task-edit-actions button {
+      min-width: 58px;
+      min-height: 28px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 850;
+      background: var(--sea);
+      font-size: .78rem;
+    }
+
+    .task-edit-actions .delete-task {
+      background: var(--reef);
     }
 
     .task.done {
@@ -1179,6 +1234,10 @@
           <button class="view-button" data-view="week" type="button">Savaitė</button>
           <button class="view-button" data-view="month" type="button">Mėnuo</button>
         </div>
+        <div class="task-tools">
+          <button class="tool-button primary" id="editTasksButton" type="button">EDIT</button>
+          <button class="tool-button" id="addTaskButton" type="button">+ Nauja užduotis</button>
+        </div>
         <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
         <div id="contentArea"></div>
       </section>
@@ -1189,7 +1248,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const childTasks = {
+    const defaultChildTasks = {
       olivia: [
         { id: "toysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 },
         { id: "clothes", icon: "👕", title: "Pati susilanksčiau rūbus", shells: 2 },
@@ -1243,13 +1302,6 @@
         { id: "domToysBooks", icon: "🧸", title: "Pats susidėjau savo žaislus ir knygutes", shells: 2 }
       ]
     };
-
-    const maxDailyShellsByChild = Object.fromEntries(
-      Object.entries(childTasks).map(([childId, list]) => [
-        childId,
-        list.reduce((sum, task) => sum + task.shells, 0)
-      ])
-    );
 
     const rewards = [
       { at: 10, text: "10 kriauklyčių: galima rinktis vakaro pasaką." },
@@ -1314,8 +1366,6 @@
       dominik: "Dominik"
     };
 
-    const maxFamilyDailyShells = Object.values(maxDailyShellsByChild).reduce((sum, value) => sum + value, 0);
-
     const initialState = {
       active: "olivia",
       view: "day",
@@ -1324,7 +1374,9 @@
       oliviaGuide: null,
       dominikGuide: null,
       records: {},
-      weekendPrizes: {}
+      weekendPrizes: {},
+      customTasks: null,
+      editMode: false
     };
 
     const storageKey = "kriauklyciu-nuotykis";
@@ -1396,6 +1448,8 @@
         dominikGuide: raw.dominikGuide || null,
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
+        customTasks: raw.customTasks || null,
+        editMode: Boolean(raw.editMode),
         legacyBonusPointsRemoved: Boolean(raw.legacyBonusPointsRemoved)
       };
 
@@ -1471,12 +1525,36 @@
       return "kriauklyčių";
     }
 
+    function cloneTasks(tasks) {
+      return tasks.map(task => ({ ...task }));
+    }
+
+    function ensureCustomTasks() {
+      if (!state.customTasks) {
+        state.customTasks = {
+          olivia: cloneTasks(defaultChildTasks.olivia),
+          dominik: cloneTasks(defaultChildTasks.dominik)
+        };
+      }
+      Object.keys(childNames).forEach(childId => {
+        if (!state.customTasks[childId]) {
+          state.customTasks[childId] = cloneTasks(defaultChildTasks[childId]);
+        }
+      });
+      return state.customTasks;
+    }
+
     function tasksForChild(childId = state.active) {
-      return childTasks[childId] || childTasks.olivia;
+      const customTasks = ensureCustomTasks();
+      return customTasks[childId] || customTasks.olivia;
     }
 
     function maxDailyShells(childId = state.active) {
-      return maxDailyShellsByChild[childId] || 0;
+      return tasksForChild(childId).reduce((sum, task) => sum + task.shells, 0);
+    }
+
+    function maxFamilyDailyShells() {
+      return Object.keys(childNames).reduce((sum, childId) => sum + maxDailyShells(childId), 0);
     }
 
     function showToast(text) {
@@ -1635,6 +1713,7 @@
     }
 
     function completeTask(task) {
+      if (state.editMode) return;
       const child = activeChild();
       const title = taskTitle(task);
       if (child.done[task.id]) {
@@ -1681,23 +1760,97 @@
       showToast(`${activeName()} gavo ${task.shells} ${shellWord(task.shells)}!`);
     }
 
+    function editTask(taskId) {
+      const tasks = tasksForChild();
+      const task = tasks.find(item => item.id === taskId);
+      if (!task) return;
+      const nextTitle = prompt("Užduoties tekstas:", taskTitle(task));
+      if (nextTitle === null) return;
+      const cleanTitle = nextTitle.trim();
+      if (!cleanTitle) return;
+      const nextShells = Number(prompt("Kiek kriauklyčių?", String(task.shells)));
+      if (!Number.isFinite(nextShells) || nextShells < 0) return;
+      const oldShells = task.shells;
+      task.title = cleanTitle;
+      task.shells = Math.round(nextShells);
+      const child = activeChild();
+      if (child.done[task.id]) {
+        child.shells = Math.max(0, child.shells + task.shells - oldShells);
+      }
+      save();
+      render();
+      showToast("Užduotis pakeista.");
+    }
+
+    function deleteTask(taskId) {
+      const tasks = tasksForChild();
+      const task = tasks.find(item => item.id === taskId);
+      if (!task) return;
+      const ok = confirm(`Ištrinti užduotį „${taskTitle(task)}“?`);
+      if (!ok) return;
+      const index = tasks.findIndex(item => item.id === taskId);
+      tasks.splice(index, 1);
+      Object.values(state.records || {}).forEach(day => {
+        const child = day[state.active];
+        if (child?.done) delete child.done[taskId];
+      });
+      save();
+      render();
+      showToast("Užduotis ištrinta.");
+    }
+
+    function addTask() {
+      const title = prompt("Naujos užduoties tekstas:");
+      if (title === null) return;
+      const cleanTitle = title.trim();
+      if (!cleanTitle) return;
+      const shells = Number(prompt("Kiek kriauklyčių?", "1"));
+      if (!Number.isFinite(shells) || shells < 0) return;
+      const tasks = tasksForChild();
+      tasks.push({
+        id: `${state.active}Custom${Date.now()}`,
+        icon: "✨",
+        title: cleanTitle,
+        shells: Math.round(shells)
+      });
+      save();
+      render();
+      showToast("Nauja užduotis pridėta.");
+    }
+
     function renderTasks() {
       const child = activeChild();
       contentArea.className = `task-grid ${state.active}`;
       contentArea.innerHTML = "";
       tasksForChild().forEach(task => {
         const title = taskTitle(task);
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = `task${child.done[task.id] ? " done" : ""}`;
+        const button = document.createElement(state.editMode ? "div" : "button");
+        if (!state.editMode) button.type = "button";
+        button.className = `task${child.done[task.id] ? " done" : ""}${state.editMode ? " editing" : ""}`;
         button.innerHTML = `
           <span class="task-icon" aria-hidden="true">${task.icon}</span>
           <span>
             <span class="task-title">${title}</span>
             <span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span>
           </span>
+          ${state.editMode ? `
+            <span class="task-edit-actions">
+              <button type="button" data-edit-task="${task.id}">Keisti</button>
+              <button class="delete-task" type="button" data-delete-task="${task.id}">Trinti</button>
+            </span>
+          ` : ""}
         `;
-        button.addEventListener("click", () => completeTask(task));
+        if (!state.editMode) {
+          button.addEventListener("click", () => completeTask(task));
+        }
+        button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
+          event.stopPropagation();
+          editTask(task.id);
+        });
+        button.querySelector("[data-delete-task]")?.addEventListener("click", event => {
+          event.stopPropagation();
+          deleteTask(task.id);
+        });
         contentArea.appendChild(button);
       });
     }
@@ -1813,8 +1966,9 @@
     }
 
     function renderReward(familyTodayTotal, activeWeekTotal) {
-      document.getElementById("familyTotal").textContent = `${familyTodayTotal} / ${maxFamilyDailyShells}`;
-      document.getElementById("familyBar").style.width = `${Math.min(familyTodayTotal / maxFamilyDailyShells * 100, 100)}%`;
+      const max = maxFamilyDailyShells();
+      document.getElementById("familyTotal").textContent = `${familyTodayTotal} / ${max}`;
+      document.getElementById("familyBar").style.width = `${Math.min(familyTodayTotal / max * 100, 100)}%`;
     }
 
     function renderSurprises() {
@@ -1984,6 +2138,9 @@
         button.classList.toggle("active", button.dataset.view === state.view);
       });
 
+      document.getElementById("editTasksButton").textContent = state.editMode ? "Baigti" : "EDIT";
+      document.getElementById("addTaskButton").style.display = state.editMode && state.view === "day" ? "" : "none";
+
       document.getElementById("todayText").textContent = state.view === "month"
         ? formatDate(state.selectedDate, "month")
         : formatDate(state.selectedDate);
@@ -2022,6 +2179,16 @@
         render();
       });
     });
+
+    document.getElementById("editTasksButton").addEventListener("click", () => {
+      state.editMode = !state.editMode;
+      state.view = "day";
+      ensureCustomTasks();
+      save();
+      render();
+    });
+
+    document.getElementById("addTaskButton").addEventListener("click", addTask);
 
     document.getElementById("prevDayButton").addEventListener("click", () => {
       const step = state.view === "month" ? -30 : state.view === "week" ? -7 : -1;
