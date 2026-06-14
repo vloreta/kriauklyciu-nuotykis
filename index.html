@@ -1310,7 +1310,8 @@
       weekendPrizes: {}
     };
 
-    const saved = localStorage.getItem("kriauklyciu-nuotykis");
+    const storageKey = "kriauklyciu-nuotykis-v2";
+    const saved = localStorage.getItem(storageKey);
     const state = normalizeState(saved ? JSON.parse(saved) : initialState);
 
     const contentArea = document.getElementById("contentArea");
@@ -1318,7 +1319,7 @@
     const toast = document.getElementById("toast");
 
     function save() {
-      localStorage.setItem("kriauklyciu-nuotykis", JSON.stringify(state));
+      localStorage.setItem(storageKey, JSON.stringify(state));
     }
 
     function todayKey() {
