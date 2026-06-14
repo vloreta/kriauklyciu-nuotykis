@@ -1118,24 +1118,6 @@
             <label for="penaltySelect">Neįvykdyta / reikia pasitaisyti</label>
             <div class="penalty-controls">
               <select id="penaltySelect">
-                <option value="toysBooks">Žaislai ar knygutės liko ne vietoje (-2)</option>
-                <option value="clothes">Rūbai nesulankstyti (-2)</option>
-                <option value="outside">Sunku gražiai elgtis lauke (-2)</option>
-                <option value="toKindergarten">Sunku gražiai elgtis į darželį (-2)</option>
-                <option value="fromKindergarten">Sunku gražiai elgtis iš darželio (-2)</option>
-                <option value="wakeUp">Sunku atsikelti pažadinus (-5)</option>
-                <option value="sleepAlone">Neužmigo pats / pati (-3)</option>
-                <option value="bagShoesJacket">Kuprinė, batai ar striukė ne vietoje (-1)</option>
-                <option value="hands">Rankos nenuplautos (-1)</option>
-                <option value="meal">Sunku gražiai sėdėti valgant (-2)</option>
-                <option value="dishes">Indai nenunešti po valgio (-1)</option>
-                <option value="thanks">Nepasakyta ačiū po valgio (-1)</option>
-                <option value="thanksNeeded">Nepasakyta ačiū, kai reikėjo (-1)</option>
-                <option value="teasing">Erzino brolį / sesę (-2)</option>
-                <option value="sorry">Neatsiprašyta, kai reikėjo (-2)</option>
-                <option value="chooseActivity">Nepasirinko ramios veiklos (-1)</option>
-                <option value="afterActivity">Nesutvarkė po veiklos (-2)</option>
-                <option value="teacher">Dieną buvo pastabų darželyje (-3)</option>
               </select>
               <button class="action warning" id="penaltyButton" type="button">Atimti</button>
             </div>
@@ -1207,32 +1189,67 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const tasks = [
-      { id: "toysBooks", icon: "🧸", title: { olivia: "Pati susidėjau savo žaislus ir knygutes", dominik: "Pats susidėjau savo žaislus ir knygutes" }, shells: 2 },
-      { id: "clothes", icon: "👕", title: { olivia: "Pati susilanksčiau rūbus", dominik: "Pats susilanksčiau rūbus" }, shells: 2 },
-      { id: "outside", icon: "🌳", title: "Gražiai elgiausi lauke", shells: 2 },
-      { id: "toKindergarten", icon: "🏫", title: "Gražiai elgiausi į darželį", shells: 2 },
-      { id: "fromKindergarten", icon: "🌤️", title: "Gražiai elgiausi iš darželio", shells: 2 },
-      { id: "wakeUp", icon: "🌞", title: { olivia: "Kai pažadino, tuoj atsikėliau", dominik: "Kai pažadino, tuoj atsikėliau" }, shells: 5 },
-      { id: "sleepAlone", icon: "🛏️", title: { olivia: "Pati užmigau be kitų", dominik: "Pats užmigau be kitų" }, shells: 3 },
-      { id: "help", icon: "🤝", title: "Padėjau kitam", shells: 2 },
-      { id: "activity", icon: "🎨", title: "Atlikau veiklą", shells: 1 },
-      { id: "bagShoesJacket", icon: "🎒", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
-      { id: "hands", icon: "🧼", title: { olivia: "Pati nusiploviau rankas", dominik: "Pats nusiploviau rankas" }, shells: 1 },
-      { id: "meal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 2 },
-      { id: "dishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
-      { id: "thanks", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
-      { id: "thanksNeeded", icon: "💛", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
-      { id: "teasing", icon: "🕊️", title: { olivia: "Neerzinau brolio", dominik: "Neerzinau sesės" }, shells: 2 },
-      { id: "sorry", icon: "💬", title: "Atsiprašiau, kai reikėjo", shells: 2 },
-      { id: "chooseActivity", icon: "🖍️", title: { olivia: "Pati pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti", dominik: "Pats pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti" }, shells: 1 },
-      { id: "singDance", icon: "🎵", title: "Dainavau, šokau", shells: 1 },
-      { id: "table", icon: "🍴", title: "Padėjau padengti stalą", shells: 2 },
-      { id: "afterActivity", icon: "🧺", title: "Padėjau sutvarkyti po veiklos", shells: 2 },
-      { id: "teacher", icon: "🏅", title: "Auklėtojos pagyrimas", shells: 3 }
-    ];
+    const childTasks = {
+      olivia: [
+        { id: "toysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 },
+        { id: "clothes", icon: "👕", title: "Pati susilanksčiau rūbus", shells: 2 },
+        { id: "outside", icon: "🌳", title: "Gražiai elgiausi lauke", shells: 2 },
+        { id: "toKindergarten", icon: "🏫", title: "Gražiai elgiausi į darželį", shells: 2 },
+        { id: "fromKindergarten", icon: "🌤️", title: "Gražiai elgiausi iš darželio", shells: 2 },
+        { id: "wakeUp", icon: "🌞", title: "Kai pažadino, tuoj atsikėliau", shells: 5 },
+        { id: "sleepAlone", icon: "🛏️", title: "Pati užmigau be kitų", shells: 3 },
+        { id: "help", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+        { id: "activity", icon: "🎨", title: "Atlikau veiklą", shells: 1 },
+        { id: "bagShoesJacket", icon: "🎒", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+        { id: "hands", icon: "🧼", title: "Pati nusiploviau rankas", shells: 1 },
+        { id: "meal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 2 },
+        { id: "dishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
+        { id: "thanks", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
+        { id: "thanksNeeded", icon: "💛", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
+        { id: "teasing", icon: "🕊️", title: "Neerzinau brolio", shells: 2 },
+        { id: "sorry", icon: "💬", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+        { id: "chooseActivity", icon: "🖍️", title: "Pati pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti", shells: 1 },
+        { id: "singDance", icon: "🎵", title: "Dainavau, šokau", shells: 1 },
+        { id: "table", icon: "🍴", title: "Padėjau padengti stalą", shells: 2 },
+        { id: "afterActivity", icon: "🧺", title: "Padėjau sutvarkyti po veiklos", shells: 2 },
+        { id: "teacher", icon: "🏅", title: "Auklėtojos pagyrimas", shells: 3 }
+      ],
+      dominik: [
+        { id: "domSleepAlone", icon: "🛏️", title: "Pats užmigau be kitų", shells: 3 },
+        { id: "domWakeUp", icon: "🌞", title: "Kai pažadino, tuoj pat pats atsikėliau", shells: 3 },
+        { id: "domBed", icon: "🛌", title: "Pats pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
+        { id: "domGettingReady", icon: "🎒", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
+        { id: "domToKindergarten", icon: "🏫", title: "Gražiai elgiausi einant į darželį", shells: 1 },
+        { id: "domKindergarten", icon: "🌈", title: "Gražiai elgiausi darželyje", shells: 1 },
+        { id: "domFromKindergarten", icon: "🌤️", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
+        { id: "domBagShoesJacket", icon: "🧥", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+        { id: "domHands", icon: "🧼", title: "Pats nusiploviau rankas", shells: 1 },
+        { id: "domTable", icon: "🍴", title: "Padėjau padengti stalą", shells: 1 },
+        { id: "domMeal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 5 },
+        { id: "domThanksMeal", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
+        { id: "domDishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
+        { id: "domNoHurtSister", icon: "🕊️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau sesės", shells: 5 },
+        { id: "domPlaySister", icon: "🧩", title: "Gražiai žaidžiau su sese", shells: 2 },
+        { id: "domNiceWordsSister", icon: "💛", title: "Pasakiau sesei kažką malonaus", shells: 2 },
+        { id: "domMom", icon: "🌷", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
+        { id: "domQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
+        { id: "domOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
+        { id: "domHelp", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+        { id: "domThanksNeeded", icon: "💬", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
+        { id: "domSorry", icon: "🤍", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+        { id: "domChooseActivity", icon: "🖍️", title: "Pats ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
+        { id: "domPraise", icon: "🏅", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
+        { id: "domSpeech", icon: "🗣️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
+        { id: "domToysBooks", icon: "🧸", title: "Pats susidėjau savo žaislus ir knygutes", shells: 2 }
+      ]
+    };
 
-    const maxDailyShells = tasks.reduce((sum, task) => sum + task.shells, 0);
+    const maxDailyShellsByChild = Object.fromEntries(
+      Object.entries(childTasks).map(([childId, list]) => [
+        childId,
+        list.reduce((sum, task) => sum + task.shells, 0)
+      ])
+    );
 
     const rewards = [
       { at: 10, text: "10 kriauklyčių: galima rinktis vakaro pasaką." },
@@ -1297,7 +1314,7 @@
       dominik: "Dominik"
     };
 
-    const maxFamilyDailyShells = maxDailyShells * Object.keys(childNames).length;
+    const maxFamilyDailyShells = Object.values(maxDailyShellsByChild).reduce((sum, value) => sum + value, 0);
 
     const initialState = {
       active: "olivia",
@@ -1454,6 +1471,14 @@
       return "kriauklyčių";
     }
 
+    function tasksForChild(childId = state.active) {
+      return childTasks[childId] || childTasks.olivia;
+    }
+
+    function maxDailyShells(childId = state.active) {
+      return maxDailyShellsByChild[childId] || 0;
+    }
+
     function showToast(text) {
       toast.textContent = text;
       toast.classList.add("show");
@@ -1462,18 +1487,20 @@
     }
 
     function oliviaDefaultGuide(shells) {
+      const max = maxDailyShells("olivia");
       if (shells <= 0) return "Undinė laukia pirmosios Olivijos kriauklytės.";
-      if (shells >= maxDailyShells) return "Olivia pasiekė perlą! Undinė labai didžiuojasi.";
-      if (shells >= maxDailyShells * 0.75) return "Olivia jau visai arti perlo. Dar keli gražūs darbeliai!";
-      if (shells >= maxDailyShells * 0.35) return "Olivia gražiai keliauja per vandenyną. Undinė saugo jos kriauklytes.";
+      if (shells >= max) return "Olivia pasiekė perlą! Undinė labai didžiuojasi.";
+      if (shells >= max * 0.75) return "Olivia jau visai arti perlo. Dar keli gražūs darbeliai!";
+      if (shells >= max * 0.35) return "Olivia gražiai keliauja per vandenyną. Undinė saugo jos kriauklytes.";
       return "Puiki pradžia, Olivia. Kiekviena kriauklytė artina prie perlo.";
     }
 
     function dominikDefaultGuide(shells) {
+      const max = maxDailyShells("dominik");
       if (shells <= 0) return "Drakonas laukia pirmosios Dominik kriauklytės.";
-      if (shells >= maxDailyShells) return "Dominik pasiekė perlą! Drakonas atrakino perlo kriauklę.";
-      if (shells >= maxDailyShells * 0.75) return "Dominik jau labai arti lobio. Drakonas ruošia raktą!";
-      if (shells >= maxDailyShells * 0.35) return "Dominik stipriai juda pirmyn. Drakonas saugo kelią iki perlo.";
+      if (shells >= max) return "Dominik pasiekė perlą! Drakonas atrakino perlo kriauklę.";
+      if (shells >= max * 0.75) return "Dominik jau labai arti lobio. Drakonas ruošia raktą!";
+      if (shells >= max * 0.35) return "Dominik stipriai juda pirmyn. Drakonas saugo kelią iki perlo.";
       return "Gera pradžia, Dominik. Drakonas mato pirmas kriauklytes.";
     }
 
@@ -1501,10 +1528,11 @@
 
     function renderMilestoneBadge(childId, shells) {
       const badge = document.getElementById(`${childId}MilestoneBadge`);
-      const halfway = Math.ceil(maxDailyShells / 2);
+      const max = maxDailyShells(childId);
+      const halfway = Math.ceil(max / 2);
       badge.classList.remove("show", "full");
 
-      if (shells >= maxDailyShells) {
+      if (shells >= max) {
         badge.textContent = "🏆 Perlas pasiektas!";
         badge.classList.add("show", "full");
         return;
@@ -1521,9 +1549,10 @@
       const child = day[childId];
       const name = childNames[childId];
       const isOlivia = childId === "olivia";
-      const halfway = Math.ceil(maxDailyShells / 2);
+      const max = maxDailyShells(childId);
+      const halfway = Math.ceil(max / 2);
 
-      if (child.shells >= maxDailyShells && !child.dailyTreasureAwarded) {
+      if (child.shells >= max && !child.dailyTreasureAwarded) {
         child.dailyTreasureAwarded = true;
         addLog(child, {
           text: isOlivia
@@ -1656,7 +1685,7 @@
       const child = activeChild();
       contentArea.className = `task-grid ${state.active}`;
       contentArea.innerHTML = "";
-      tasks.forEach(task => {
+      tasksForChild().forEach(task => {
         const title = taskTitle(task);
         const button = document.createElement("button");
         button.type = "button";
@@ -1821,6 +1850,17 @@
       chooseButton.disabled = !unlocked;
     }
 
+    function renderPenaltyOptions() {
+      const select = document.getElementById("penaltySelect");
+      select.innerHTML = "";
+      tasksForChild().forEach(task => {
+        const option = document.createElement("option");
+        option.value = task.id;
+        option.textContent = `${taskTitle(task)} (-${task.shells})`;
+        select.appendChild(option);
+      });
+    }
+
     function chooseSurprise(surprise) {
       const child = activeChild();
       if (!child.surpriseUnlocked) return;
@@ -1841,11 +1881,12 @@
         ["olivia", oliviaToday],
         ["dominik", dominikToday]
       ].forEach(([childId, shells]) => {
-        const percent = Math.min(Math.max(shells / maxDailyShells, 0), 1) * 100;
+        const max = maxDailyShells(childId);
+        const percent = Math.min(Math.max(shells / max, 0), 1) * 100;
         const track = document.getElementById(`${childId}RaceTrack`);
         const score = document.getElementById(`${childId}RaceScore`);
         track.style.setProperty("--progress", `${percent}%`);
-        score.textContent = `${shells} / ${maxDailyShells} ${shellWord(maxDailyShells)}`;
+        score.textContent = `${shells} / ${max} ${shellWord(max)}`;
       });
     }
 
@@ -1958,6 +1999,7 @@
       renderReward(familyTodayTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
       renderWeekendPrize(oliviaWeek, dominikWeek);
       renderSurprises();
+      renderPenaltyOptions();
       renderRace(oliviaToday, dominikToday);
       renderOliviaGuide(oliviaToday);
       renderDominikGuide(dominikToday);
@@ -2031,12 +2073,14 @@
     document.getElementById("penaltyButton").addEventListener("click", () => {
       const child = activeChild();
       const key = document.getElementById("penaltySelect").value;
-      const penalty = penalties[key];
-      const removed = Math.min(child.shells, penalty.shells);
+      const penaltyTask = tasksForChild().find(task => task.id === key);
+      if (!penaltyTask) return;
+      const title = taskTitle(penaltyTask);
+      const removed = Math.min(child.shells, penaltyTask.shells);
 
       if (removed === 0) {
         addLog(child, {
-          text: `${activeName()}: ${penalty.text} (0)`,
+          text: `${activeName()}: pasitaisyti - ${title} (0)`,
           delta: 0,
           kind: "penalty"
         });
@@ -2055,7 +2099,7 @@
 
       child.shells -= removed;
       addLog(child, {
-        text: `${activeName()}: ${penalty.text} (-${removed})`,
+        text: `${activeName()}: pasitaisyti - ${title} (-${removed})`,
         delta: -removed,
         kind: "penalty"
       });
