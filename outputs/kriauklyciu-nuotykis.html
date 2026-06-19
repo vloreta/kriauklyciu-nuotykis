@@ -498,6 +498,11 @@
       cursor: pointer;
     }
 
+    #childrenList {
+      display: grid;
+      gap: 12px;
+    }
+
     .child-button.active {
       border-color: var(--sea);
       background: #e7f9ff;
@@ -506,6 +511,16 @@
     .child-button[data-child="olivia"] .avatar {
       background: linear-gradient(135deg, #fff6fb, #e9fbff);
       box-shadow: inset 0 0 0 3px rgba(244, 132, 190, .22);
+    }
+
+    .child-button[data-gender="girl"] .avatar {
+      background: linear-gradient(135deg, #fff6fb, #e9fbff);
+      box-shadow: inset 0 0 0 3px rgba(244, 132, 190, .22);
+    }
+
+    .child-button[data-gender="boy"] .avatar {
+      background: linear-gradient(135deg, #eff9ff, #edfff4);
+      box-shadow: inset 0 0 0 3px rgba(13, 138, 168, .18);
     }
 
     .avatar {
@@ -689,6 +704,23 @@
     .task-grid.olivia .task.done {
       border-color: #f4a8c8;
       background: #fff0f7;
+    }
+
+    .task-grid.pink .task.done,
+    .task-grid.girl .task.done {
+      border-color: #f4a8c8;
+      background: #fff0f7;
+    }
+
+    .task-grid.blue .task.done,
+    .task-grid.boy .task.done {
+      border-color: #8fcdec;
+      background: #eef9ff;
+    }
+
+    .task-grid.green .task.done {
+      border-color: var(--leaf);
+      background: #ecfff4;
     }
 
     .task-icon {
@@ -1014,6 +1046,31 @@
       gap: 8px;
     }
 
+    .settings-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .settings-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 110px;
+      gap: 8px;
+      align-items: end;
+      border: 1px solid #dce8ee;
+      border-radius: 8px;
+      padding: 10px;
+      background: #f8fcff;
+    }
+
+    .settings-row select {
+      min-height: 40px;
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 8px;
+    }
+
     @media (max-width: 940px) {
       .hero, .dashboard {
         grid-template-columns: 1fr;
@@ -1163,8 +1220,8 @@
     <section class="hero" aria-label="Krabukų nuotykių pradžia">
       <div class="title-block">
         <div class="hero-badge">🦀 Dienos kelionė iki perlo</div>
-        <h1>Krabukų nuotykiai</h1>
-        <p class="subtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
+        <h1 id="appTitle">Krabukų nuotykiai</h1>
+        <p class="subtitle" id="appSubtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
       </div>
       <div class="weekend-prize" aria-label="Didysis savaitgalio prizas">
         <div class="weekend-icons" aria-hidden="true">
@@ -1175,10 +1232,7 @@
           <strong>Didysis savaitgalio prizas</strong>
           <span>Čia rodoma visų pasirinktos savaitės dienų suma. Daugiausiai kriauklyčių surinkęs vaikas pasirenka prizą.</span>
         </div>
-        <div class="weekend-score">
-          <span id="weekendOliviaScore">Olivia: 0</span>
-          <span id="weekendDominikScore">Dominik: 0</span>
-        </div>
+        <div class="weekend-score" id="weekendScores"></div>
         <div class="weekend-status" id="weekendPrizeStatus">Dar renkami savaitės taškai.</div>
         <div class="weekend-picker">
           <select id="weekendPrizeSelect" aria-label="Didžiojo savaitgalio prizo pasirinkimas"></select>
@@ -1189,20 +1243,7 @@
 
     <section class="dashboard">
       <aside class="panel children" aria-label="Vaikai">
-        <button class="child-button active" data-child="olivia" type="button">
-          <span class="avatar" aria-hidden="true">👧</span>
-          <span>
-            <span class="child-name">Olivia</span><br>
-            <span class="shell-count" id="oliviaCount">0 kriauklyčių</span>
-          </span>
-        </button>
-        <button class="child-button" data-child="dominik" type="button">
-          <span class="avatar" aria-hidden="true">👦</span>
-          <span>
-            <span class="child-name">Dominik</span><br>
-            <span class="shell-count" id="dominikCount">0 kriauklyčių</span>
-          </span>
-        </button>
+        <div id="childrenList"></div>
         <div class="progress-box">
           <div class="progress-row">
             <span>Bendras lobis</span>
@@ -1287,6 +1328,7 @@
           <button class="view-button" data-view="month" type="button">Mėnuo</button>
         </div>
         <div class="task-tools">
+          <button class="tool-button" id="settingsButton" type="button">Nustatymai</button>
           <button class="tool-button primary" id="editTasksButton" type="button">EDIT</button>
           <button class="tool-button" id="addTaskButton" type="button">+ Nauja užduotis</button>
         </div>
@@ -1315,32 +1357,55 @@
       </div>
     </form>
   </div>
+  <div class="edit-dialog" id="settingsDialog" aria-hidden="true">
+    <form class="edit-card" id="settingsForm">
+      <h3>Nustatymai</h3>
+      <label>
+        Projekto pavadinimas
+        <input id="settingsTitle" type="text" autocomplete="off">
+      </label>
+      <label>
+        Aprašymas
+        <input id="settingsSubtitle" type="text" autocomplete="off">
+      </label>
+      <div class="settings-grid" id="childSettingsList"></div>
+      <button class="tool-button" id="addChildButton" type="button">+ Pridėti vaiką</button>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="settingsCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
 
   <script>
     const defaultChildTasks = {
       olivia: [
-        { id: "toysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 },
-        { id: "clothes", icon: "👕", title: "Pati susilanksčiau rūbus", shells: 2 },
-        { id: "outside", icon: "🌳", title: "Gražiai elgiausi lauke", shells: 2 },
-        { id: "toKindergarten", icon: "🏫", title: "Gražiai elgiausi į darželį", shells: 2 },
-        { id: "fromKindergarten", icon: "🌤️", title: "Gražiai elgiausi iš darželio", shells: 2 },
-        { id: "wakeUp", icon: "🌞", title: "Kai pažadino, tuoj atsikėliau", shells: 5 },
-        { id: "sleepAlone", icon: "🛏️", title: "Pati užmigau be kitų", shells: 3 },
-        { id: "help", icon: "🤝", title: "Padėjau kitam", shells: 2 },
-        { id: "activity", icon: "🎨", title: "Atlikau veiklą", shells: 1 },
-        { id: "bagShoesJacket", icon: "🎒", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
-        { id: "hands", icon: "🧼", title: "Pati nusiploviau rankas", shells: 1 },
-        { id: "meal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 2 },
-        { id: "dishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
-        { id: "thanks", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
-        { id: "thanksNeeded", icon: "💛", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
-        { id: "teasing", icon: "🕊️", title: "Neerzinau brolio", shells: 2 },
-        { id: "sorry", icon: "💬", title: "Atsiprašiau, kai reikėjo", shells: 2 },
-        { id: "chooseActivity", icon: "🖍️", title: "Pati pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti", shells: 1 },
-        { id: "singDance", icon: "🎵", title: "Dainavau, šokau", shells: 1 },
-        { id: "table", icon: "🍴", title: "Padėjau padengti stalą", shells: 2 },
-        { id: "afterActivity", icon: "🧺", title: "Padėjau sutvarkyti po veiklos", shells: 2 },
-        { id: "teacher", icon: "🏅", title: "Auklėtojos pagyrimas", shells: 3 }
+        { id: "oliSleepAlone", icon: "🛏️", title: "Pati užmigau be kitų", shells: 3 },
+        { id: "oliWakeUp", icon: "🌞", title: "Kai pažadino, tuoj pat pati atsikėliau", shells: 3 },
+        { id: "oliBed", icon: "🛌", title: "Pati pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
+        { id: "oliGettingReady", icon: "🎒", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
+        { id: "oliToKindergarten", icon: "🏫", title: "Gražiai elgiausi einant į darželį", shells: 1 },
+        { id: "oliKindergarten", icon: "🌈", title: "Gražiai elgiausi darželyje", shells: 1 },
+        { id: "oliFromKindergarten", icon: "🌤️", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
+        { id: "oliBagShoesJacket", icon: "🧥", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+        { id: "oliHands", icon: "🧼", title: "Pati nusiploviau rankas", shells: 1 },
+        { id: "oliTable", icon: "🍴", title: "Padėjau padengti stalą", shells: 1 },
+        { id: "oliMeal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 5 },
+        { id: "oliThanksMeal", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
+        { id: "oliDishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
+        { id: "oliNoHurtBrother", icon: "🕊️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau brolio", shells: 5 },
+        { id: "oliPlayBrother", icon: "🧩", title: "Gražiai žaidžiau su broliu", shells: 2 },
+        { id: "oliNiceWordsBrother", icon: "💛", title: "Pasakiau broliui kažką malonaus", shells: 2 },
+        { id: "oliMom", icon: "🌷", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
+        { id: "oliQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
+        { id: "oliOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
+        { id: "oliHelp", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+        { id: "oliThanksNeeded", icon: "💬", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
+        { id: "oliSorry", icon: "🤍", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+        { id: "oliChooseActivity", icon: "🖍️", title: "Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
+        { id: "oliPraise", icon: "🏅", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
+        { id: "oliSpeech", icon: "🗣️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
+        { id: "oliToysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 }
       ],
       dominik: [
         { id: "domSleepAlone", icon: "🛏️", title: "Pats užmigau be kitų", shells: 3 },
@@ -1430,9 +1495,14 @@
       teacher: { text: "dieną buvo pastabų darželyje", shells: 3 }
     };
 
-    const childNames = {
-      olivia: "Olivia",
-      dominik: "Dominik"
+    const defaultChildProfiles = {
+      olivia: { name: "Olivia", gender: "girl", color: "pink", avatar: "👧" },
+      dominik: { name: "Dominik", gender: "boy", color: "blue", avatar: "👦" }
+    };
+
+    const defaultAppSettings = {
+      title: "Krabukų nuotykiai",
+      subtitle: "Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio."
     };
 
     const initialState = {
@@ -1445,12 +1515,49 @@
       records: {},
       weekendPrizes: {},
       customTasks: null,
+      taskSchemaVersion: 3,
+      childProfiles: defaultChildProfiles,
+      appSettings: defaultAppSettings,
       editMode: false
     };
 
     const storageKey = "kriauklyciu-nuotykis";
-    const saved = localStorage.getItem(storageKey);
-    const state = normalizeState(saved ? JSON.parse(saved) : initialState);
+    const legacyStorageKey = "kriauklyciu-nuotykis-v2";
+
+    function readSavedState(key) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function mergeSavedRecords(primary, legacy) {
+      const merged = primary ? { ...primary, records: { ...(primary.records || {}) } } : { ...initialState };
+      if (!legacy?.records) return merged;
+
+      Object.entries(legacy.records).forEach(([date, legacyDay]) => {
+        if (!merged.records[date]) merged.records[date] = {};
+        Object.entries(legacyDay || {}).forEach(([childId, legacyChild]) => {
+          if (!legacyChild) return;
+          const currentChild = merged.records[date][childId];
+          const legacyShells = legacyChild.shells || 0;
+          const currentShells = currentChild?.shells || 0;
+          const legacyLogCount = Array.isArray(legacyChild.log) ? legacyChild.log.length : 0;
+          const currentLogCount = Array.isArray(currentChild?.log) ? currentChild.log.length : 0;
+
+          if (!currentChild || legacyShells > currentShells || legacyLogCount > currentLogCount) {
+            merged.records[date][childId] = legacyChild;
+          }
+        });
+      });
+
+      return merged;
+    }
+
+    const saved = mergeSavedRecords(readSavedState(storageKey), readSavedState(legacyStorageKey));
+    const state = normalizeState(saved);
 
     const contentArea = document.getElementById("contentArea");
     const log = document.getElementById("log");
@@ -1523,9 +1630,16 @@
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
         customTasks: raw.customTasks || null,
+        taskSchemaVersion: raw.taskSchemaVersion || 0,
+        childProfiles: { ...defaultChildProfiles, ...(raw.childProfiles || {}) },
+        appSettings: { ...defaultAppSettings, ...(raw.appSettings || {}) },
         editMode: Boolean(raw.editMode),
         legacyBonusPointsRemoved: Boolean(raw.legacyBonusPointsRemoved)
       };
+
+      if (!next.childProfiles[next.active]) {
+        next.active = Object.keys(next.childProfiles)[0] || "olivia";
+      }
 
       if (next.lastCalendarDate !== currentDay) {
         next.selectedDate = currentDay;
@@ -1556,10 +1670,30 @@
       return next;
     }
 
+    function childProfiles(targetState = state) {
+      return targetState.childProfiles || defaultChildProfiles;
+    }
+
+    function childIds(targetState = state) {
+      return Object.keys(childProfiles(targetState));
+    }
+
+    function childProfile(childId = state.active) {
+      return childProfiles()[childId] || defaultChildProfiles.olivia;
+    }
+
+    function childName(childId = state.active) {
+      return childProfile(childId).name || childId;
+    }
+
+    function childGender(childId = state.active) {
+      return childProfile(childId).gender || "girl";
+    }
+
     function migrateLegacyBonusPoints(targetState) {
       if (targetState.legacyBonusPointsRemoved) return;
       Object.values(targetState.records || {}).forEach(day => {
-        Object.keys(childNames).forEach(childId => {
+        childIds(targetState).forEach(childId => {
           const child = day[childId];
           if (!child || !Array.isArray(child.log)) return;
           const legacyBonusTotal = child.log.reduce((sum, item) => {
@@ -1582,7 +1716,7 @@
 
     function ensureDay(key, targetState = state) {
       if (!targetState.records[key]) targetState.records[key] = {};
-      Object.keys(childNames).forEach(childId => {
+      childIds(targetState).forEach(childId => {
         if (!targetState.records[key][childId]) {
           targetState.records[key][childId] = { shells: 0, done: {}, log: [] };
         }
@@ -1603,6 +1737,24 @@
       return tasks.map(task => ({ ...task }));
     }
 
+    function taskIdSignature(tasks) {
+      return (tasks || []).map(task => task.id).join("|");
+    }
+
+    function taskFullSignature(tasks) {
+      return (tasks || []).map(task => `${task.id}:${task.title}:${task.shells}`).join("|");
+    }
+
+    function defaultTasksForChild(childId) {
+      if (defaultChildTasks[childId]) return defaultChildTasks[childId];
+      return childGender(childId) === "boy" ? defaultChildTasks.dominik : defaultChildTasks.olivia;
+    }
+
+    function tasksWithUniqueIds(childId, tasks) {
+      if (defaultChildTasks[childId]) return cloneTasks(tasks);
+      return tasks.map(task => ({ ...task, id: `${childId}_${task.id}` }));
+    }
+
     function ensureCustomTasks() {
       if (!state.customTasks) {
         state.customTasks = {
@@ -1610,9 +1762,22 @@
           dominik: cloneTasks(defaultChildTasks.dominik)
         };
       }
-      Object.keys(childNames).forEach(childId => {
+      if (state.taskSchemaVersion < 4) {
+        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
+        state.taskSchemaVersion = 4;
+        save();
+      }
+      if (
+        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia) ||
+        taskFullSignature(state.customTasks.olivia) !== taskFullSignature(defaultChildTasks.olivia)
+      ) {
+        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
+        state.taskSchemaVersion = 4;
+        save();
+      }
+      childIds().forEach(childId => {
         if (!state.customTasks[childId]) {
-          state.customTasks[childId] = cloneTasks(defaultChildTasks[childId]);
+          state.customTasks[childId] = tasksWithUniqueIds(childId, defaultTasksForChild(childId));
         }
       });
       return state.customTasks;
@@ -1628,7 +1793,7 @@
     }
 
     function maxFamilyDailyShells() {
-      return Object.keys(childNames).reduce((sum, childId) => sum + maxDailyShells(childId), 0);
+      return childIds().reduce((sum, childId) => sum + maxDailyShells(childId), 0);
     }
 
     function showToast(text) {
@@ -1699,7 +1864,7 @@
     function checkChildMilestones(childId) {
       const day = ensureDay(state.selectedDate);
       const child = day[childId];
-      const name = childNames[childId];
+      const name = childName(childId);
       const isOlivia = childId === "olivia";
       const max = maxDailyShells(childId);
       const halfway = Math.ceil(max / 2);
@@ -1744,7 +1909,7 @@
     }
 
     function activeName() {
-      return childNames[state.active];
+      return childName(state.active);
     }
 
     function taskTitle(task, childId = state.active) {
@@ -1912,7 +2077,7 @@
 
     function renderTasks() {
       const child = activeChild();
-      contentArea.className = `task-grid ${state.active}`;
+      contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
       contentArea.innerHTML = "";
       tasksForChild().forEach(task => {
         const title = taskTitle(task);
@@ -1975,18 +2140,26 @@
       return keys.reduce((sum, key) => sum + (ensureDay(key)[childId].shells || 0), 0);
     }
 
-    function renderWeekendPrize(oliviaWeek, dominikWeek) {
+    function renderWeekendPrize(weekScores) {
       const weekKey = startOfWeek(state.selectedDate);
       const selected = state.weekendPrizes[weekKey];
-      const total = oliviaWeek + dominikWeek;
-      const winnerId = oliviaWeek > dominikWeek ? "olivia" : dominikWeek > oliviaWeek ? "dominik" : null;
-      const winnerName = winnerId ? childNames[winnerId] : "Olivia ir Dominik";
+      const entries = Object.entries(weekScores);
+      const total = entries.reduce((sum, [, score]) => sum + score, 0);
+      const maxScore = Math.max(...entries.map(([, score]) => score), 0);
+      const leaders = entries.filter(([, score]) => score === maxScore && score > 0).map(([childId]) => childId);
+      const winnerId = leaders.length === 1 ? leaders[0] : null;
+      const winnerName = winnerId ? childName(winnerId) : "visi vaikai";
       const status = document.getElementById("weekendPrizeStatus");
       const select = document.getElementById("weekendPrizeSelect");
       const button = document.getElementById("weekendPrizeButton");
 
-      document.getElementById("weekendOliviaScore").textContent = `Olivia: ${oliviaWeek} ${shellWord(oliviaWeek)}`;
-      document.getElementById("weekendDominikScore").textContent = `Dominik: ${dominikWeek} ${shellWord(dominikWeek)}`;
+      const scoreBox = document.getElementById("weekendScores");
+      scoreBox.innerHTML = "";
+      entries.forEach(([childId, score]) => {
+        const item = document.createElement("span");
+        item.textContent = `${childName(childId)}: ${score} ${shellWord(score)}`;
+        scoreBox.appendChild(item);
+      });
 
       select.innerHTML = "";
       weekendPrizes.forEach(prize => {
@@ -2026,13 +2199,15 @@
       if (state.weekendPrizes[weekKey]) return;
 
       const weekKeys = getWeekKeys(state.selectedDate);
-      const oliviaWeek = childTotal("olivia", weekKeys);
-      const dominikWeek = childTotal("dominik", weekKeys);
-      const total = oliviaWeek + dominikWeek;
+      const weekScores = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, weekKeys)]));
+      const entries = Object.entries(weekScores);
+      const total = entries.reduce((sum, [, score]) => sum + score, 0);
       if (total === 0) return;
 
-      const winnerId = oliviaWeek > dominikWeek ? "olivia" : dominikWeek > oliviaWeek ? "dominik" : null;
-      const winner = winnerId ? childNames[winnerId] : "Olivia ir Dominik";
+      const maxScore = Math.max(...entries.map(([, score]) => score), 0);
+      const leaders = entries.filter(([, score]) => score === maxScore).map(([childId]) => childId);
+      const winnerId = leaders.length === 1 ? leaders[0] : null;
+      const winner = winnerId ? childName(winnerId) : "Visi vaikai";
       const prize = document.getElementById("weekendPrizeSelect").value;
       state.weekendPrizes[weekKey] = { winner, prize };
 
@@ -2043,7 +2218,7 @@
           kind: "weekendPrize"
         });
       } else {
-        Object.keys(childNames).forEach(childId => {
+        childIds().forEach(childId => {
           addLog(ensureDay(state.selectedDate)[childId], {
             text: `Bendras savaitgalio prizas - ${prize}`,
             delta: 0,
@@ -2107,6 +2282,107 @@
       });
     }
 
+    function renderChildren(weekKeys) {
+      const list = document.getElementById("childrenList");
+      list.innerHTML = "";
+      childIds().forEach(childId => {
+        const profile = childProfile(childId);
+        const total = childTotal(childId, [state.selectedDate]);
+        const button = document.createElement("button");
+        button.className = `child-button${childId === state.active ? " active" : ""}`;
+        button.dataset.child = childId;
+        button.dataset.gender = profile.gender;
+        button.type = "button";
+        button.innerHTML = `
+          <span class="avatar" aria-hidden="true">${profile.avatar || (profile.gender === "boy" ? "👦" : "👧")}</span>
+          <span>
+            <span class="child-name">${profile.name}</span><br>
+            <span class="shell-count">${total} ${shellWord(total)} pasirinktą dieną</span>
+          </span>
+        `;
+        button.addEventListener("click", () => {
+          state.active = childId;
+          save();
+          render();
+        });
+        list.appendChild(button);
+      });
+    }
+
+    function openSettings() {
+      document.getElementById("settingsTitle").value = state.appSettings.title;
+      document.getElementById("settingsSubtitle").value = state.appSettings.subtitle;
+      renderChildSettings();
+      document.getElementById("settingsDialog").classList.add("open");
+      document.getElementById("settingsDialog").setAttribute("aria-hidden", "false");
+    }
+
+    function closeSettings() {
+      document.getElementById("settingsDialog").classList.remove("open");
+      document.getElementById("settingsDialog").setAttribute("aria-hidden", "true");
+    }
+
+    function renderChildSettings() {
+      const list = document.getElementById("childSettingsList");
+      list.innerHTML = "";
+      childIds().forEach(childId => {
+        const profile = childProfile(childId);
+        const row = document.createElement("div");
+        row.className = "settings-row";
+        row.innerHTML = `
+          <label>Vardas<input data-child-name="${childId}" type="text" value="${profile.name}"></label>
+          <label>Lytis<select data-child-gender="${childId}">
+            <option value="girl"${profile.gender === "girl" ? " selected" : ""}>Mergaitė</option>
+            <option value="boy"${profile.gender === "boy" ? " selected" : ""}>Berniukas</option>
+          </select></label>
+          <label>Spalva<select data-child-color="${childId}">
+            <option value="pink"${profile.color === "pink" ? " selected" : ""}>Rožinė</option>
+            <option value="blue"${profile.color === "blue" ? " selected" : ""}>Melsva</option>
+            <option value="green"${profile.color === "green" ? " selected" : ""}>Žalsva</option>
+          </select></label>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function saveSettings() {
+      state.appSettings.title = document.getElementById("settingsTitle").value.trim() || defaultAppSettings.title;
+      state.appSettings.subtitle = document.getElementById("settingsSubtitle").value.trim() || defaultAppSettings.subtitle;
+      childIds().forEach(childId => {
+        const name = document.querySelector(`[data-child-name="${childId}"]`).value.trim() || childName(childId);
+        const gender = document.querySelector(`[data-child-gender="${childId}"]`).value;
+        const color = document.querySelector(`[data-child-color="${childId}"]`).value;
+        state.childProfiles[childId] = {
+          ...state.childProfiles[childId],
+          name,
+          gender,
+          color,
+          avatar: gender === "boy" ? "👦" : "👧"
+        };
+      });
+      closeSettings();
+      save();
+      render();
+      showToast("Nustatymai išsaugoti.");
+    }
+
+    function addChildFromSettings() {
+      const name = prompt("Vaiko vardas:");
+      if (name === null) return;
+      const cleanName = name.trim();
+      if (!cleanName) return;
+      const childId = `child${Date.now()}`;
+      state.childProfiles[childId] = {
+        name: cleanName,
+        gender: "girl",
+        color: "pink",
+        avatar: "👧"
+      };
+      ensureCustomTasks();
+      ensureDay(state.selectedDate);
+      renderChildSettings();
+    }
+
     function chooseSurprise(surprise) {
       const child = activeChild();
       if (!child.surpriseUnlocked) return;
@@ -2128,7 +2404,7 @@
         ["dominik", dominikToday]
       ].forEach(([childId, shells]) => {
         const max = maxDailyShells(childId);
-        const percent = Math.min(Math.max(shells / max, 0), 1) * 100;
+        const percent = max > 0 ? Math.min(Math.max(shells / max, 0), 1) * 100 : 0;
         const track = document.getElementById(`${childId}RaceTrack`);
         const score = document.getElementById(`${childId}RaceScore`);
         track.style.setProperty("--progress", `${percent}%`);
@@ -2163,14 +2439,14 @@
       contentArea.innerHTML = "";
 
       keys.forEach(key => {
-        const olivia = childTotal("olivia", [key]);
-        const dominik = childTotal("dominik", [key]);
         const card = document.createElement("div");
         card.className = "summary-card";
         card.innerHTML = `
           <strong>${formatDate(key)}</strong>
-          <button class="summary-button summary-line" data-child="olivia" type="button"><span>Olivia</span><span>${olivia} ${shellWord(olivia)}</span></button>
-          <button class="summary-button summary-line" data-child="dominik" type="button"><span>Dominik</span><span>${dominik} ${shellWord(dominik)}</span></button>
+          ${childIds().map(childId => {
+            const total = childTotal(childId, [key]);
+            return `<button class="summary-button summary-line" data-child="${childId}" type="button"><span>${childName(childId)}</span><span>${total} ${shellWord(total)}</span></button>`;
+          }).join("")}
         `;
         card.querySelectorAll(".summary-button").forEach(button => {
           button.addEventListener("click", () => openDay(key, button.dataset.child));
@@ -2194,14 +2470,14 @@
         const date = new Date(gridStart);
         date.setDate(gridStart.getDate() + index);
         const key = dateKey(date);
-        const olivia = childTotal("olivia", [key]);
-        const dominik = childTotal("dominik", [key]);
         const card = document.createElement("div");
         card.className = `month-day${date.getMonth() !== selectedMonth ? " muted" : ""}${key === todayKey() ? " today-mark" : ""}`;
         card.innerHTML = `
           <span class="month-date">${date.getDate()}</span>
-          <span>O: ${olivia}</span>
-          <span>D: ${dominik}</span>
+          ${childIds().map(childId => {
+            const initial = childName(childId).slice(0, 1);
+            return `<span>${initial}: ${childTotal(childId, [key])}</span>`;
+          }).join("")}
         `;
         card.title = "Paspauskite, kad matytumėte tos dienos istoriją";
         card.addEventListener("click", () => openDay(key, state.active));
@@ -2216,15 +2492,18 @@
       const dominikToday = childTotal("dominik", [state.selectedDate]);
       const oliviaWeek = childTotal("olivia", weekKeys);
       const dominikWeek = childTotal("dominik", weekKeys);
+      const todayTotals = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, [state.selectedDate])]));
+      const weekTotals = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, weekKeys)]));
       const child = activeChild();
-      const familyTodayTotal = oliviaToday + dominikToday;
+      const familyTodayTotal = Object.values(todayTotals).reduce((sum, value) => sum + value, 0);
       const oliviaMilestone = checkChildMilestones("olivia");
       const dominikMilestone = checkChildMilestones("dominik");
       if (oliviaMilestone || dominikMilestone) save();
 
-      document.querySelectorAll(".child-button").forEach(button => {
-        button.classList.toggle("active", button.dataset.child === state.active);
-      });
+      document.getElementById("appTitle").textContent = state.appSettings.title;
+      document.getElementById("appSubtitle").textContent = state.appSettings.subtitle;
+      document.title = state.appSettings.title;
+      renderChildren(weekKeys);
 
       document.querySelectorAll(".view-button").forEach(button => {
         button.classList.toggle("active", button.dataset.view === state.view);
@@ -2236,17 +2515,15 @@
       document.getElementById("todayText").textContent = state.view === "month"
         ? formatDate(state.selectedDate, "month")
         : formatDate(state.selectedDate);
-      document.getElementById("oliviaCount").textContent = `${oliviaToday} ${shellWord(oliviaToday)} pasirinktą dieną`;
-      document.getElementById("dominikCount").textContent = `${dominikToday} ${shellWord(dominikToday)} pasirinktą dieną`;
       document.getElementById("activeName").textContent = activeName();
-      document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${state.active === "olivia" ? oliviaWeek : dominikWeek} ${shellWord(state.active === "olivia" ? oliviaWeek : dominikWeek)}.`;
+      document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
 
       if (state.view === "day") renderTasks();
       if (state.view === "week") renderWeek();
       if (state.view === "month") renderMonth();
       renderLog();
-      renderReward(familyTodayTotal, state.active === "olivia" ? oliviaWeek : dominikWeek);
-      renderWeekendPrize(oliviaWeek, dominikWeek);
+      renderReward(familyTodayTotal, weekTotals[state.active] || 0);
+      renderWeekendPrize(weekTotals);
       renderSurprises();
       renderPenaltyOptions();
       renderRace(oliviaToday, dominikToday);
@@ -2281,6 +2558,16 @@
     });
 
     document.getElementById("addTaskButton").addEventListener("click", addTask);
+    document.getElementById("settingsButton").addEventListener("click", openSettings);
+    document.getElementById("addChildButton").addEventListener("click", addChildFromSettings);
+    document.getElementById("settingsCancel").addEventListener("click", closeSettings);
+    document.getElementById("settingsForm").addEventListener("submit", event => {
+      event.preventDefault();
+      saveSettings();
+    });
+    document.getElementById("settingsDialog").addEventListener("click", event => {
+      if (event.target.id === "settingsDialog") closeSettings();
+    });
 
     taskEditForm.addEventListener("submit", event => {
       event.preventDefault();
