@@ -1516,6 +1516,7 @@
       weekendPrizes: {},
       customTasks: null,
       taskSchemaVersion: 5,
+      sharedTasks: null,
       childProfiles: defaultChildProfiles,
       appSettings: defaultAppSettings,
       editMode: false
@@ -1571,6 +1572,9 @@
     function save() {
       delete state.customTasks;
       delete state.taskSchemaVersion;
+      if (!state.sharedTasks || taskFullSignature(state.sharedTasks) === taskFullSignature(defaultTasksForChild())) {
+        delete state.sharedTasks;
+      }
       localStorage.setItem(storageKey, JSON.stringify(state));
     }
 
@@ -1633,6 +1637,7 @@
         weekendPrizes: raw.weekendPrizes || {},
         customTasks: null,
         taskSchemaVersion: 0,
+        sharedTasks: normalizeSharedTasks(raw.sharedTasks),
         childProfiles: { ...defaultChildProfiles, ...(raw.childProfiles || {}) },
         appSettings: { ...defaultAppSettings, ...(raw.appSettings || {}) },
         editMode: Boolean(raw.editMode),
@@ -1751,6 +1756,25 @@
       return defaultChildTasks.olivia;
     }
 
+    function sharedTasks() {
+      if (!state.sharedTasks) {
+        state.sharedTasks = cloneTasks(defaultTasksForChild());
+      }
+      return state.sharedTasks;
+    }
+
+    function normalizeSharedTasks(tasks) {
+      if (!Array.isArray(tasks)) return null;
+      if (taskIdSignature(tasks) !== taskIdSignature(defaultTasksForChild())) return null;
+      const total = tasks.reduce((sum, task) => sum + Number(task.shells || 0), 0);
+      if (tasks.length !== defaultTasksForChild().length || total !== 55) return null;
+      return tasks.map((task, index) => ({
+        ...defaultTasksForChild()[index],
+        title: typeof task.title === "string" && task.title.trim() ? task.title.trim() : defaultTasksForChild()[index].title,
+        shells: defaultTasksForChild()[index].shells
+      }));
+    }
+
     function tasksWithUniqueIds(childId, tasks) {
       if (defaultChildTasks[childId]) return cloneTasks(tasks);
       return tasks.map(task => ({ ...task, id: `${childId}_${task.id}` }));
@@ -1763,7 +1787,7 @@
 
     function tasksForChild(childId = state.active) {
       ensureCustomTasks();
-      return cloneTasks(defaultTasksForChild(childId));
+      return sharedTasks();
     }
 
     function maxDailyShells(childId = state.active) {
@@ -1978,14 +2002,13 @@
     }
 
     function editTask(taskId) {
-      showToast("Užduočių sąrašas yra bendras abiem vaikams ir nekeičiamas.");
-      return;
       const tasks = tasksForChild();
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
       editingTaskId = taskId;
       taskEditTitle.value = taskTitle(task);
       taskEditShells.value = task.shells;
+      taskEditShells.readOnly = true;
       taskEditDialog.classList.add("open");
       taskEditDialog.setAttribute("aria-hidden", "false");
       taskEditTitle.focus();
@@ -2004,19 +2027,12 @@
       if (!task) return;
       const cleanTitle = taskEditTitle.value.trim();
       if (!cleanTitle) return;
-      const nextShells = Number(taskEditShells.value);
-      if (!Number.isFinite(nextShells) || nextShells < 0) return;
-      const oldShells = task.shells;
       task.title = cleanTitle;
-      task.shells = Math.round(nextShells);
-      const child = activeChild();
-      if (child.done[task.id]) {
-        child.shells = Math.max(0, child.shells + task.shells - oldShells);
-      }
+      task.shells = defaultTasksForChild().find(item => item.id === task.id)?.shells || task.shells;
       closeTaskEditor();
       save();
       render();
-      showToast("Užduotis pakeista.");
+      showToast("Užduotis pakeista abiem vaikams.");
     }
 
     function deleteTask(taskId) {
@@ -2534,11 +2550,11 @@
     });
 
     document.getElementById("editTasksButton").addEventListener("click", () => {
-      state.editMode = false;
+      state.editMode = !state.editMode;
       state.view = "day";
       save();
       render();
-      showToast("Užduočių sąrašas yra bendras abiem vaikams ir nekeičiamas.");
+      showToast(state.editMode ? "Galima koreguoti bendro sąrašo tekstus." : "Redagavimas išjungtas.");
     });
 
     document.getElementById("addTaskButton").addEventListener("click", addTask);
