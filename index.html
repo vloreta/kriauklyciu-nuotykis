@@ -1515,7 +1515,7 @@
       records: {},
       weekendPrizes: {},
       customTasks: null,
-      taskSchemaVersion: 3,
+      taskSchemaVersion: 5,
       childProfiles: defaultChildProfiles,
       appSettings: defaultAppSettings,
       editMode: false
@@ -1762,17 +1762,19 @@
           dominik: cloneTasks(defaultChildTasks.dominik)
         };
       }
-      if (state.taskSchemaVersion < 4) {
-        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
-        state.taskSchemaVersion = 4;
-        save();
-      }
-      if (
-        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia) ||
-        taskFullSignature(state.customTasks.olivia) !== taskFullSignature(defaultChildTasks.olivia)
-      ) {
-        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
-        state.taskSchemaVersion = 4;
+      let tasksChanged = false;
+      ["olivia", "dominik"].forEach(childId => {
+        if (
+          state.taskSchemaVersion < 5 ||
+          taskIdSignature(state.customTasks[childId]) !== taskIdSignature(defaultChildTasks[childId]) ||
+          taskFullSignature(state.customTasks[childId]) !== taskFullSignature(defaultChildTasks[childId])
+        ) {
+          state.customTasks[childId] = cloneTasks(defaultChildTasks[childId]);
+          tasksChanged = true;
+        }
+      });
+      if (tasksChanged) {
+        state.taskSchemaVersion = 5;
         save();
       }
       childIds().forEach(childId => {
