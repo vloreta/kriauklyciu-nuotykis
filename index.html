@@ -33,9 +33,10 @@
     button, input, select { font: inherit; }
 
     .app {
-      width: min(1180px, calc(100% - 28px));
-      margin: 0 auto;
-      padding: 22px 0 30px;
+      width: calc(100% - 48px);
+      max-width: none;
+      margin: 24px auto;
+      padding: 0;
     }
 
     .hero {
@@ -1105,8 +1106,8 @@
 
     @media (max-width: 620px) {
       .app {
-        width: min(100% - 18px, 1180px);
-        padding-top: 10px;
+        width: calc(100% - 18px);
+        margin: 9px auto;
       }
 
       .title-block {
