@@ -1569,6 +1569,8 @@
     let editingTaskId = null;
 
     function save() {
+      delete state.customTasks;
+      delete state.taskSchemaVersion;
       localStorage.setItem(storageKey, JSON.stringify(state));
     }
 
@@ -1629,8 +1631,8 @@
         dominikGuide: raw.dominikGuide || null,
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
-        customTasks: raw.customTasks || null,
-        taskSchemaVersion: raw.taskSchemaVersion || 0,
+        customTasks: null,
+        taskSchemaVersion: 0,
         childProfiles: { ...defaultChildProfiles, ...(raw.childProfiles || {}) },
         appSettings: { ...defaultAppSettings, ...(raw.appSettings || {}) },
         editMode: Boolean(raw.editMode),
@@ -1745,9 +1747,8 @@
       return (tasks || []).map(task => `${task.id}:${task.title}:${task.shells}`).join("|");
     }
 
-    function defaultTasksForChild(childId) {
-      if (defaultChildTasks[childId]) return defaultChildTasks[childId];
-      return childGender(childId) === "boy" ? defaultChildTasks.dominik : defaultChildTasks.olivia;
+    function defaultTasksForChild() {
+      return defaultChildTasks.olivia;
     }
 
     function tasksWithUniqueIds(childId, tasks) {
@@ -1756,38 +1757,13 @@
     }
 
     function ensureCustomTasks() {
-      if (!state.customTasks) {
-        state.customTasks = {
-          olivia: cloneTasks(defaultChildTasks.olivia),
-          dominik: cloneTasks(defaultChildTasks.dominik)
-        };
-      }
-      let tasksChanged = false;
-      ["olivia", "dominik"].forEach(childId => {
-        if (
-          state.taskSchemaVersion < 5 ||
-          taskIdSignature(state.customTasks[childId]) !== taskIdSignature(defaultChildTasks[childId]) ||
-          taskFullSignature(state.customTasks[childId]) !== taskFullSignature(defaultChildTasks[childId])
-        ) {
-          state.customTasks[childId] = cloneTasks(defaultChildTasks[childId]);
-          tasksChanged = true;
-        }
-      });
-      if (tasksChanged) {
-        state.taskSchemaVersion = 5;
-        save();
-      }
-      childIds().forEach(childId => {
-        if (!state.customTasks[childId]) {
-          state.customTasks[childId] = tasksWithUniqueIds(childId, defaultTasksForChild(childId));
-        }
-      });
-      return state.customTasks;
+      if (state.customTasks || state.taskSchemaVersion) save();
+      return null;
     }
 
     function tasksForChild(childId = state.active) {
-      const customTasks = ensureCustomTasks();
-      return customTasks[childId] || customTasks.olivia;
+      ensureCustomTasks();
+      return cloneTasks(defaultTasksForChild(childId));
     }
 
     function maxDailyShells(childId = state.active) {
@@ -2002,6 +1978,8 @@
     }
 
     function editTask(taskId) {
+      showToast("Užduočių sąrašas yra bendras abiem vaikams ir nekeičiamas.");
+      return;
       const tasks = tasksForChild();
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
@@ -2042,6 +2020,8 @@
     }
 
     function deleteTask(taskId) {
+      showToast("Užduočių sąrašas yra bendras abiem vaikams ir nekeičiamas.");
+      return;
       const tasks = tasksForChild();
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
@@ -2059,6 +2039,8 @@
     }
 
     function addTask() {
+      showToast("Užduočių sąrašas yra bendras abiem vaikams ir nekeičiamas.");
+      return;
       const title = prompt("Naujos užduoties tekstas:");
       if (title === null) return;
       const cleanTitle = title.trim();
@@ -2552,11 +2534,11 @@
     });
 
     document.getElementById("editTasksButton").addEventListener("click", () => {
-      state.editMode = !state.editMode;
+      state.editMode = false;
       state.view = "day";
-      ensureCustomTasks();
       save();
       render();
+      showToast("Užduočių sąrašas yra bendras abiem vaikams ir nekeičiamas.");
     });
 
     document.getElementById("addTaskButton").addEventListener("click", addTask);
