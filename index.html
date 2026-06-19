@@ -1357,6 +1357,23 @@
       </div>
     </form>
   </div>
+  <div class="edit-dialog" id="taskAddDialog" aria-hidden="true">
+    <form class="edit-card" id="taskAddForm">
+      <h3>Nauja bendra užduotis</h3>
+      <label>
+        Užduoties tekstas
+        <input id="taskAddTitle" type="text" autocomplete="off">
+      </label>
+      <label>
+        Kriauklyčių skaičius
+        <input id="taskAddShells" type="number" min="0" step="1" value="1">
+      </label>
+      <div class="edit-actions">
+        <button class="action" type="submit">Pridėti</button>
+        <button class="action secondary" id="taskAddCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
   <div class="edit-dialog" id="settingsDialog" aria-hidden="true">
     <form class="edit-card" id="settingsForm">
       <h3>Nustatymai</h3>
@@ -1567,6 +1584,10 @@
     const taskEditForm = document.getElementById("taskEditForm");
     const taskEditTitle = document.getElementById("taskEditTitle");
     const taskEditShells = document.getElementById("taskEditShells");
+    const taskAddDialog = document.getElementById("taskAddDialog");
+    const taskAddForm = document.getElementById("taskAddForm");
+    const taskAddTitle = document.getElementById("taskAddTitle");
+    const taskAddShells = document.getElementById("taskAddShells");
     let editingTaskId = null;
 
     function save() {
@@ -2088,12 +2109,23 @@
       showToast("Užduotis ištrinta.");
     }
 
+    function openAddTask() {
+      taskAddTitle.value = "";
+      taskAddShells.value = "1";
+      taskAddDialog.classList.add("open");
+      taskAddDialog.setAttribute("aria-hidden", "false");
+      taskAddTitle.focus();
+    }
+
+    function closeAddTask() {
+      taskAddDialog.classList.remove("open");
+      taskAddDialog.setAttribute("aria-hidden", "true");
+    }
+
     function addTask() {
-      const title = prompt("Naujos užduoties tekstas:");
-      if (title === null) return;
-      const cleanTitle = title.trim();
+      const cleanTitle = taskAddTitle.value.trim();
       if (!cleanTitle) return;
-      const shells = Number(prompt("Kiek kriauklyčių?", "1"));
+      const shells = Number(taskAddShells.value);
       if (!Number.isFinite(shells) || shells < 0) return;
       const tasks = tasksForChild();
       tasks.push({
@@ -2102,6 +2134,7 @@
         title: cleanTitle,
         shells: Math.round(shells)
       });
+      closeAddTask();
       save();
       render();
       showToast("Nauja bendra užduotis pridėta abiem vaikams.");
@@ -2589,7 +2622,7 @@
       showToast(state.editMode ? "Galima koreguoti bendro sąrašo tekstus." : "Redagavimas išjungtas.");
     });
 
-    document.getElementById("addTaskButton").addEventListener("click", addTask);
+    document.getElementById("addTaskButton").addEventListener("click", openAddTask);
     document.getElementById("settingsButton").addEventListener("click", openSettings);
     document.getElementById("addChildButton").addEventListener("click", addChildFromSettings);
     document.getElementById("settingsCancel").addEventListener("click", closeSettings);
@@ -2610,6 +2643,17 @@
 
     taskEditDialog.addEventListener("click", event => {
       if (event.target === taskEditDialog) closeTaskEditor();
+    });
+
+    taskAddForm.addEventListener("submit", event => {
+      event.preventDefault();
+      addTask();
+    });
+
+    document.getElementById("taskAddCancel").addEventListener("click", closeAddTask);
+
+    taskAddDialog.addEventListener("click", event => {
+      if (event.target === taskAddDialog) closeAddTask();
     });
 
     document.getElementById("prevDayButton").addEventListener("click", () => {
