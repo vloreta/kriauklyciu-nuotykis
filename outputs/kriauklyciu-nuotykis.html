@@ -491,17 +491,18 @@
       position: relative;
       min-height: 105px;
       overflow: hidden;
-      border-top: 2px solid rgba(255, 255, 255, 0.7);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(5, 67, 97, 0.04));
-    }
-
-    .ocean-lane:first-child {
-      border-top: 0;
+      border: 0;
+      background: transparent;
     }
 
     .ocean-lane.active {
-      background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 238, 177, 0.08), rgba(255, 255, 255, 0.12));
-      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.38);
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .ocean-lane.active .ocean-label {
+      border-color: rgba(255, 215, 96, 0.95);
+      box-shadow: 0 0 0 3px rgba(255, 215, 96, 0.28), 0 8px 18px rgba(23, 87, 112, 0.18);
     }
 
     .ocean-lane .ocean-label {
