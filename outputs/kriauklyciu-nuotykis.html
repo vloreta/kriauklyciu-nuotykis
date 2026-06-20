@@ -482,6 +482,64 @@
       line-height: 1.2;
     }
 
+    .ocean-lanes {
+      display: grid;
+      min-height: 100%;
+    }
+
+    .ocean-lane {
+      position: relative;
+      min-height: 105px;
+      overflow: hidden;
+      border-top: 2px solid rgba(255, 255, 255, 0.7);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(5, 67, 97, 0.04));
+    }
+
+    .ocean-lane:first-child {
+      border-top: 0;
+    }
+
+    .ocean-lane.active {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 238, 177, 0.08), rgba(255, 255, 255, 0.12));
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.38);
+    }
+
+    .ocean-lane .ocean-label {
+      top: 24px;
+      padding: 6px 11px;
+    }
+
+    .ocean-lane .race-track {
+      top: 68%;
+    }
+
+    .ocean-lane .guide-bubble {
+      display: none;
+      top: 8px;
+      min-height: 36px;
+      padding: 4px 9px;
+    }
+
+    .ocean-lane.active .guide-bubble {
+      display: grid;
+    }
+
+    .ocean-lane .milestone-badge {
+      top: 44%;
+    }
+
+    .ocean-lane[data-color="pink"] .race-crab {
+      filter: hue-rotate(315deg) saturate(1.75) brightness(1.08) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
+    }
+
+    .ocean-lane[data-color="blue"] .race-crab {
+      filter: hue-rotate(165deg) saturate(1.85) brightness(1.05) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
+    }
+
+    .ocean-lane[data-color="green"] .race-crab {
+      filter: hue-rotate(78deg) saturate(1.85) brightness(1.04) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
+    }
+
     .child-button {
       width: 100%;
       min-height: 84px;
@@ -1220,6 +1278,12 @@
         padding: 6px 9px;
       }
 
+      .ocean-lane .guide-bubble {
+        left: 116px;
+        right: 8px;
+        top: 8px;
+      }
+
       .guide-avatar {
         width: 28px;
         height: 28px;
@@ -1333,37 +1397,8 @@
         </div>
       </aside>
 
-      <section class="panel ocean-scene" aria-label="Vandenyno dugno vaizdas">
-        <div class="ocean-half olivia" role="img" aria-label="Olivijos vandenyno dalis su kriauklėmis ir krabiukais">
-          <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">🧜‍♀️</span>Olivia</span>
-          <div class="guide-bubble" aria-live="polite">
-            <span class="guide-avatar" aria-hidden="true">🧜‍♀️</span>
-            <span class="guide-text" id="oliviaGuideText">Undinė laukia pirmosios Olivijos kriauklytės.</span>
-          </div>
-          <span class="milestone-badge" id="oliviaMilestoneBadge">⭐ Pusė kelio!</span>
-          <div class="race-track" id="oliviaRaceTrack" aria-hidden="true">
-            <span class="race-path"></span>
-            <span class="race-progress"></span>
-            <span class="race-crab">🦀</span>
-            <span class="treasure-shell"><span class="pearl"></span></span>
-          </div>
-          <span class="race-score" id="oliviaRaceScore">0 / 0</span>
-        </div>
-        <div class="ocean-half dominik" role="img" aria-label="Dominik vandenyno dalis su kriauklėmis ir krabiukais">
-          <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">🐉</span>Dominik</span>
-          <div class="guide-bubble dominik-guide" aria-live="polite">
-            <span class="guide-avatar" aria-hidden="true">🐉</span>
-            <span class="guide-text" id="dominikGuideText">Drakonas laukia pirmosios Dominik kriauklytės.</span>
-          </div>
-          <span class="milestone-badge dominik-badge" id="dominikMilestoneBadge">⭐ Pusė kelio!</span>
-          <div class="race-track" id="dominikRaceTrack" aria-hidden="true">
-            <span class="race-path"></span>
-            <span class="race-progress"></span>
-            <span class="race-crab">🦀</span>
-            <span class="treasure-shell"><span class="pearl"></span></span>
-          </div>
-          <span class="race-score" id="dominikRaceScore">0 / 0</span>
-        </div>
+      <section class="panel ocean-scene" id="oceanScene" aria-label="Visų vaikų keliai iki perlo">
+        <div class="ocean-lanes" id="oceanLanes"></div>
       </section>
 
       <section class="panel main">
@@ -1568,6 +1603,7 @@
       lastCalendarDate: todayKey(),
       oliviaGuide: null,
       dominikGuide: null,
+      childGuides: {},
       records: {},
       weekendPrizes: {},
       customTasks: null,
@@ -1683,6 +1719,7 @@
         lastCalendarDate: raw.lastCalendarDate || currentDay,
         oliviaGuide: raw.oliviaGuide || null,
         dominikGuide: raw.dominikGuide || null,
+        childGuides: { ...(raw.childGuides || {}) },
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
         customTasks: raw.customTasks || null,
@@ -1709,6 +1746,7 @@
         next.lastCalendarDate = currentDay;
         next.oliviaGuide = null;
         next.dominikGuide = null;
+        next.childGuides = {};
       }
 
       if (raw.children && !raw.records) {
@@ -1884,29 +1922,50 @@
     }
 
     function setOliviaGuide(text) {
-      state.oliviaGuide = { date: state.selectedDate, text };
-      const guide = document.getElementById("oliviaGuideText");
-      if (guide) guide.textContent = text;
+      setChildGuide("olivia", text);
     }
 
     function setDominikGuide(text) {
-      state.dominikGuide = { date: state.selectedDate, text };
-      const guide = document.getElementById("dominikGuideText");
+      setChildGuide("dominik", text);
+    }
+
+    function setChildGuide(childId, text) {
+      state.childGuides ||= {};
+      state.childGuides[childId] = { date: state.selectedDate, text };
+      if (childId === "olivia") state.oliviaGuide = state.childGuides[childId];
+      if (childId === "dominik") state.dominikGuide = state.childGuides[childId];
+      const guide = document.getElementById(`${childId}GuideText`);
       if (guide) guide.textContent = text;
     }
 
-    function renderOliviaGuide(oliviaToday) {
-      const savedGuide = state.oliviaGuide?.date === state.selectedDate ? state.oliviaGuide.text : "";
-      document.getElementById("oliviaGuideText").textContent = savedGuide || oliviaDefaultGuide(oliviaToday);
+    function childGuideAvatar(childId) {
+      if (childId === "olivia") return "🧜‍♀️";
+      if (childId === "dominik") return "🐉";
+      return "🐠";
     }
 
-    function renderDominikGuide(dominikToday) {
-      const savedGuide = state.dominikGuide?.date === state.selectedDate ? state.dominikGuide.text : "";
-      document.getElementById("dominikGuideText").textContent = savedGuide || dominikDefaultGuide(dominikToday);
+    function childDefaultGuide(childId, shells) {
+      if (childId === "olivia") return oliviaDefaultGuide(shells);
+      if (childId === "dominik") return dominikDefaultGuide(shells);
+      const name = childName(childId);
+      const max = maxDailyShells(childId);
+      if (shells <= 0) return `Jūros draugas laukia pirmosios ${name} kriauklytės.`;
+      if (shells >= max) return `${name} pasiekė perlą! Jūros draugas labai didžiuojasi.`;
+      if (shells >= max * 0.75) return `${name} jau visai arti perlo!`;
+      if (shells >= max * 0.35) return `${name} gražiai keliauja pirmyn per vandenyną.`;
+      return `Puiki pradžia, ${name}! Kiekviena kriauklytė artina prie perlo.`;
+    }
+
+    function childGuideText(childId, shells) {
+      const modernGuide = state.childGuides?.[childId];
+      const legacyGuide = childId === "olivia" ? state.oliviaGuide : childId === "dominik" ? state.dominikGuide : null;
+      const savedGuide = modernGuide || legacyGuide;
+      return savedGuide?.date === state.selectedDate ? savedGuide.text : childDefaultGuide(childId, shells);
     }
 
     function renderMilestoneBadge(childId, shells) {
       const badge = document.getElementById(`${childId}MilestoneBadge`);
+      if (!badge) return;
       const max = maxDailyShells(childId);
       const halfway = Math.ceil(max / 2);
       badge.classList.remove("show", "full");
@@ -1927,24 +1986,26 @@
       const day = ensureDay(state.selectedDate);
       const child = day[childId];
       const name = childName(childId);
-      const isOlivia = childId === "olivia";
       const max = maxDailyShells(childId);
       const halfway = Math.ceil(max / 2);
 
       if (child.shells >= max && !child.dailyTreasureAwarded) {
         child.dailyTreasureAwarded = true;
         addLog(child, {
-          text: isOlivia
+          text: childId === "olivia"
             ? "Olivia: dienos lobis pasiektas - Undinė atvėrė perlo kriauklę (prizas)"
-            : "Dominik: dienos lobis pasiektas - Drakonas atrakino perlo kriauklę (prizas)",
+            : childId === "dominik"
+              ? "Dominik: dienos lobis pasiektas - Drakonas atrakino perlo kriauklę (prizas)"
+              : `${name}: dienos lobis pasiektas - perlo kriauklė atsivėrė (prizas)`,
           delta: 0,
           kind: "dailyPrize"
         });
-        if (isOlivia) {
-          setOliviaGuide("Olivia surinko visas kriauklytes! Undinė atvėrė perlo kriauklę - šiandien priklauso ypatingas prizas.");
-        } else {
-          setDominikGuide("Dominik surinko visas kriauklytes! Drakonas atrakino perlo kriauklę - šiandien priklauso ypatingas prizas.");
-        }
+        const message = childId === "olivia"
+          ? "Olivia surinko visas kriauklytes! Undinė atvėrė perlo kriauklę - šiandien priklauso ypatingas prizas."
+          : childId === "dominik"
+            ? "Dominik surinko visas kriauklytes! Drakonas atrakino perlo kriauklę - šiandien priklauso ypatingas prizas."
+            : `${name} surinko visas kriauklytes! Jūros draugas atvėrė perlo kriauklę - šiandien priklauso ypatingas prizas.`;
+        setChildGuide(childId, message);
         return "full";
       }
 
@@ -1955,11 +2016,12 @@
           delta: 0,
           kind: "halfwayNotice"
         });
-        if (isOlivia) {
-          setOliviaGuide("Olivia jau nuėjo pusę kelio iki perlo! Undinė mato, kaip gražiai juda krabiukas.");
-        } else {
-          setDominikGuide("Dominik jau nuėjo pusę kelio iki perlo! Drakonas mato, kaip drąsiai juda krabiukas.");
-        }
+        const message = childId === "olivia"
+          ? "Olivia jau nuėjo pusę kelio iki perlo! Undinė mato, kaip gražiai juda krabiukas."
+          : childId === "dominik"
+            ? "Dominik jau nuėjo pusę kelio iki perlo! Drakonas mato, kaip drąsiai juda krabiukas."
+            : `${name} jau nuėjo pusę kelio iki perlo! Jūros draugas džiaugiasi šia pažanga.`;
+        setChildGuide(childId, message);
         return "half";
       }
 
@@ -2028,13 +2090,13 @@
         });
         save();
         render();
-        if (state.active === "olivia") {
-          setOliviaGuide(`Nieko tokio, Olivia. Galime pabandyti dar kartą ir kriauklytė sugrįš.`);
-          save();
-        } else if (state.active === "dominik") {
-          setDominikGuide("Nieko tokio, Dominik. Drakonas saugo kelią - galima pabandyti dar kartą.");
-          save();
-        }
+        const retryMessage = state.active === "olivia"
+          ? "Nieko tokio, Olivia. Galime pabandyti dar kartą ir kriauklytė sugrįš."
+          : state.active === "dominik"
+            ? "Nieko tokio, Dominik. Drakonas saugo kelią - galima pabandyti dar kartą."
+            : `Nieko tokio, ${activeName()}. Jūros draugas laukia, kol pabandysi dar kartą.`;
+        setChildGuide(state.active, retryMessage);
+        save();
         showToast(`${title} atšaukta: -${task.shells} ${shellWord(task.shells)}.`);
         return;
       }
@@ -2047,14 +2109,13 @@
         kind: "complete"
       });
       const milestone = checkChildMilestones(state.active);
-      if (state.active === "olivia") {
-        if (!milestone) {
-          setOliviaGuide(`Puiku, Olivia! Undinė įdėjo ${task.shells} ${shellWord(task.shells)} į tavo lobį.`);
-        }
-      } else if (state.active === "dominik") {
-        if (!milestone) {
-          setDominikGuide(`Šaunu, Dominik! Drakonas pridėjo ${task.shells} ${shellWord(task.shells)} prie tavo kelio.`);
-        }
+      if (!milestone) {
+        const successMessage = state.active === "olivia"
+          ? `Puiku, Olivia! Undinė įdėjo ${task.shells} ${shellWord(task.shells)} į tavo lobį.`
+          : state.active === "dominik"
+            ? `Šaunu, Dominik! Drakonas pridėjo ${task.shells} ${shellWord(task.shells)} prie tavo kelio.`
+            : `Puiku, ${activeName()}! Jūros draugas pridėjo ${task.shells} ${shellWord(task.shells)} prie tavo kelio.`;
+        setChildGuide(state.active, successMessage);
       }
       save();
       render();
@@ -2418,6 +2479,7 @@
       }
       delete state.childProfiles[childId];
       if (state.customTasks) delete state.customTasks[childId];
+      if (state.childGuides) delete state.childGuides[childId];
       Object.values(state.records || {}).forEach(day => {
         delete day[childId];
       });
@@ -2483,21 +2545,43 @@
       showToast(`Pasirinkta staigmena: ${surprise}.`);
     }
 
-    function renderRace(oliviaToday, dominikToday) {
-      [
-        ["olivia", oliviaToday],
-        ["dominik", dominikToday]
-      ].forEach(([childId, shells]) => {
-        const lane = document.querySelector(`.ocean-half.${childId}`);
-        const isVisible = Boolean(state.childProfiles[childId]);
-        if (lane) lane.style.display = isVisible ? "" : "none";
-        if (!isVisible) return;
+    function renderRace(todayTotals) {
+      const scene = document.getElementById("oceanScene");
+      const lanes = document.getElementById("oceanLanes");
+      const ids = childIds();
+      const laneHeight = ids.length <= 2 ? 150 : 105;
+      scene.style.height = `${Math.min(525, Math.max(220, ids.length * laneHeight))}px`;
+      scene.style.overflowY = ids.length > 5 ? "auto" : "hidden";
+      lanes.style.gridTemplateRows = `repeat(${ids.length}, minmax(${laneHeight}px, 1fr))`;
+      lanes.innerHTML = "";
+
+      ids.forEach(childId => {
+        const shells = todayTotals[childId] || 0;
+        const profile = childProfile(childId);
         const max = maxDailyShells(childId);
         const percent = max > 0 ? Math.min(Math.max(shells / max, 0), 1) * 100 : 0;
-        const track = document.getElementById(`${childId}RaceTrack`);
-        const score = document.getElementById(`${childId}RaceScore`);
-        track.style.setProperty("--progress", `${percent}%`);
-        score.textContent = `${shells} / ${max} ${shellWord(max)}`;
+        const lane = document.createElement("div");
+        lane.className = `ocean-lane${childId === state.active ? " active" : ""}`;
+        lane.dataset.child = childId;
+        lane.dataset.color = profile.color || (profile.gender === "girl" ? "pink" : "blue");
+        lane.setAttribute("role", "img");
+        lane.setAttribute("aria-label", `${profile.name} kelias iki perlo: ${shells} iš ${max}`);
+        lane.innerHTML = `
+          <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">${profile.avatar}</span>${profile.name}</span>
+          <div class="guide-bubble" aria-live="polite">
+            <span class="guide-avatar" aria-hidden="true">${childGuideAvatar(childId)}</span>
+            <span class="guide-text" id="${childId}GuideText">${childGuideText(childId, shells)}</span>
+          </div>
+          <span class="milestone-badge" id="${childId}MilestoneBadge">⭐ Pusė kelio!</span>
+          <div class="race-track" id="${childId}RaceTrack" aria-hidden="true" style="--progress: ${percent}%">
+            <span class="race-path"></span>
+            <span class="race-progress"></span>
+            <span class="race-crab">🦀</span>
+            <span class="treasure-shell"><span class="pearl"></span></span>
+          </div>
+          <span class="race-score" id="${childId}RaceScore">${shells} / ${max} ${shellWord(max)}</span>
+        `;
+        lanes.appendChild(lane);
       });
     }
 
@@ -2577,17 +2661,12 @@
     function render() {
       ensureDay(state.selectedDate);
       const weekKeys = getWeekKeys(state.selectedDate);
-      const oliviaToday = childTotal("olivia", [state.selectedDate]);
-      const dominikToday = childTotal("dominik", [state.selectedDate]);
-      const oliviaWeek = childTotal("olivia", weekKeys);
-      const dominikWeek = childTotal("dominik", weekKeys);
       const todayTotals = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, [state.selectedDate])]));
       const weekTotals = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, weekKeys)]));
       const child = activeChild();
       const familyTodayTotal = Object.values(todayTotals).reduce((sum, value) => sum + value, 0);
-      const oliviaMilestone = state.childProfiles.olivia ? checkChildMilestones("olivia") : "";
-      const dominikMilestone = state.childProfiles.dominik ? checkChildMilestones("dominik") : "";
-      if (oliviaMilestone || dominikMilestone) save();
+      const milestoneChanges = childIds().map(childId => checkChildMilestones(childId));
+      if (milestoneChanges.some(Boolean)) save();
 
       const displayTitle = state.appSettings.title;
       document.getElementById("appTitle").textContent = displayTitle;
@@ -2618,15 +2697,8 @@
       renderWeekendPrize(weekTotals);
       renderSurprises();
       renderPenaltyOptions();
-      renderRace(oliviaToday, dominikToday);
-      if (state.childProfiles.olivia) {
-        renderOliviaGuide(oliviaToday);
-        renderMilestoneBadge("olivia", oliviaToday);
-      }
-      if (state.childProfiles.dominik) {
-        renderDominikGuide(dominikToday);
-        renderMilestoneBadge("dominik", dominikToday);
-      }
+      renderRace(todayTotals);
+      childIds().forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
     }
 
     document.querySelectorAll(".child-button").forEach(button => {
@@ -2711,13 +2783,13 @@
       });
       save();
       render();
-      if (state.active === "olivia") {
-        setOliviaGuide("Olivia gavo ypatingą pagyrimą! Undinė atrakino mažą staigmeną.");
-        save();
-      } else if (state.active === "dominik") {
-        setDominikGuide("Dominik gavo ypatingą pagyrimą! Drakonas atrakino mažą staigmeną.");
-        save();
-      }
+      const praiseMessage = state.active === "olivia"
+        ? "Olivia gavo ypatingą pagyrimą! Undinė atrakino mažą staigmeną."
+        : state.active === "dominik"
+          ? "Dominik gavo ypatingą pagyrimą! Drakonas atrakino mažą staigmeną."
+          : `${activeName()} gavo ypatingą pagyrimą! Jūros draugas atrakino mažą staigmeną.`;
+      setChildGuide(state.active, praiseMessage);
+      save();
       showToast("Ypatingas pagyrimas atrakino staigmeną!");
     });
 
@@ -2744,13 +2816,13 @@
         });
         save();
         render();
-        if (state.active === "olivia") {
-          setOliviaGuide("Viskas gerai, Olivia. Undinė laukia pirmos kriauklytės ir tiki tavimi.");
-          save();
-        } else if (state.active === "dominik") {
-          setDominikGuide("Viskas gerai, Dominik. Drakonas laukia pirmos kriauklytės ir saugo kelią.");
-          save();
-        }
+        const emptyPenaltyMessage = state.active === "olivia"
+          ? "Viskas gerai, Olivia. Undinė laukia pirmos kriauklytės ir tiki tavimi."
+          : state.active === "dominik"
+            ? "Viskas gerai, Dominik. Drakonas laukia pirmos kriauklytės ir saugo kelią."
+            : `Viskas gerai, ${activeName()}. Jūros draugas tiki tavimi.`;
+        setChildGuide(state.active, emptyPenaltyMessage);
+        save();
         showToast("Kriauklyčių dar nėra, todėl nieko neatimta.");
         return;
       }
@@ -2763,13 +2835,13 @@
       });
       save();
       render();
-      if (state.active === "olivia") {
-        setOliviaGuide("Nieko tokio, Olivia. Undinė primena: galima pasitaisyti ir vėl rinkti kriauklytes.");
-        save();
-      } else if (state.active === "dominik") {
-        setDominikGuide("Nieko tokio, Dominik. Drakonas primena: galima pasitaisyti ir vėl judėti link perlo.");
-        save();
-      }
+      const penaltyMessage = state.active === "olivia"
+        ? "Nieko tokio, Olivia. Undinė primena: galima pasitaisyti ir vėl rinkti kriauklytes."
+        : state.active === "dominik"
+          ? "Nieko tokio, Dominik. Drakonas primena: galima pasitaisyti ir vėl judėti link perlo."
+          : `Nieko tokio, ${activeName()}. Jūros draugas primena, kad galima pasitaisyti ir judėti pirmyn.`;
+      setChildGuide(state.active, penaltyMessage);
+      save();
       showToast(`${activeName()} prarado ${removed} ${shellWord(removed)}.`);
     });
 
