@@ -641,6 +641,12 @@
       color: #0c718a;
     }
 
+    .tool-button.danger {
+      border-color: #f15b61;
+      background: #f15b61;
+      color: #fff;
+    }
+
     .view-button.active {
       border-color: var(--sea);
       background: #e7f9ff;
@@ -1070,6 +1076,18 @@
       background: #fff;
       color: var(--ink);
       padding: 0 8px;
+    }
+
+    .remove-child-button {
+      grid-column: 1 / -1;
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      background: #f15b61;
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 0 12px;
     }
 
     @media (max-width: 940px) {
@@ -2393,6 +2411,7 @@
       list.innerHTML = "";
       childIds().forEach(childId => {
         const profile = childProfile(childId);
+        const canRemove = !defaultChildProfiles[childId];
         const row = document.createElement("div");
         row.className = "settings-row";
         row.innerHTML = `
@@ -2406,9 +2425,31 @@
             <option value="blue"${profile.color === "blue" ? " selected" : ""}>Melsva</option>
             <option value="green"${profile.color === "green" ? " selected" : ""}>Žalsva</option>
           </select></label>
+          ${canRemove
+            ? `<button class="remove-child-button" data-remove-child="${childId}" type="button">Pašalinti vaiką</button>`
+            : ""}
         `;
         list.appendChild(row);
       });
+    }
+
+    function removeChildFromSettings(childId) {
+      if (defaultChildProfiles[childId]) {
+        showToast("Olivia ir Dominik yra pagrindiniai vaikai.");
+        return;
+      }
+      delete state.childProfiles[childId];
+      if (state.customTasks) delete state.customTasks[childId];
+      Object.values(state.records || {}).forEach(day => {
+        delete day[childId];
+      });
+      if (state.active === childId) {
+        state.active = childIds()[0] || "olivia";
+      }
+      save();
+      renderChildSettings();
+      render();
+      showToast("Vaikas pašalintas iš sąrašo.");
     }
 
     function saveSettings() {
@@ -2575,7 +2616,9 @@
         button.classList.toggle("active", button.dataset.view === state.view);
       });
 
-      document.getElementById("editTasksButton").textContent = state.editMode ? "Baigti" : "EDIT";
+      const editButton = document.getElementById("editTasksButton");
+      editButton.textContent = state.editMode ? "Baigti" : "EDIT";
+      editButton.classList.toggle("danger", state.editMode);
       document.getElementById("addTaskButton").style.display = state.editMode && state.view === "day" ? "" : "none";
 
       document.getElementById("todayText").textContent = state.view === "month"
@@ -2632,6 +2675,11 @@
       saveSettings();
     });
     document.getElementById("settingsDialog").addEventListener("click", event => {
+      const removeButton = event.target.closest("[data-remove-child]");
+      if (removeButton) {
+        removeChildFromSettings(removeButton.dataset.removeChild);
+        return;
+      }
       if (event.target.id === "settingsDialog") closeSettings();
     });
 
