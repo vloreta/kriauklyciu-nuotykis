@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Krabukų nuotykiai</title>
+  <title>Kraiklyčių nuotykiai</title>
   <style>
     :root {
       --sea: #0d8aa8;
@@ -33,10 +33,9 @@
     button, input, select { font: inherit; }
 
     .app {
-      width: calc(100% - 48px);
-      max-width: none;
-      margin: 24px auto;
-      padding: 0;
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 30px;
     }
 
     .hero {
@@ -1124,8 +1123,8 @@
 
     @media (max-width: 620px) {
       .app {
-        width: calc(100% - 18px);
-        margin: 9px auto;
+        width: min(100% - 18px, 1180px);
+        padding-top: 10px;
       }
 
       .title-block {
@@ -1239,7 +1238,7 @@
     <section class="hero" aria-label="Krabukų nuotykių pradžia">
       <div class="title-block">
         <div class="hero-badge">🦀 Dienos kelionė iki perlo</div>
-        <h1 id="appTitle">Krabukų nuotykiai</h1>
+        <h1 id="appTitle">Kraiklyčių nuotykiai</h1>
         <p class="subtitle" id="appSubtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
       </div>
       <div class="weekend-prize" aria-label="Didysis savaitgalio prizas">
@@ -1373,23 +1372,6 @@
       <div class="edit-actions">
         <button class="action" type="submit">Išsaugoti</button>
         <button class="action secondary" id="taskEditCancel" type="button">Atšaukti</button>
-      </div>
-    </form>
-  </div>
-  <div class="edit-dialog" id="taskAddDialog" aria-hidden="true">
-    <form class="edit-card" id="taskAddForm">
-      <h3>Nauja bendra užduotis</h3>
-      <label>
-        Užduoties tekstas
-        <input id="taskAddTitle" type="text" autocomplete="off">
-      </label>
-      <label>
-        Kriauklyčių skaičius
-        <input id="taskAddShells" type="number" min="0" step="1" value="1">
-      </label>
-      <div class="edit-actions">
-        <button class="action" type="submit">Pridėti</button>
-        <button class="action secondary" id="taskAddCancel" type="button">Atšaukti</button>
       </div>
     </form>
   </div>
@@ -1537,7 +1519,7 @@
     };
 
     const defaultAppSettings = {
-      title: "Krabukų nuotykiai",
+      title: "Kraiklyčių nuotykiai",
       subtitle: "Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio."
     };
 
@@ -1551,8 +1533,7 @@
       records: {},
       weekendPrizes: {},
       customTasks: null,
-      taskSchemaVersion: 5,
-      sharedTasks: null,
+      taskSchemaVersion: 3,
       childProfiles: defaultChildProfiles,
       appSettings: defaultAppSettings,
       editMode: false
@@ -1603,18 +1584,9 @@
     const taskEditForm = document.getElementById("taskEditForm");
     const taskEditTitle = document.getElementById("taskEditTitle");
     const taskEditShells = document.getElementById("taskEditShells");
-    const taskAddDialog = document.getElementById("taskAddDialog");
-    const taskAddForm = document.getElementById("taskAddForm");
-    const taskAddTitle = document.getElementById("taskAddTitle");
-    const taskAddShells = document.getElementById("taskAddShells");
     let editingTaskId = null;
 
     function save() {
-      delete state.customTasks;
-      delete state.taskSchemaVersion;
-      if (!state.sharedTasks || taskFullSignature(state.sharedTasks) === taskFullSignature(defaultTasksForChild())) {
-        delete state.sharedTasks;
-      }
       localStorage.setItem(storageKey, JSON.stringify(state));
     }
 
@@ -1675,14 +1647,19 @@
         dominikGuide: raw.dominikGuide || null,
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
-        customTasks: null,
-        taskSchemaVersion: 0,
-        sharedTasks: normalizeSharedTasks(raw.sharedTasks),
-        childProfiles: { ...defaultChildProfiles, ...(raw.childProfiles || {}) },
+        customTasks: raw.customTasks || null,
+        taskSchemaVersion: raw.taskSchemaVersion || 0,
+        childProfiles: raw.childProfiles
+          ? { ...raw.childProfiles }
+          : { ...defaultChildProfiles },
         appSettings: { ...defaultAppSettings, ...(raw.appSettings || {}) },
         editMode: Boolean(raw.editMode),
         legacyBonusPointsRemoved: Boolean(raw.legacyBonusPointsRemoved)
       };
+
+      if (["Krabukų nuotykiai", "Krabukų nuotykiai..."].includes(next.appSettings.title)) {
+        next.appSettings.title = defaultAppSettings.title;
+      }
 
       if (!next.childProfiles[next.active]) {
         next.active = Object.keys(next.childProfiles)[0] || "olivia";
@@ -1792,37 +1769,9 @@
       return (tasks || []).map(task => `${task.id}:${task.title}:${task.shells}`).join("|");
     }
 
-    function defaultTasksForChild() {
-      return defaultChildTasks.olivia;
-    }
-
-    function sharedTasks() {
-      if (!state.sharedTasks) {
-        state.sharedTasks = cloneTasks(defaultTasksForChild());
-      }
-      return state.sharedTasks;
-    }
-
-    function normalizeSharedTasks(tasks) {
-      if (!Array.isArray(tasks)) return null;
-      const defaults = defaultTasksForChild();
-      const defaultSignature = taskIdSignature(defaults);
-      const savedDefaults = tasks.slice(0, defaults.length);
-      if (taskIdSignature(savedDefaults) !== defaultSignature) return null;
-      const normalizedDefaults = defaults.map((task, index) => ({
-        ...defaultTasksForChild()[index],
-        title: typeof savedDefaults[index].title === "string" && savedDefaults[index].title.trim() ? savedDefaults[index].title.trim() : defaultTasksForChild()[index].title,
-        shells: defaultTasksForChild()[index].shells
-      }));
-      const customTasks = tasks.slice(defaults.length).map(task => ({
-        id: String(task.id || `sharedCustom${Date.now()}`),
-        icon: task.icon || "✨",
-        title: typeof task.title === "string" && task.title.trim() ? task.title.trim() : "Nauja užduotis",
-        shells: Math.max(0, Math.round(Number(task.shells || 0)))
-      })).filter(task => task.id.startsWith("sharedCustom") && task.title);
-      const normalized = [...normalizedDefaults, ...customTasks];
-      const total = normalized.reduce((sum, task) => sum + task.shells, 0);
-      return total === 53 ? null : normalized;
+    function defaultTasksForChild(childId) {
+      if (defaultChildTasks[childId]) return defaultChildTasks[childId];
+      return childGender(childId) === "boy" ? defaultChildTasks.dominik : defaultChildTasks.olivia;
     }
 
     function tasksWithUniqueIds(childId, tasks) {
@@ -1831,13 +1780,36 @@
     }
 
     function ensureCustomTasks() {
-      if (state.customTasks || state.taskSchemaVersion) save();
-      return null;
+      if (!state.customTasks) {
+        state.customTasks = {
+          olivia: cloneTasks(defaultChildTasks.olivia),
+          dominik: cloneTasks(defaultChildTasks.dominik)
+        };
+      }
+      if (state.taskSchemaVersion < 4) {
+        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
+        state.taskSchemaVersion = 4;
+        save();
+      }
+      if (
+        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia) ||
+        taskFullSignature(state.customTasks.olivia) !== taskFullSignature(defaultChildTasks.olivia)
+      ) {
+        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
+        state.taskSchemaVersion = 4;
+        save();
+      }
+      childIds().forEach(childId => {
+        if (!state.customTasks[childId]) {
+          state.customTasks[childId] = tasksWithUniqueIds(childId, defaultTasksForChild(childId));
+        }
+      });
+      return state.customTasks;
     }
 
     function tasksForChild(childId = state.active) {
-      ensureCustomTasks();
-      return sharedTasks();
+      const customTasks = ensureCustomTasks();
+      return customTasks[childId] || customTasks.olivia;
     }
 
     function maxDailyShells(childId = state.active) {
@@ -2058,7 +2030,6 @@
       editingTaskId = taskId;
       taskEditTitle.value = taskTitle(task);
       taskEditShells.value = task.shells;
-      taskEditShells.readOnly = !task.id.startsWith("sharedCustom");
       taskEditDialog.classList.add("open");
       taskEditDialog.setAttribute("aria-hidden", "false");
       taskEditTitle.focus();
@@ -2077,41 +2048,22 @@
       if (!task) return;
       const cleanTitle = taskEditTitle.value.trim();
       if (!cleanTitle) return;
+      const nextShells = Number(taskEditShells.value);
+      if (!Number.isFinite(nextShells) || nextShells < 0) return;
+      const oldShells = task.shells;
       task.title = cleanTitle;
-      const defaultTask = defaultTasksForChild().find(item => item.id === task.id);
-      if (defaultTask) {
-        task.shells = defaultTask.shells;
-      } else {
-        const nextShells = Number(taskEditShells.value);
-        if (!Number.isFinite(nextShells) || nextShells < 0) return;
-        task.shells = Math.round(nextShells);
+      task.shells = Math.round(nextShells);
+      const child = activeChild();
+      if (child.done[task.id]) {
+        child.shells = Math.max(0, child.shells + task.shells - oldShells);
       }
       closeTaskEditor();
       save();
       render();
-      showToast("Užduotis pakeista abiem vaikams.");
+      showToast("Užduotis pakeista.");
     }
 
     function deleteTask(taskId) {
-      if (taskId.startsWith("sharedCustom")) {
-        const tasks = tasksForChild();
-        const index = tasks.findIndex(item => item.id === taskId);
-        if (index < 0) return;
-        const ok = confirm(`Ištrinti užduotį „${taskTitle(tasks[index])}“?`);
-        if (!ok) return;
-        tasks.splice(index, 1);
-        Object.values(state.records || {}).forEach(day => {
-          childIds().forEach(childId => {
-            if (day[childId]?.done) delete day[childId].done[taskId];
-          });
-        });
-        save();
-        render();
-        showToast("Bendra užduotis ištrinta abiem vaikams.");
-        return;
-      }
-      showToast("Užduočių sąrašas yra bendras abiem vaikams ir nekeičiamas.");
-      return;
       const tasks = tasksForChild();
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
@@ -2128,35 +2080,23 @@
       showToast("Užduotis ištrinta.");
     }
 
-    function openAddTask() {
-      taskAddTitle.value = "";
-      taskAddShells.value = "1";
-      taskAddDialog.classList.add("open");
-      taskAddDialog.setAttribute("aria-hidden", "false");
-      taskAddTitle.focus();
-    }
-
-    function closeAddTask() {
-      taskAddDialog.classList.remove("open");
-      taskAddDialog.setAttribute("aria-hidden", "true");
-    }
-
     function addTask() {
-      const cleanTitle = taskAddTitle.value.trim();
+      const title = prompt("Naujos užduoties tekstas:");
+      if (title === null) return;
+      const cleanTitle = title.trim();
       if (!cleanTitle) return;
-      const shells = Number(taskAddShells.value);
+      const shells = Number(prompt("Kiek kriauklyčių?", "1"));
       if (!Number.isFinite(shells) || shells < 0) return;
       const tasks = tasksForChild();
       tasks.push({
-        id: `sharedCustom${Date.now()}`,
+        id: `${state.active}Custom${Date.now()}`,
         icon: "✨",
         title: cleanTitle,
         shells: Math.round(shells)
       });
-      closeAddTask();
       save();
       render();
-      showToast("Nauja bendra užduotis pridėta abiem vaikams.");
+      showToast("Nauja užduotis pridėta.");
     }
 
     function renderTasks() {
@@ -2221,7 +2161,7 @@
     }
 
     function childTotal(childId, keys) {
-      return keys.reduce((sum, key) => sum + (ensureDay(key)[childId].shells || 0), 0);
+      return keys.reduce((sum, key) => sum + (ensureDay(key)[childId]?.shells || 0), 0);
     }
 
     function renderWeekendPrize(weekScores) {
@@ -2381,7 +2321,7 @@
           <span class="avatar" aria-hidden="true">${profile.avatar || (profile.gender === "boy" ? "👦" : "👧")}</span>
           <span>
             <span class="child-name">${profile.name}</span><br>
-            <span class="shell-count">${total} / ${maxDailyShells(childId)} ${shellWord(total)} pasirinktą dieną</span>
+            <span class="shell-count">${total} ${shellWord(total)} pasirinktą dieną</span>
           </span>
         `;
         button.addEventListener("click", () => {
@@ -2411,7 +2351,7 @@
       list.innerHTML = "";
       childIds().forEach(childId => {
         const profile = childProfile(childId);
-        const canRemove = !defaultChildProfiles[childId];
+        const canRemove = childIds().length > 1;
         const row = document.createElement("div");
         row.className = "settings-row";
         row.innerHTML = `
@@ -2434,8 +2374,8 @@
     }
 
     function removeChildFromSettings(childId) {
-      if (defaultChildProfiles[childId]) {
-        showToast("Olivia ir Dominik yra pagrindiniai vaikai.");
+      if (childIds().length <= 1) {
+        showToast("Sąraše turi likti bent vienas vaikas.");
         return;
       }
       delete state.childProfiles[childId];
@@ -2510,6 +2450,10 @@
         ["olivia", oliviaToday],
         ["dominik", dominikToday]
       ].forEach(([childId, shells]) => {
+        const lane = document.querySelector(`.ocean-half.${childId}`);
+        const isVisible = Boolean(state.childProfiles[childId]);
+        if (lane) lane.style.display = isVisible ? "" : "none";
+        if (!isVisible) return;
         const max = maxDailyShells(childId);
         const percent = max > 0 ? Math.min(Math.max(shells / max, 0), 1) * 100 : 0;
         const track = document.getElementById(`${childId}RaceTrack`);
@@ -2603,13 +2547,14 @@
       const weekTotals = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, weekKeys)]));
       const child = activeChild();
       const familyTodayTotal = Object.values(todayTotals).reduce((sum, value) => sum + value, 0);
-      const oliviaMilestone = checkChildMilestones("olivia");
-      const dominikMilestone = checkChildMilestones("dominik");
+      const oliviaMilestone = state.childProfiles.olivia ? checkChildMilestones("olivia") : "";
+      const dominikMilestone = state.childProfiles.dominik ? checkChildMilestones("dominik") : "";
       if (oliviaMilestone || dominikMilestone) save();
 
-      document.getElementById("appTitle").textContent = state.appSettings.title;
+      const displayTitle = state.appSettings.title;
+      document.getElementById("appTitle").textContent = displayTitle;
       document.getElementById("appSubtitle").textContent = state.appSettings.subtitle;
-      document.title = state.appSettings.title;
+      document.title = displayTitle;
       renderChildren(weekKeys);
 
       document.querySelectorAll(".view-button").forEach(button => {
@@ -2625,7 +2570,7 @@
         ? formatDate(state.selectedDate, "month")
         : formatDate(state.selectedDate);
       document.getElementById("activeName").textContent = activeName();
-      document.getElementById("activeTotal").textContent = `${child.shells} / ${maxDailyShells(state.active)} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
+      document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
 
       if (state.view === "day") renderTasks();
       if (state.view === "week") renderWeek();
@@ -2636,10 +2581,14 @@
       renderSurprises();
       renderPenaltyOptions();
       renderRace(oliviaToday, dominikToday);
-      renderOliviaGuide(oliviaToday);
-      renderDominikGuide(dominikToday);
-      renderMilestoneBadge("olivia", oliviaToday);
-      renderMilestoneBadge("dominik", dominikToday);
+      if (state.childProfiles.olivia) {
+        renderOliviaGuide(oliviaToday);
+        renderMilestoneBadge("olivia", oliviaToday);
+      }
+      if (state.childProfiles.dominik) {
+        renderDominikGuide(dominikToday);
+        renderMilestoneBadge("dominik", dominikToday);
+      }
     }
 
     document.querySelectorAll(".child-button").forEach(button => {
@@ -2661,12 +2610,12 @@
     document.getElementById("editTasksButton").addEventListener("click", () => {
       state.editMode = !state.editMode;
       state.view = "day";
+      ensureCustomTasks();
       save();
       render();
-      showToast(state.editMode ? "Galima koreguoti bendro sąrašo tekstus." : "Redagavimas išjungtas.");
     });
 
-    document.getElementById("addTaskButton").addEventListener("click", openAddTask);
+    document.getElementById("addTaskButton").addEventListener("click", addTask);
     document.getElementById("settingsButton").addEventListener("click", openSettings);
     document.getElementById("addChildButton").addEventListener("click", addChildFromSettings);
     document.getElementById("settingsCancel").addEventListener("click", closeSettings);
@@ -2692,17 +2641,6 @@
 
     taskEditDialog.addEventListener("click", event => {
       if (event.target === taskEditDialog) closeTaskEditor();
-    });
-
-    taskAddForm.addEventListener("submit", event => {
-      event.preventDefault();
-      addTask();
-    });
-
-    document.getElementById("taskAddCancel").addEventListener("click", closeAddTask);
-
-    taskAddDialog.addEventListener("click", event => {
-      if (event.target === taskAddDialog) closeAddTask();
     });
 
     document.getElementById("prevDayButton").addEventListener("click", () => {
