@@ -1038,6 +1038,8 @@
     }
 
     .edit-card input {
+      width: 100%;
+      min-width: 0;
       min-height: 40px;
       border: 2px solid #dce8ee;
       border-radius: 8px;
@@ -1057,18 +1059,36 @@
       gap: 10px;
     }
 
+    #settingsForm {
+      width: min(520px, 100%);
+      max-height: calc(100vh - 24px);
+      overflow-y: auto;
+    }
+
+    #settingsForm > label,
+    .settings-row label {
+      min-width: 0;
+    }
+
+    #settingsForm > .tool-button,
+    #settingsForm > .edit-actions {
+      width: 100%;
+    }
+
     .settings-row {
       display: grid;
-      grid-template-columns: 1fr 110px 110px;
-      gap: 8px;
+      grid-template-columns: minmax(0, 1.45fr) minmax(96px, .8fr) minmax(96px, .8fr);
+      gap: 10px;
       align-items: end;
       border: 1px solid #dce8ee;
       border-radius: 8px;
-      padding: 10px;
+      padding: 12px;
       background: #f8fcff;
     }
 
     .settings-row select {
+      width: 100%;
+      min-width: 0;
       min-height: 40px;
       border: 2px solid #dce8ee;
       border-radius: 8px;
@@ -1087,6 +1107,24 @@
       font-weight: 900;
       cursor: pointer;
       padding: 0 12px;
+    }
+
+    @media (max-width: 560px) {
+      #settingsDialog {
+        padding: 10px;
+      }
+
+      #settingsForm {
+        padding: 16px;
+      }
+
+      .settings-row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .settings-row label:first-child {
+        grid-column: 1 / -1;
+      }
     }
 
     @media (max-width: 940px) {
