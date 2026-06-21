@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kraiklyčių nuotykiai</title>
   <style>
+    /* Foundation and shared controls */
     :root {
       --sea: #0d8aa8;
       --reef: #f15f5f;
@@ -15,6 +16,8 @@
       --paper: #fffaf0;
       --panel: #ffffff;
       --shadow: 0 16px 40px rgba(31, 54, 71, .16);
+      --focus-ring: 0 0 0 4px rgba(13, 138, 168, .24);
+      --control-height: 40px;
       font-family: "Segoe UI", Arial, sans-serif;
     }
 
@@ -30,7 +33,34 @@
         linear-gradient(180deg, #c9f3ff 0%, #f7fffb 48%, #fff4df 100%);
     }
 
-    button, input, select { font: inherit; }
+    body.dialog-open { overflow: hidden; }
+
+    button, input, select, textarea { font: inherit; }
+
+    button,
+    select,
+    input,
+    textarea {
+      transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 2px solid var(--sea);
+      outline-offset: 2px;
+      box-shadow: var(--focus-ring);
+    }
+
+    button:active:not(:disabled) { transform: translateY(1px); }
+
+    button:disabled,
+    select:disabled,
+    input:disabled {
+      cursor: not-allowed;
+    }
 
     .app {
       width: calc(100% - 24px);
@@ -39,6 +69,7 @@
       padding: 22px 0 30px;
     }
 
+    /* Hero and weekend prize */
     .hero {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 360px;
@@ -246,6 +277,7 @@
       align-content: start;
     }
 
+    /* Ocean progress board */
     .ocean-scene {
       position: sticky;
       top: 10px;
@@ -262,21 +294,6 @@
       display: grid;
       grid-template-rows: 1fr 1fr;
       box-shadow: 0 12px 28px rgba(25, 68, 90, 0.18);
-    }
-
-    .ocean-half {
-      position: relative;
-      overflow: hidden;
-      background: transparent;
-    }
-
-    .ocean-half.olivia {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
-    }
-
-    .ocean-half.dominik {
-      border-top: 2px solid rgba(255, 255, 255, 0.75);
-      background: linear-gradient(180deg, rgba(5, 67, 97, 0.04), rgba(255, 255, 255, 0.05));
     }
 
     .ocean-label {
@@ -316,10 +333,6 @@
       transform: translateY(-50%);
     }
 
-    .ocean-half.olivia .race-track {
-      top: 74%;
-    }
-
     .race-path {
       position: absolute;
       left: 0;
@@ -352,14 +365,6 @@
       font-size: 37px;
       filter: drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
       transition: left 320ms ease;
-    }
-
-    .ocean-half.olivia .race-crab {
-      filter: hue-rotate(315deg) saturate(1.75) brightness(1.08) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
-    }
-
-    .ocean-half.dominik .race-crab {
-      filter: hue-rotate(165deg) saturate(1.85) brightness(1.05) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
     }
 
     .treasure-shell {
@@ -453,12 +458,6 @@
       color: #4a3200;
     }
 
-    .dominik-badge {
-      top: 36%;
-      background: rgba(232, 247, 255, 0.92);
-      color: #0b4768;
-    }
-
     .guide-bubble {
       position: absolute;
       right: 18px;
@@ -479,10 +478,6 @@
       backdrop-filter: blur(5px);
     }
 
-    .dominik-guide {
-      background: rgba(232, 247, 255, 0.86);
-    }
-
     .guide-avatar {
       width: 30px;
       height: 30px;
@@ -492,10 +487,6 @@
       background: linear-gradient(135deg, #e4fbff, #f7edff);
       box-shadow: inset 0 0 0 2px rgba(19, 159, 190, 0.18);
       font-size: 1.1rem;
-    }
-
-    .dominik-guide .guide-avatar {
-      background: linear-gradient(135deg, #dff6ff, #e9ffe2);
     }
 
     .guide-text {
@@ -563,6 +554,7 @@
       filter: hue-rotate(78deg) saturate(1.85) brightness(1.04) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
     }
 
+    /* Children, tasks and calendar */
     .child-button {
       width: 100%;
       min-height: 84px;
@@ -650,6 +642,7 @@
 
     .main {
       padding: 18px;
+      min-width: 0;
     }
 
     .section-head {
@@ -786,11 +779,6 @@
     .task.done {
       border-color: var(--leaf);
       background: #ecfff4;
-    }
-
-    .task-grid.olivia .task.done {
-      border-color: #f4a8c8;
-      background: #fff0f7;
     }
 
     .task-grid.pink .task.done,
@@ -936,6 +924,7 @@
       }
     }
 
+    /* Rewards, corrections and history */
     .reward {
       padding: 10px;
       border-radius: 8px;
@@ -1007,7 +996,7 @@
     }
 
     .action {
-      min-height: 40px;
+      min-height: var(--control-height);
       border: 0;
       border-radius: 8px;
       cursor: pointer;
@@ -1102,6 +1091,7 @@
       font-weight: 800;
       max-width: calc(100% - 24px);
       text-align: center;
+      z-index: 100;
     }
 
     .toast.show {
@@ -1109,6 +1099,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* Dialogs and settings */
     .edit-dialog {
       position: fixed;
       inset: 0;
@@ -1149,7 +1140,7 @@
     .edit-card input {
       width: 100%;
       min-width: 0;
-      min-height: 40px;
+      min-height: var(--control-height);
       border: 2px solid #dce8ee;
       border-radius: 8px;
       padding: 0 10px;
@@ -1263,6 +1254,7 @@
       padding: 0 12px;
     }
 
+    /* Responsive layout */
     @media (max-width: 560px) {
       #settingsDialog {
         padding: 10px;
@@ -1339,6 +1331,29 @@
         grid-template-columns: 1fr;
       }
 
+      .date-button,
+      .view-button,
+      .tool-button,
+      .weekend-edit-button,
+      .reward-edit-button,
+      .task-edit-actions button {
+        min-height: 44px;
+      }
+
+      .date-button {
+        min-width: 44px;
+      }
+
+      .month-grid {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        grid-template-columns: repeat(7, minmax(76px, 1fr));
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        padding-bottom: 8px;
+      }
+
       .section-head {
         align-items: flex-start;
         flex-direction: column;
@@ -1369,10 +1384,6 @@
         left: 28px;
         right: 74px;
         top: 62%;
-      }
-
-      .ocean-half.olivia .race-track {
-        top: 76%;
       }
 
       .guide-bubble {
@@ -1439,6 +1450,17 @@
         top: 18px;
         width: 19px;
         height: 19px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
       }
     }
   </style>
@@ -1520,15 +1542,15 @@
             <div class="today" id="todayText"></div>
           </div>
           <div class="date-nav">
-            <button class="date-button" id="prevDayButton" type="button">‹</button>
+            <button class="date-button" id="prevDayButton" type="button" aria-label="Ankstesnis laikotarpis">‹</button>
             <button class="date-button" id="todayButton" type="button">Šiandien</button>
-            <button class="date-button" id="nextDayButton" type="button">›</button>
+            <button class="date-button" id="nextDayButton" type="button" aria-label="Kitas laikotarpis">›</button>
           </div>
         </div>
-        <div class="view-tabs" aria-label="Laikotarpio pasirinkimas">
-          <button class="view-button active" data-view="day" type="button">Diena</button>
-          <button class="view-button" data-view="week" type="button">Savaitė</button>
-          <button class="view-button" data-view="month" type="button">Mėnuo</button>
+        <div class="view-tabs" role="tablist" aria-label="Laikotarpio pasirinkimas">
+          <button class="view-button active" data-view="day" type="button" role="tab" aria-selected="true">Diena</button>
+          <button class="view-button" data-view="week" type="button" role="tab" aria-selected="false">Savaitė</button>
+          <button class="view-button" data-view="month" type="button" role="tab" aria-selected="false">Mėnuo</button>
         </div>
         <div class="task-tools">
           <button class="tool-button" id="settingsButton" type="button">Nustatymai</button>
@@ -1543,16 +1565,16 @@
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <div class="edit-dialog" id="taskEditDialog" aria-hidden="true">
+  <div class="edit-dialog" id="taskEditDialog" role="dialog" aria-modal="true" aria-labelledby="taskEditHeading" aria-hidden="true">
     <form class="edit-card" id="taskEditForm">
-      <h3>Keisti užduotį</h3>
+      <h3 id="taskEditHeading">Keisti užduotį</h3>
       <label>
         Užduoties tekstas
-        <input id="taskEditTitle" type="text" autocomplete="off">
+        <input id="taskEditTitle" type="text" maxlength="160" autocomplete="off">
       </label>
       <label>
         Kriauklyčių skaičius
-        <input id="taskEditShells" type="number" min="0" step="1">
+        <input id="taskEditShells" type="number" min="0" max="99" step="1">
       </label>
       <div class="edit-actions">
         <button class="action" type="submit">Išsaugoti</button>
@@ -1560,16 +1582,16 @@
       </div>
     </form>
   </div>
-  <div class="edit-dialog" id="settingsDialog" aria-hidden="true">
+  <div class="edit-dialog" id="settingsDialog" role="dialog" aria-modal="true" aria-labelledby="settingsHeading" aria-hidden="true">
     <form class="edit-card" id="settingsForm">
-      <h3>Nustatymai</h3>
+      <h3 id="settingsHeading">Nustatymai</h3>
       <label>
         Projekto pavadinimas
-        <input id="settingsTitle" type="text" autocomplete="off">
+        <input id="settingsTitle" type="text" maxlength="80" autocomplete="off">
       </label>
       <label>
         Aprašymas
-        <input id="settingsSubtitle" type="text" autocomplete="off">
+        <input id="settingsSubtitle" type="text" maxlength="240" autocomplete="off">
       </label>
       <div class="settings-grid" id="childSettingsList"></div>
       <button class="tool-button" id="addChildButton" type="button">+ Pridėti vaiką</button>
@@ -1579,16 +1601,16 @@
       </div>
     </form>
   </div>
-  <div class="edit-dialog" id="weekendPrizeEditDialog" aria-hidden="true">
+  <div class="edit-dialog" id="weekendPrizeEditDialog" role="dialog" aria-modal="true" aria-labelledby="weekendPrizeEditHeading" aria-hidden="true">
     <form class="edit-card" id="weekendPrizeEditForm">
-      <h3>Didžiojo prizo nustatymai</h3>
+      <h3 id="weekendPrizeEditHeading">Didžiojo prizo nustatymai</h3>
       <label>
         Antraštė
-        <input id="weekendPrizeTitleInput" type="text" autocomplete="off">
+        <input id="weekendPrizeTitleInput" type="text" maxlength="80" autocomplete="off">
       </label>
       <label>
         Paaiškinimas
-        <textarea id="weekendPrizeDescriptionInput"></textarea>
+        <textarea id="weekendPrizeDescriptionInput" maxlength="300"></textarea>
       </label>
       <label>Prizai</label>
       <div class="prize-editor-list" id="weekendPrizeEditorList"></div>
@@ -1599,16 +1621,16 @@
       </div>
     </form>
   </div>
-  <div class="edit-dialog" id="surpriseEditDialog" aria-hidden="true">
+  <div class="edit-dialog" id="surpriseEditDialog" role="dialog" aria-modal="true" aria-labelledby="surpriseEditHeading" aria-hidden="true">
     <form class="edit-card" id="surpriseEditForm">
-      <h3>Staigmenų bloko nustatymai</h3>
+      <h3 id="surpriseEditHeading">Staigmenų bloko nustatymai</h3>
       <label>
         Antraštė
-        <input id="surpriseTitleInput" type="text" autocomplete="off">
+        <input id="surpriseTitleInput" type="text" maxlength="80" autocomplete="off">
       </label>
       <label>
         Paaiškinimas
-        <textarea id="surpriseDescriptionInput"></textarea>
+        <textarea id="surpriseDescriptionInput" maxlength="300"></textarea>
       </label>
       <label>Staigmenos</label>
       <div class="prize-editor-list" id="surpriseEditorList"></div>
@@ -1621,6 +1643,7 @@
   </div>
 
   <script>
+    // Default content and application state
     const defaultChildTasks = {
       olivia: [
         { id: "oliSleepAlone", icon: "🛏️", title: "Pati užmigau be kitų", shells: 3 },
@@ -1680,13 +1703,6 @@
       ]
     };
 
-    const rewards = [
-      { at: 10, text: "10 kriauklyčių: galima rinktis vakaro pasaką." },
-      { at: 20, text: "20 kriauklyčių: galima rinktis filmuką arba žaidimą." },
-      { at: 30, text: "30 kriauklyčių: Undinė ir Drakonas atidaro bendrą staigmeną." },
-      { at: 50, text: "50 kriauklyčių: ypatinga išvyka arba didesnis prizas." }
-    ];
-
     const surprises = [
       "1 pasirinktas filmukas",
       "Pasaka prieš miegą",
@@ -1729,27 +1745,6 @@
       prizes: weekendPrizes
     };
 
-    const penalties = {
-      toysBooks: { text: "žaislai ar knygutės liko ne vietoje", shells: 2 },
-      clothes: { text: "rūbai nesulankstyti", shells: 2 },
-      outside: { text: "sunku gražiai elgtis lauke", shells: 2 },
-      toKindergarten: { text: "sunku gražiai elgtis į darželį", shells: 2 },
-      fromKindergarten: { text: "sunku gražiai elgtis iš darželio", shells: 2 },
-      wakeUp: { text: "sunku atsikelti pažadinus", shells: 5 },
-      sleepAlone: { text: "neužmigo pats / pati", shells: 3 },
-      bagShoesJacket: { text: "kuprinė, batai ar striukė ne vietoje", shells: 1 },
-      hands: { text: "rankos nenuplautos", shells: 1 },
-      meal: { text: "sunku gražiai sėdėti valgant", shells: 2 },
-      dishes: { text: "indai nenunešti po valgio", shells: 1 },
-      thanks: { text: "nepasakyta ačiū po valgio", shells: 1 },
-      thanksNeeded: { text: "nepasakyta ačiū, kai reikėjo", shells: 1 },
-      teasing: { text: "erzino brolį / sesę", shells: 2 },
-      sorry: { text: "neatsiprašyta, kai reikėjo", shells: 2 },
-      chooseActivity: { text: "nepasirinko ramios veiklos", shells: 1 },
-      afterActivity: { text: "nesutvarkė po veiklos", shells: 2 },
-      teacher: { text: "dieną buvo pastabų darželyje", shells: 3 }
-    };
-
     const defaultChildProfiles = {
       olivia: { name: "Olivia", gender: "girl", color: "pink", avatar: "👧" },
       dominik: { name: "Dominik", gender: "boy", color: "blue", avatar: "👦" }
@@ -1782,6 +1777,7 @@
     const storageKey = "kriauklyciu-nuotykis";
     const legacyStorageKey = "kriauklyciu-nuotykis-v2";
 
+    // Persistence and date helpers
     function readSavedState(key) {
       try {
         const value = localStorage.getItem(key);
@@ -1827,7 +1823,13 @@
     let editingTaskId = null;
 
     function save() {
-      localStorage.setItem(storageKey, JSON.stringify(state));
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+        return true;
+      } catch {
+        showToast("Nepavyko išsaugoti duomenų šioje naršyklėje.");
+        return false;
+      }
     }
 
     function todayKey() {
@@ -1908,7 +1910,7 @@
           ? { ...raw.childProfiles }
           : { ...defaultChildProfiles },
         appSettings: { ...defaultAppSettings, ...(raw.appSettings || {}) },
-        editMode: Boolean(raw.editMode),
+        editMode: false,
         legacyBonusPointsRemoved: Boolean(raw.legacyBonusPointsRemoved)
       };
 
@@ -2013,6 +2015,17 @@
       return "kriauklyčių";
     }
 
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[character]);
+    }
+
+    // Task model and child-specific behavior
     function cloneTasks(tasks) {
       return tasks.map(task => ({ ...task }));
     }
@@ -2081,6 +2094,24 @@
       toast.classList.add("show");
       clearTimeout(showToast.timer);
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    let dialogReturnFocus = null;
+
+    function openDialog(dialog, focusTarget) {
+      dialogReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      dialog.classList.add("open");
+      dialog.setAttribute("aria-hidden", "false");
+      document.body.classList.add("dialog-open");
+      requestAnimationFrame(() => focusTarget?.focus());
+    }
+
+    function closeDialog(dialog) {
+      dialog.classList.remove("open");
+      dialog.setAttribute("aria-hidden", "true");
+      if (!document.querySelector(".edit-dialog.open")) document.body.classList.remove("dialog-open");
+      dialogReturnFocus?.focus();
+      dialogReturnFocus = null;
     }
 
     function oliviaDefaultGuide(shells) {
@@ -2316,14 +2347,11 @@
       editingTaskId = taskId;
       taskEditTitle.value = taskTitle(task);
       taskEditShells.value = task.shells;
-      taskEditDialog.classList.add("open");
-      taskEditDialog.setAttribute("aria-hidden", "false");
-      taskEditTitle.focus();
+      openDialog(taskEditDialog, taskEditTitle);
     }
 
     function closeTaskEditor() {
-      taskEditDialog.classList.remove("open");
-      taskEditDialog.setAttribute("aria-hidden", "true");
+      closeDialog(taskEditDialog);
       editingTaskId = null;
     }
 
@@ -2332,10 +2360,10 @@
       const tasks = tasksForChild();
       const task = tasks.find(item => item.id === editingTaskId);
       if (!task) return;
-      const cleanTitle = taskEditTitle.value.trim();
+      const cleanTitle = taskEditTitle.value.trim().slice(0, 160);
       if (!cleanTitle) return;
       const nextShells = Number(taskEditShells.value);
-      if (!Number.isFinite(nextShells) || nextShells < 0) return;
+      if (!Number.isFinite(nextShells) || nextShells < 0 || nextShells > 99) return;
       const oldShells = task.shells;
       task.title = cleanTitle;
       task.shells = Math.round(nextShells);
@@ -2369,10 +2397,10 @@
     function addTask() {
       const title = prompt("Naujos užduoties tekstas:");
       if (title === null) return;
-      const cleanTitle = title.trim();
+      const cleanTitle = title.trim().slice(0, 160);
       if (!cleanTitle) return;
       const shells = Number(prompt("Kiek kriauklyčių?", "1"));
-      if (!Number.isFinite(shells) || shells < 0) return;
+      if (!Number.isFinite(shells) || shells < 0 || shells > 99) return;
       const tasks = tasksForChild();
       tasks.push({
         id: `${state.active}Custom${Date.now()}`,
@@ -2385,25 +2413,27 @@
       showToast("Nauja užduotis pridėta.");
     }
 
+    // UI renderers
     function renderTasks() {
       const child = activeChild();
       contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
       contentArea.innerHTML = "";
       tasksForChild().forEach(task => {
         const title = taskTitle(task);
+        const safeTaskId = escapeHtml(task.id);
         const button = document.createElement(state.editMode ? "div" : "button");
         if (!state.editMode) button.type = "button";
         button.className = `task${child.done[task.id] ? " done" : ""}${state.editMode ? " editing" : ""}`;
         button.innerHTML = `
-          <span class="task-icon" aria-hidden="true">${task.icon}</span>
+          <span class="task-icon" aria-hidden="true">${escapeHtml(task.icon)}</span>
           <span>
-            <span class="task-title">${title}</span>
+            <span class="task-title">${escapeHtml(title)}</span>
             <span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span>
           </span>
           ${state.editMode ? `
             <span class="task-edit-actions">
-              <button type="button" data-edit-task="${task.id}">Keisti</button>
-              <button class="delete-task" type="button" data-delete-task="${task.id}">Trinti</button>
+              <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
+              <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
             </span>
           ` : ""}
         `;
@@ -2615,10 +2645,11 @@
         button.dataset.child = childId;
         button.dataset.gender = profile.gender;
         button.type = "button";
+        button.setAttribute("aria-pressed", String(childId === state.active));
         button.innerHTML = `
-          <span class="avatar" aria-hidden="true">${profile.avatar || (profile.gender === "boy" ? "👦" : "👧")}</span>
+          <span class="avatar" aria-hidden="true">${escapeHtml(profile.avatar || (profile.gender === "boy" ? "👦" : "👧"))}</span>
           <span>
-            <span class="child-name">${profile.name}</span><br>
+            <span class="child-name">${escapeHtml(profile.name)}</span><br>
             <span class="shell-count">${total} ${shellWord(total)} pasirinktą dieną</span>
           </span>
         `;
@@ -2635,13 +2666,11 @@
       document.getElementById("settingsTitle").value = state.appSettings.title;
       document.getElementById("settingsSubtitle").value = state.appSettings.subtitle;
       renderChildSettings();
-      document.getElementById("settingsDialog").classList.add("open");
-      document.getElementById("settingsDialog").setAttribute("aria-hidden", "false");
+      openDialog(document.getElementById("settingsDialog"), document.getElementById("settingsTitle"));
     }
 
     function closeSettings() {
-      document.getElementById("settingsDialog").classList.remove("open");
-      document.getElementById("settingsDialog").setAttribute("aria-hidden", "true");
+      closeDialog(document.getElementById("settingsDialog"));
     }
 
     function weekendPrizeEditorValues() {
@@ -2658,6 +2687,7 @@
         row.className = "prize-editor-row";
         const input = document.createElement("input");
         input.type = "text";
+        input.maxLength = 80;
         input.value = prize;
         input.dataset.weekendPrizeInput = "";
         input.setAttribute("aria-label", "Prizo pavadinimas");
@@ -2677,13 +2707,11 @@
       document.getElementById("weekendPrizeTitleInput").value = state.weekendPrizeSettings.title;
       document.getElementById("weekendPrizeDescriptionInput").value = state.weekendPrizeSettings.description;
       renderWeekendPrizeEditor();
-      document.getElementById("weekendPrizeEditDialog").classList.add("open");
-      document.getElementById("weekendPrizeEditDialog").setAttribute("aria-hidden", "false");
+      openDialog(document.getElementById("weekendPrizeEditDialog"), document.getElementById("weekendPrizeTitleInput"));
     }
 
     function closeWeekendPrizeEditor() {
-      document.getElementById("weekendPrizeEditDialog").classList.remove("open");
-      document.getElementById("weekendPrizeEditDialog").setAttribute("aria-hidden", "true");
+      closeDialog(document.getElementById("weekendPrizeEditDialog"));
     }
 
     function saveWeekendPrizeSettings() {
@@ -2717,6 +2745,7 @@
         row.className = "prize-editor-row";
         const input = document.createElement("input");
         input.type = "text";
+        input.maxLength = 80;
         input.value = item;
         input.dataset.surpriseInput = "";
         input.setAttribute("aria-label", "Staigmenos pavadinimas");
@@ -2736,13 +2765,11 @@
       document.getElementById("surpriseTitleInput").value = state.surpriseSettings.title;
       document.getElementById("surpriseDescriptionInput").value = state.surpriseSettings.description;
       renderSurpriseEditor();
-      document.getElementById("surpriseEditDialog").classList.add("open");
-      document.getElementById("surpriseEditDialog").setAttribute("aria-hidden", "false");
+      openDialog(document.getElementById("surpriseEditDialog"), document.getElementById("surpriseTitleInput"));
     }
 
     function closeSurpriseEditor() {
-      document.getElementById("surpriseEditDialog").classList.remove("open");
-      document.getElementById("surpriseEditDialog").setAttribute("aria-hidden", "true");
+      closeDialog(document.getElementById("surpriseEditDialog"));
     }
 
     function saveSurpriseSettings() {
@@ -2770,19 +2797,20 @@
         const canRemove = childIds().length > 1;
         const row = document.createElement("div");
         row.className = "settings-row";
+        const safeChildId = escapeHtml(childId);
         row.innerHTML = `
-          <label>Vardas<input data-child-name="${childId}" type="text" value="${profile.name}"></label>
-          <label>Lytis<select data-child-gender="${childId}">
+          <label>Vardas<input data-child-name="${safeChildId}" type="text" maxlength="40" value="${escapeHtml(profile.name)}"></label>
+          <label>Lytis<select data-child-gender="${safeChildId}">
             <option value="girl"${profile.gender === "girl" ? " selected" : ""}>Mergaitė</option>
             <option value="boy"${profile.gender === "boy" ? " selected" : ""}>Berniukas</option>
           </select></label>
-          <label>Spalva<select data-child-color="${childId}">
+          <label>Spalva<select data-child-color="${safeChildId}">
             <option value="pink"${profile.color === "pink" ? " selected" : ""}>Rožinė</option>
             <option value="blue"${profile.color === "blue" ? " selected" : ""}>Melsva</option>
             <option value="green"${profile.color === "green" ? " selected" : ""}>Žalsva</option>
           </select></label>
           ${canRemove
-            ? `<button class="remove-child-button" data-remove-child="${childId}" type="button">Pašalinti vaiką</button>`
+            ? `<button class="remove-child-button" data-remove-child="${safeChildId}" type="button">Pašalinti vaiką</button>`
             : ""}
         `;
         list.appendChild(row);
@@ -2813,7 +2841,7 @@
       state.appSettings.title = document.getElementById("settingsTitle").value.trim() || defaultAppSettings.title;
       state.appSettings.subtitle = document.getElementById("settingsSubtitle").value.trim() || defaultAppSettings.subtitle;
       childIds().forEach(childId => {
-        const name = document.querySelector(`[data-child-name="${childId}"]`).value.trim() || childName(childId);
+        const name = document.querySelector(`[data-child-name="${childId}"]`).value.trim().slice(0, 40) || childName(childId);
         const gender = document.querySelector(`[data-child-gender="${childId}"]`).value;
         const color = document.querySelector(`[data-child-color="${childId}"]`).value;
         state.childProfiles[childId] = {
@@ -2833,7 +2861,7 @@
     function addChildFromSettings() {
       const name = prompt("Vaiko vardas:");
       if (name === null) return;
-      const cleanName = name.trim();
+      const cleanName = name.trim().slice(0, 40);
       if (!cleanName) return;
       const childId = `child${Date.now()}`;
       state.childProfiles[childId] = {
@@ -2883,20 +2911,21 @@
         lane.dataset.color = profile.color || (profile.gender === "girl" ? "pink" : "blue");
         lane.setAttribute("role", "img");
         lane.setAttribute("aria-label", `${profile.name} kelias iki perlo: ${shells} iš ${max}`);
+        const safeChildId = escapeHtml(childId);
         lane.innerHTML = `
-          <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">${profile.avatar}</span>${profile.name}</span>
+          <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">${escapeHtml(profile.avatar)}</span>${escapeHtml(profile.name)}</span>
           <div class="guide-bubble" aria-live="polite">
-            <span class="guide-avatar" aria-hidden="true">${childGuideAvatar(childId)}</span>
-            <span class="guide-text" id="${childId}GuideText">${childGuideText(childId, shells)}</span>
+            <span class="guide-avatar" aria-hidden="true">${escapeHtml(childGuideAvatar(childId))}</span>
+            <span class="guide-text" id="${safeChildId}GuideText">${escapeHtml(childGuideText(childId, shells))}</span>
           </div>
-          <span class="milestone-badge" id="${childId}MilestoneBadge">⭐ Pusė kelio!</span>
-          <div class="race-track" id="${childId}RaceTrack" aria-hidden="true" style="--progress: ${percent}%">
+          <span class="milestone-badge" id="${safeChildId}MilestoneBadge">⭐ Pusė kelio!</span>
+          <div class="race-track" id="${safeChildId}RaceTrack" aria-hidden="true" style="--progress: ${percent}%">
             <span class="race-path"></span>
             <span class="race-progress"></span>
             <span class="race-crab">🦀</span>
             <span class="treasure-shell"><span class="pearl"></span></span>
           </div>
-          <span class="race-score" id="${childId}RaceScore">${shells} / ${max} ${shellWord(max)}</span>
+          <span class="race-score" id="${safeChildId}RaceScore">${shells} / ${max} ${shellWord(max)}</span>
         `;
         lanes.appendChild(lane);
       });
@@ -2935,7 +2964,7 @@
           <strong>${formatDate(key)}</strong>
           ${childIds().map(childId => {
             const total = childTotal(childId, [key]);
-            return `<button class="summary-button summary-line" data-child="${childId}" type="button"><span>${childName(childId)}</span><span>${total} ${shellWord(total)}</span></button>`;
+            return `<button class="summary-button summary-line" data-child="${escapeHtml(childId)}" type="button"><span>${escapeHtml(childName(childId))}</span><span>${total} ${shellWord(total)}</span></button>`;
           }).join("")}
         `;
         card.querySelectorAll(".summary-button").forEach(button => {
@@ -2966,7 +2995,7 @@
           <span class="month-date">${date.getDate()}</span>
           ${childIds().map(childId => {
             const initial = childName(childId).slice(0, 1);
-            return `<span>${initial}: ${childTotal(childId, [key])}</span>`;
+            return `<span>${escapeHtml(initial)}: ${childTotal(childId, [key])}</span>`;
           }).join("")}
         `;
         card.title = "Paspauskite, kad matytumėte tos dienos istoriją";
@@ -2992,12 +3021,15 @@
       renderChildren(weekKeys);
 
       document.querySelectorAll(".view-button").forEach(button => {
-        button.classList.toggle("active", button.dataset.view === state.view);
+        const isActive = button.dataset.view === state.view;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
       });
 
       const editButton = document.getElementById("editTasksButton");
       editButton.textContent = state.editMode ? "Baigti" : "EDIT";
       editButton.classList.toggle("danger", state.editMode);
+      editButton.setAttribute("aria-pressed", String(state.editMode));
       document.getElementById("addTaskButton").style.display = state.editMode && state.view === "day" ? "" : "none";
 
       document.getElementById("todayText").textContent = state.view === "month"
@@ -3018,6 +3050,7 @@
       childIds().forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
     }
 
+    // User interactions
     document.querySelectorAll(".child-button").forEach(button => {
       button.addEventListener("click", () => {
         state.active = button.dataset.child;
@@ -3118,6 +3151,34 @@
 
     taskEditDialog.addEventListener("click", event => {
       if (event.target === taskEditDialog) closeTaskEditor();
+    });
+
+    document.addEventListener("keydown", event => {
+      const dialog = document.querySelector(".edit-dialog.open");
+      if (!dialog) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        if (dialog.id === "taskEditDialog") closeTaskEditor();
+        if (dialog.id === "settingsDialog") closeSettings();
+        if (dialog.id === "weekendPrizeEditDialog") closeWeekendPrizeEditor();
+        if (dialog.id === "surpriseEditDialog") closeSurpriseEditor();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const focusable = [...dialog.querySelectorAll("button, input, select, textarea, [tabindex]:not([tabindex='-1'])")]
+        .filter(element => !element.disabled && element.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     });
 
     document.getElementById("prevDayButton").addEventListener("click", () => {
