@@ -2216,11 +2216,18 @@
       return childName(state.active);
     }
 
+    function taskTitleForGender(title, gender) {
+      const forms = gender === "boy"
+        ? { Pati: "Pats", pati: "pats", Pats: "Pats", pats: "pats" }
+        : { Pati: "Pati", pati: "pati", Pats: "Pati", pats: "pati" };
+      return title.replace(/\b(Pati|Pats|pati|pats)\b/g, form => forms[form]);
+    }
+
     function taskTitle(task, childId = state.active) {
-      if (typeof task.title === "string") {
-        return task.title;
-      }
-      return task.title[childId] || task.title.olivia || task.title.dominik;
+      const title = typeof task.title === "string"
+        ? task.title
+        : task.title[childId] || task.title.olivia || task.title.dominik;
+      return taskTitleForGender(title, childGender(childId));
     }
 
     function addLog(child, entry) {
