@@ -105,6 +105,7 @@
     }
 
     .weekend-prize {
+      position: relative;
       min-height: 220px;
       border-radius: 8px;
       padding: 16px;
@@ -154,6 +155,26 @@
 
     .weekend-icon.dragon {
       background: #e4f8df;
+    }
+
+    .weekend-edit-button {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      min-height: 34px;
+      border: 1px solid #cfe1e9;
+      border-radius: 8px;
+      padding: 0 11px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #17435a;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 5px 12px rgba(31, 54, 71, 0.1);
+    }
+
+    .weekend-edit-button:hover {
+      background: #e7f9ff;
+      border-color: var(--sea);
     }
 
     .weekend-score {
@@ -1108,6 +1129,51 @@
       font: inherit;
     }
 
+    .edit-card textarea {
+      width: 100%;
+      min-width: 0;
+      min-height: 86px;
+      resize: vertical;
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--ink);
+      font: inherit;
+      line-height: 1.35;
+    }
+
+    .prize-editor-list {
+      display: grid;
+      gap: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 3px;
+    }
+
+    .prize-editor-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 40px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .prize-remove-button {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 8px;
+      background: #fff0f1;
+      color: #c6323b;
+      font-size: 1.35rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .prize-remove-button:hover {
+      background: #f15b61;
+      color: #fff;
+    }
+
     .edit-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1358,13 +1424,14 @@
         <p class="subtitle" id="appSubtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
       </div>
       <div class="weekend-prize" aria-label="Didysis savaitgalio prizas">
+        <button class="weekend-edit-button" id="weekendPrizeEditButton" type="button">Keisti</button>
         <div class="weekend-icons" aria-hidden="true">
           <span class="weekend-icon">🧜‍♀️</span>
           <span class="weekend-icon dragon">🐉</span>
         </div>
         <div class="weekend-title">
-          <strong>Didysis savaitgalio prizas</strong>
-          <span>Čia rodoma visų pasirinktos savaitės dienų suma. Daugiausiai kriauklyčių surinkęs vaikas pasirenka prizą.</span>
+          <strong id="weekendPrizeTitle">Didysis savaitgalio prizas</strong>
+          <span id="weekendPrizeDescription">Čia rodoma visų pasirinktos savaitės dienų suma. Daugiausiai kriauklyčių surinkęs vaikas pasirenka prizą.</span>
         </div>
         <div class="weekend-score" id="weekendScores"></div>
         <div class="weekend-status" id="weekendPrizeStatus">Dar renkami savaitės taškai.</div>
@@ -1481,6 +1548,26 @@
       </div>
     </form>
   </div>
+  <div class="edit-dialog" id="weekendPrizeEditDialog" aria-hidden="true">
+    <form class="edit-card" id="weekendPrizeEditForm">
+      <h3>Didžiojo prizo nustatymai</h3>
+      <label>
+        Antraštė
+        <input id="weekendPrizeTitleInput" type="text" autocomplete="off">
+      </label>
+      <label>
+        Paaiškinimas
+        <textarea id="weekendPrizeDescriptionInput"></textarea>
+      </label>
+      <label>Prizai</label>
+      <div class="prize-editor-list" id="weekendPrizeEditorList"></div>
+      <button class="tool-button" id="addWeekendPrizeButton" type="button">+ Pridėti prizą</button>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="weekendPrizeEditCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
 
   <script>
     const defaultChildTasks = {
@@ -1579,6 +1666,12 @@
       "Boulingas"
     ];
 
+    const defaultWeekendPrizeSettings = {
+      title: "Didysis savaitgalio prizas",
+      description: "Čia rodoma visų pasirinktos savaitės dienų suma. Daugiausiai kriauklyčių surinkęs vaikas pasirenka prizą.",
+      prizes: weekendPrizes
+    };
+
     const penalties = {
       toysBooks: { text: "žaislai ar knygutės liko ne vietoje", shells: 2 },
       clothes: { text: "rūbai nesulankstyti", shells: 2 },
@@ -1620,6 +1713,7 @@
       childGuides: {},
       records: {},
       weekendPrizes: {},
+      weekendPrizeSettings: defaultWeekendPrizeSettings,
       customTasks: null,
       taskSchemaVersion: 3,
       childProfiles: defaultChildProfiles,
@@ -1736,6 +1830,13 @@
         childGuides: { ...(raw.childGuides || {}) },
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
+        weekendPrizeSettings: {
+          title: raw.weekendPrizeSettings?.title || defaultWeekendPrizeSettings.title,
+          description: raw.weekendPrizeSettings?.description || defaultWeekendPrizeSettings.description,
+          prizes: Array.isArray(raw.weekendPrizeSettings?.prizes) && raw.weekendPrizeSettings.prizes.length
+            ? [...raw.weekendPrizeSettings.prizes]
+            : [...defaultWeekendPrizeSettings.prizes]
+        },
         customTasks: raw.customTasks || null,
         taskSchemaVersion: raw.taskSchemaVersion || 0,
         childProfiles: raw.childProfiles
@@ -2290,6 +2391,10 @@
       const select = document.getElementById("weekendPrizeSelect");
       const button = document.getElementById("weekendPrizeButton");
 
+      document.getElementById("weekendPrizeTitle").textContent = state.weekendPrizeSettings.title;
+      document.getElementById("weekendPrizeDescription").textContent = state.weekendPrizeSettings.description;
+      document.querySelector(".weekend-prize").setAttribute("aria-label", state.weekendPrizeSettings.title);
+
       const scoreBox = document.getElementById("weekendScores");
       scoreBox.innerHTML = "";
       entries.forEach(([childId, score]) => {
@@ -2299,7 +2404,7 @@
       });
 
       select.innerHTML = "";
-      weekendPrizes.forEach(prize => {
+      state.weekendPrizeSettings.prizes.forEach(prize => {
         const option = document.createElement("option");
         option.value = prize;
         option.textContent = prize;
@@ -2307,6 +2412,12 @@
       });
 
       if (selected) {
+        if (!state.weekendPrizeSettings.prizes.includes(selected.prize)) {
+          const historicOption = document.createElement("option");
+          historicOption.value = selected.prize;
+          historicOption.textContent = selected.prize;
+          select.appendChild(historicOption);
+        }
         status.textContent = `Šios savaitės prizas: ${selected.winner} pasirinko „${selected.prize}“.`;
         button.textContent = "Prizas pasirinktas";
         button.disabled = true;
@@ -2457,6 +2568,65 @@
     function closeSettings() {
       document.getElementById("settingsDialog").classList.remove("open");
       document.getElementById("settingsDialog").setAttribute("aria-hidden", "true");
+    }
+
+    function weekendPrizeEditorValues() {
+      return Array.from(document.querySelectorAll("[data-weekend-prize-input]"))
+        .map(input => input.value.trim())
+        .filter(Boolean);
+    }
+
+    function renderWeekendPrizeEditor(prizes = state.weekendPrizeSettings.prizes) {
+      const list = document.getElementById("weekendPrizeEditorList");
+      list.innerHTML = "";
+      prizes.forEach(prize => {
+        const row = document.createElement("div");
+        row.className = "prize-editor-row";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = prize;
+        input.dataset.weekendPrizeInput = "";
+        input.setAttribute("aria-label", "Prizo pavadinimas");
+        const removeButton = document.createElement("button");
+        removeButton.className = "prize-remove-button";
+        removeButton.type = "button";
+        removeButton.dataset.removeWeekendPrize = "";
+        removeButton.setAttribute("aria-label", `Pašalinti prizą ${prize || "be pavadinimo"}`);
+        removeButton.title = "Pašalinti prizą";
+        removeButton.textContent = "×";
+        row.append(input, removeButton);
+        list.appendChild(row);
+      });
+    }
+
+    function openWeekendPrizeEditor() {
+      document.getElementById("weekendPrizeTitleInput").value = state.weekendPrizeSettings.title;
+      document.getElementById("weekendPrizeDescriptionInput").value = state.weekendPrizeSettings.description;
+      renderWeekendPrizeEditor();
+      document.getElementById("weekendPrizeEditDialog").classList.add("open");
+      document.getElementById("weekendPrizeEditDialog").setAttribute("aria-hidden", "false");
+    }
+
+    function closeWeekendPrizeEditor() {
+      document.getElementById("weekendPrizeEditDialog").classList.remove("open");
+      document.getElementById("weekendPrizeEditDialog").setAttribute("aria-hidden", "true");
+    }
+
+    function saveWeekendPrizeSettings() {
+      const prizes = [...new Set(weekendPrizeEditorValues())];
+      if (!prizes.length) {
+        showToast("Palikite bent vieną prizą.");
+        return;
+      }
+      state.weekendPrizeSettings = {
+        title: document.getElementById("weekendPrizeTitleInput").value.trim() || defaultWeekendPrizeSettings.title,
+        description: document.getElementById("weekendPrizeDescriptionInput").value.trim() || defaultWeekendPrizeSettings.description,
+        prizes
+      };
+      save();
+      closeWeekendPrizeEditor();
+      render();
+      showToast("Didžiojo prizo blokas atnaujintas.");
     }
 
     function renderChildSettings() {
@@ -2754,6 +2924,31 @@
         return;
       }
       if (event.target.id === "settingsDialog") closeSettings();
+    });
+
+    document.getElementById("weekendPrizeEditButton").addEventListener("click", openWeekendPrizeEditor);
+    document.getElementById("weekendPrizeEditCancel").addEventListener("click", closeWeekendPrizeEditor);
+    document.getElementById("addWeekendPrizeButton").addEventListener("click", () => {
+      renderWeekendPrizeEditor([...weekendPrizeEditorValues(), ""]);
+      const inputs = document.querySelectorAll("[data-weekend-prize-input]");
+      inputs[inputs.length - 1]?.focus();
+    });
+    document.getElementById("weekendPrizeEditForm").addEventListener("submit", event => {
+      event.preventDefault();
+      saveWeekendPrizeSettings();
+    });
+    document.getElementById("weekendPrizeEditDialog").addEventListener("click", event => {
+      const removeButton = event.target.closest("[data-remove-weekend-prize]");
+      if (removeButton) {
+        const rows = document.querySelectorAll("#weekendPrizeEditorList .prize-editor-row");
+        if (rows.length <= 1) {
+          showToast("Palikite bent vieną prizą.");
+          return;
+        }
+        removeButton.closest(".prize-editor-row").remove();
+        return;
+      }
+      if (event.target.id === "weekendPrizeEditDialog") closeWeekendPrizeEditor();
     });
 
     taskEditForm.addEventListener("submit", event => {
