@@ -948,6 +948,34 @@
 
     .reward strong { display: block; margin-bottom: 6px; }
 
+    .reward-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .reward-heading strong {
+      margin: 0;
+    }
+
+    .reward-edit-button {
+      flex: 0 0 auto;
+      min-height: 30px;
+      border: 1px solid #dfc98f;
+      border-radius: 8px;
+      padding: 0 9px;
+      background: rgba(255, 255, 255, 0.86);
+      color: #6c4b05;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .reward-edit-button:hover {
+      border-color: #d6a82f;
+      background: #fff;
+    }
+
     .surprise-picker {
       display: grid;
       gap: 8px;
@@ -1454,7 +1482,10 @@
         </div>
         <div class="side" aria-label="Staigmenos ir istorija">
           <div class="reward">
-            <strong>Staigmena už ypatingą pagyrimą</strong>
+            <div class="reward-heading">
+              <strong id="surpriseTitle">Staigmena už ypatingą pagyrimą</strong>
+              <button class="reward-edit-button" id="surpriseEditButton" type="button">Keisti</button>
+            </div>
             <span id="surpriseText">Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.</span>
             <button class="action" id="bonusButton" type="button">Ypatingas pagyrimas</button>
             <div class="surprise-picker">
@@ -1568,6 +1599,26 @@
       </div>
     </form>
   </div>
+  <div class="edit-dialog" id="surpriseEditDialog" aria-hidden="true">
+    <form class="edit-card" id="surpriseEditForm">
+      <h3>Staigmenų bloko nustatymai</h3>
+      <label>
+        Antraštė
+        <input id="surpriseTitleInput" type="text" autocomplete="off">
+      </label>
+      <label>
+        Paaiškinimas
+        <textarea id="surpriseDescriptionInput"></textarea>
+      </label>
+      <label>Staigmenos</label>
+      <div class="prize-editor-list" id="surpriseEditorList"></div>
+      <button class="tool-button" id="addSurpriseButton" type="button">+ Pridėti staigmeną</button>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="surpriseEditCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
 
   <script>
     const defaultChildTasks = {
@@ -1653,6 +1704,12 @@
       "Pasirinkti stalo žaidimą"
     ];
 
+    const defaultSurpriseSettings = {
+      title: "Staigmena už ypatingą pagyrimą",
+      description: "Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.",
+      surprises
+    };
+
     const weekendPrizes = [
       "Kinas",
       "Zoologijos sodas",
@@ -1714,6 +1771,7 @@
       records: {},
       weekendPrizes: {},
       weekendPrizeSettings: defaultWeekendPrizeSettings,
+      surpriseSettings: defaultSurpriseSettings,
       customTasks: null,
       taskSchemaVersion: 3,
       childProfiles: defaultChildProfiles,
@@ -1836,6 +1894,13 @@
           prizes: Array.isArray(raw.weekendPrizeSettings?.prizes) && raw.weekendPrizeSettings.prizes.length
             ? [...raw.weekendPrizeSettings.prizes]
             : [...defaultWeekendPrizeSettings.prizes]
+        },
+        surpriseSettings: {
+          title: raw.surpriseSettings?.title || defaultSurpriseSettings.title,
+          description: raw.surpriseSettings?.description || defaultSurpriseSettings.description,
+          surprises: Array.isArray(raw.surpriseSettings?.surprises) && raw.surpriseSettings.surprises.length
+            ? [...raw.surpriseSettings.surprises]
+            : [...defaultSurpriseSettings.surprises]
         },
         customTasks: raw.customTasks || null,
         taskSchemaVersion: raw.taskSchemaVersion || 0,
@@ -2494,6 +2559,8 @@
       const select = document.getElementById("surpriseSelect");
       const chooseButton = document.getElementById("chooseSurpriseButton");
 
+      document.getElementById("surpriseTitle").textContent = state.surpriseSettings.title;
+
       if (unlocked) {
         text.textContent = `${activeName()} gavo ypatingą pagyrimą. Galima pasirinkti vieną staigmeną.`;
         button.textContent = "Staigmena atrakinta";
@@ -2503,13 +2570,13 @@
         button.textContent = "Ypatingas pagyrimas";
         button.disabled = false;
       } else {
-        text.textContent = "Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.";
+        text.textContent = state.surpriseSettings.description;
         button.textContent = "Ypatingas pagyrimas";
         button.disabled = false;
       }
 
       select.innerHTML = "";
-      surprises.forEach(surprise => {
+      state.surpriseSettings.surprises.forEach(surprise => {
         const option = document.createElement("option");
         option.value = surprise;
         option.textContent = surprise;
@@ -2627,6 +2694,65 @@
       closeWeekendPrizeEditor();
       render();
       showToast("Didžiojo prizo blokas atnaujintas.");
+    }
+
+    function surpriseEditorValues() {
+      return Array.from(document.querySelectorAll("[data-surprise-input]"))
+        .map(input => input.value.trim())
+        .filter(Boolean);
+    }
+
+    function renderSurpriseEditor(items = state.surpriseSettings.surprises) {
+      const list = document.getElementById("surpriseEditorList");
+      list.innerHTML = "";
+      items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "prize-editor-row";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = item;
+        input.dataset.surpriseInput = "";
+        input.setAttribute("aria-label", "Staigmenos pavadinimas");
+        const removeButton = document.createElement("button");
+        removeButton.className = "prize-remove-button";
+        removeButton.type = "button";
+        removeButton.dataset.removeSurprise = "";
+        removeButton.setAttribute("aria-label", `Pašalinti staigmeną ${item || "be pavadinimo"}`);
+        removeButton.title = "Pašalinti staigmeną";
+        removeButton.textContent = "×";
+        row.append(input, removeButton);
+        list.appendChild(row);
+      });
+    }
+
+    function openSurpriseEditor() {
+      document.getElementById("surpriseTitleInput").value = state.surpriseSettings.title;
+      document.getElementById("surpriseDescriptionInput").value = state.surpriseSettings.description;
+      renderSurpriseEditor();
+      document.getElementById("surpriseEditDialog").classList.add("open");
+      document.getElementById("surpriseEditDialog").setAttribute("aria-hidden", "false");
+    }
+
+    function closeSurpriseEditor() {
+      document.getElementById("surpriseEditDialog").classList.remove("open");
+      document.getElementById("surpriseEditDialog").setAttribute("aria-hidden", "true");
+    }
+
+    function saveSurpriseSettings() {
+      const items = [...new Set(surpriseEditorValues())];
+      if (!items.length) {
+        showToast("Palikite bent vieną staigmeną.");
+        return;
+      }
+      state.surpriseSettings = {
+        title: document.getElementById("surpriseTitleInput").value.trim() || defaultSurpriseSettings.title,
+        description: document.getElementById("surpriseDescriptionInput").value.trim() || defaultSurpriseSettings.description,
+        surprises: items
+      };
+      save();
+      closeSurpriseEditor();
+      render();
+      showToast("Staigmenų blokas atnaujintas.");
     }
 
     function renderChildSettings() {
@@ -2949,6 +3075,31 @@
         return;
       }
       if (event.target.id === "weekendPrizeEditDialog") closeWeekendPrizeEditor();
+    });
+
+    document.getElementById("surpriseEditButton").addEventListener("click", openSurpriseEditor);
+    document.getElementById("surpriseEditCancel").addEventListener("click", closeSurpriseEditor);
+    document.getElementById("addSurpriseButton").addEventListener("click", () => {
+      renderSurpriseEditor([...surpriseEditorValues(), ""]);
+      const inputs = document.querySelectorAll("[data-surprise-input]");
+      inputs[inputs.length - 1]?.focus();
+    });
+    document.getElementById("surpriseEditForm").addEventListener("submit", event => {
+      event.preventDefault();
+      saveSurpriseSettings();
+    });
+    document.getElementById("surpriseEditDialog").addEventListener("click", event => {
+      const removeButton = event.target.closest("[data-remove-surprise]");
+      if (removeButton) {
+        const rows = document.querySelectorAll("#surpriseEditorList .prize-editor-row");
+        if (rows.length <= 1) {
+          showToast("Palikite bent vieną staigmeną.");
+          return;
+        }
+        removeButton.closest(".prize-editor-row").remove();
+        return;
+      }
+      if (event.target.id === "surpriseEditDialog") closeSurpriseEditor();
     });
 
     taskEditForm.addEventListener("submit", event => {
