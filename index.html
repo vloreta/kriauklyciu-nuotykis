@@ -1648,6 +1648,7 @@
       </label>
       <div class="settings-grid" id="childSettingsList"></div>
       <button class="tool-button" id="addChildButton" type="button">+ Pridėti vaiką</button>
+      <button class="tool-button" id="exportDataButton" type="button">Eksportuoti duomenis</button>
       <div class="edit-actions">
         <button class="action" type="submit">Išsaugoti</button>
         <button class="action secondary" id="settingsCancel" type="button">Atšaukti</button>
@@ -1829,6 +1830,10 @@
 
     const storageKey = "kriauklyciu-nuotykis";
     const legacyStorageKey = "kriauklyciu-nuotykis-v2";
+    const backupKeyPrefix = "kriauklyciu-nuotykis-backup_";
+    const backupFormat = "kriauklyciu-nuotykis-backup";
+    const backupVersion = 1;
+    const retainedDailyBackups = 14;
 
     // Persistence and date helpers
     function readSavedState(key) {
@@ -1838,6 +1843,90 @@
       } catch {
         return null;
       }
+    }
+
+    function isRestorableState(value) {
+      return Boolean(value && typeof value === "object" && value.records && typeof value.records === "object");
+    }
+
+    function createBackupEnvelope(data, reason) {
+      return {
+        format: backupFormat,
+        version: backupVersion,
+        createdAt: new Date().toISOString(),
+        reason,
+        data
+      };
+    }
+
+    function dailyBackupKeys() {
+      return Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index))
+        .filter(Boolean)
+        .filter(key => key.startsWith(backupKeyPrefix) && /^\d{4}-\d{2}-\d{2}$/.test(key.slice(backupKeyPrefix.length)))
+        .sort();
+    }
+
+    function pruneDailyBackups() {
+      const keys = dailyBackupKeys();
+      keys.slice(0, Math.max(0, keys.length - retainedDailyBackups)).forEach(key => {
+        localStorage.removeItem(key);
+      });
+    }
+
+    function latestRestorableBackup() {
+      const keys = dailyBackupKeys().reverse();
+      for (const key of keys) {
+        const backup = readSavedState(key);
+        const data = backup?.format === backupFormat ? backup.data : backup;
+        if (isRestorableState(data)) return data;
+      }
+      return null;
+    }
+
+    function readPrimaryStateWithRecovery() {
+      const primary = readSavedState(storageKey);
+      if (isRestorableState(primary)) return primary;
+
+      const recovered = latestRestorableBackup();
+      if (!recovered) return primary;
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(recovered));
+      } catch {
+        // The recovered state is still returned and will be saved again when storage is available.
+      }
+      return recovered;
+    }
+
+    function ensureDailyBackup(data) {
+      if (!isRestorableState(data)) return false;
+      const key = `${backupKeyPrefix}${todayKey()}`;
+      if (localStorage.getItem(key)) return true;
+
+      try {
+        localStorage.setItem(key, JSON.stringify(createBackupEnvelope(data, "daily")));
+        pruneDailyBackups();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function exportData() {
+      const envelope = {
+        ...createBackupEnvelope(state, "manual-export"),
+        storageKey
+      };
+      const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `kriauklyciu-nuotykis-${todayKey()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+      showToast("Duomenų kopija paruošta.");
     }
 
     function mergeSavedRecords(primary, legacy) {
@@ -1863,8 +1952,10 @@
       return merged;
     }
 
-    const saved = mergeSavedRecords(readSavedState(storageKey), readSavedState(legacyStorageKey));
+    const saved = mergeSavedRecords(readPrimaryStateWithRecovery(), readSavedState(legacyStorageKey));
     const state = normalizeState(saved);
+    let lastSavedSnapshot = JSON.stringify(state);
+    ensureDailyBackup(state);
 
     const contentArea = document.getElementById("contentArea");
     const log = document.getElementById("log");
@@ -1877,12 +1968,20 @@
 
     function save() {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(state));
+        ensureDailyBackup(readSavedState(storageKey) || state);
+        const serializedState = JSON.stringify(state);
+        localStorage.setItem(storageKey, serializedState);
+        lastSavedSnapshot = serializedState;
         return true;
       } catch {
         showToast("Nepavyko išsaugoti duomenų šioje naršyklėje.");
         return false;
       }
+    }
+
+    function autoSave() {
+      const currentSnapshot = JSON.stringify(state);
+      if (currentSnapshot !== lastSavedSnapshot) save();
     }
 
     function todayKey() {
@@ -3132,6 +3231,7 @@
     document.getElementById("addTaskButton").addEventListener("click", addTask);
     document.getElementById("settingsButton").addEventListener("click", openSettings);
     document.getElementById("addChildButton").addEventListener("click", addChildFromSettings);
+    document.getElementById("exportDataButton").addEventListener("click", exportData);
     document.getElementById("settingsCancel").addEventListener("click", closeSettings);
     document.getElementById("settingsForm").addEventListener("submit", event => {
       event.preventDefault();
@@ -3341,10 +3441,13 @@
 
     render();
     save();
+    setInterval(autoSave, 30000);
     setInterval(refreshCalendarDay, 60000);
+    window.addEventListener("pagehide", autoSave);
     window.addEventListener("focus", refreshCalendarDay);
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) refreshCalendarDay();
+      if (document.hidden) autoSave();
+      else refreshCalendarDay();
     });
   </script>
 </body>
