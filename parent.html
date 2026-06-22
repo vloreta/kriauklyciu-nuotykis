@@ -1,0 +1,3454 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kraiklyčių nuotykiai</title>
+  <style>
+    /* Foundation and shared controls */
+    :root {
+      --sea: #0d8aa8;
+      --reef: #f15f5f;
+      --sun: #ffd166;
+      --leaf: #3bb273;
+      --ink: #25313b;
+      --muted: #66727d;
+      --paper: #fffaf0;
+      --panel: #ffffff;
+      --shadow: 0 12px 30px rgba(31, 54, 71, .13);
+      --card-border: #e1ebf0;
+      --focus-ring: 0 0 0 4px rgba(13, 138, 168, .24);
+      --control-height: 40px;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      line-height: 1.45;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255, 209, 102, .55), transparent 24rem),
+        radial-gradient(circle at 86% 14%, rgba(241, 95, 95, .28), transparent 22rem),
+        linear-gradient(180deg, #c9f3ff 0%, #f4fff7 48%, #eef9ef 100%);
+    }
+
+    body.dialog-open { overflow: hidden; }
+
+    button, input, select, textarea { font: inherit; }
+
+    button,
+    select,
+    input,
+    textarea {
+      transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 2px solid var(--sea);
+      outline-offset: 2px;
+      box-shadow: var(--focus-ring);
+    }
+
+    button:active:not(:disabled) { transform: translateY(1px); }
+
+    button:disabled,
+    select:disabled,
+    input:disabled {
+      cursor: not-allowed;
+    }
+
+    .app {
+      width: calc(100% - 24px);
+      max-width: none;
+      margin: 0 auto;
+      padding: 22px 0 30px;
+    }
+
+    /* Hero and weekend prize */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 18px;
+      align-items: stretch;
+      min-height: 220px;
+    }
+
+    .title-block {
+      position: relative;
+      overflow: hidden;
+      padding: 30px;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(229, 250, 255, .78)),
+        linear-gradient(90deg, rgba(13, 138, 168, .14), rgba(255, 209, 102, .18));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .7);
+    }
+
+    .title-block::after {
+      content: "🦀  🐚  🫧  💎";
+      position: absolute;
+      right: 18px;
+      bottom: 14px;
+      font-size: clamp(1.25rem, 2vw, 2rem);
+      letter-spacing: 0;
+      opacity: .34;
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 5vw, 4.8rem);
+      line-height: 1;
+      letter-spacing: 0;
+      max-width: 680px;
+      color: #1c2b36;
+    }
+
+    .subtitle {
+      position: relative;
+      z-index: 1;
+      margin: 14px 0 0;
+      font-size: 1.1rem;
+      color: #3d5966;
+      max-width: 560px;
+      font-weight: 600;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 248, 231, .92);
+      border: 1px solid rgba(255, 209, 102, .65);
+      color: #6c4b05;
+      font-weight: 900;
+      font-size: .92rem;
+      box-shadow: 0 8px 18px rgba(31, 54, 71, .1);
+    }
+
+    .weekend-prize {
+      position: relative;
+      min-height: 220px;
+      border-radius: 8px;
+      padding: 16px;
+      background:
+        radial-gradient(circle at 92% 8%, rgba(255, 230, 145, .34), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(239, 252, 255, .88));
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      border: 1px solid rgba(255,255,255,.78);
+    }
+
+    .weekend-title {
+      display: grid;
+      gap: 3px;
+    }
+
+    .weekend-title strong {
+      font-size: 1.18rem;
+      line-height: 1.2;
+    }
+
+    .weekend-title span,
+    .weekend-status {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.3;
+    }
+
+    .weekend-icons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .weekend-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      font-size: 1.55rem;
+      background: #e2fbff;
+      border: 3px solid #fff;
+      box-shadow: 0 7px 16px rgba(31, 54, 71, .12);
+    }
+
+    .weekend-icon.dragon {
+      background: #e4f8df;
+    }
+
+    .weekend-edit-button {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      min-height: 34px;
+      border: 1px solid #cfe1e9;
+      border-radius: 8px;
+      padding: 0 11px;
+      background: rgba(255, 255, 255, 0.88);
+      color: #17435a;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 5px 12px rgba(31, 54, 71, 0.1);
+    }
+
+    .weekend-edit-button:hover {
+      background: #e7f9ff;
+      border-color: var(--sea);
+    }
+
+    .weekend-score {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      gap: 8px;
+    }
+
+    .weekend-score span {
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .76);
+      border: 1px solid rgba(187, 219, 229, .72);
+      padding: 8px;
+      font-weight: 850;
+      color: #234454;
+      line-height: 1.25;
+    }
+
+    .weekend-picker {
+      display: grid;
+      gap: 8px;
+    }
+
+    .weekend-picker select {
+      min-width: 0;
+      min-height: 40px;
+      border: 2px solid #cfe1eb;
+      border-radius: 8px;
+      background: rgba(255,255,255,.94);
+      color: var(--ink);
+      padding: 0 10px;
+    }
+
+    .weekend-button {
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 900;
+      color: #fff;
+      background: linear-gradient(135deg, #0b8fa6, #35b78b);
+    }
+
+    .weekend-button:disabled {
+      cursor: not-allowed;
+      opacity: .7;
+      filter: saturate(.65);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      gap: 18px;
+      margin-top: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .9);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .82);
+    }
+
+    .children {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+      align-self: stretch;
+      align-content: start;
+    }
+
+    /* Ocean progress board */
+    .ocean-scene {
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      height: 340px;
+      overflow: hidden;
+      padding: 0;
+      background:
+        linear-gradient(90deg, rgba(5, 67, 97, 0.26), rgba(5, 67, 97, 0.02) 42%, rgba(5, 67, 97, 0.24)),
+        url("assets/ocean-boardwalk.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      box-shadow: 0 12px 28px rgba(25, 68, 90, 0.18);
+    }
+
+    .ocean-label {
+      position: absolute;
+      left: 14px;
+      top: 22px;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.72);
+      color: #123044;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(23, 87, 112, 0.18);
+      backdrop-filter: blur(4px);
+    }
+
+    .ocean-icon {
+      width: 30px;
+      height: 30px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #eaf9ff;
+      box-shadow: inset 0 0 0 2px rgba(19, 159, 190, 0.2);
+    }
+
+    .race-track {
+      position: absolute;
+      left: 42px;
+      right: 92px;
+      top: 66%;
+      height: 34px;
+      transform: translateY(-50%);
+    }
+
+    .race-path {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 244, 200, 0.82);
+      box-shadow: 0 2px 0 rgba(173, 108, 49, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+    }
+
+    .race-progress {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: var(--progress, 0%);
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ffcf5a, #ff8a65);
+      box-shadow: 0 0 14px rgba(255, 205, 90, 0.55);
+      transition: width 320ms ease;
+    }
+
+    .race-crab {
+      position: absolute;
+      left: var(--progress, 0%);
+      top: 50%;
+      z-index: 2;
+      transform: translate(-50%, -57%);
+      font-size: 37px;
+      filter: drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
+      transition: left 320ms ease;
+    }
+
+    .treasure-shell {
+      position: absolute;
+      right: -76px;
+      top: 50%;
+      width: 68px;
+      height: 58px;
+      transform: translateY(-50%);
+    }
+
+    .treasure-shell::before,
+    .treasure-shell::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      width: 56px;
+      height: 30px;
+      border-radius: 50% 50% 10px 10px;
+      background:
+        radial-gradient(circle at 24% 28%, rgba(255,255,255,0.9), transparent 18%),
+        linear-gradient(135deg, #fff6c9, #ffb2c8 54%, #bd72dd);
+      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.52), 0 9px 16px rgba(20, 73, 93, 0.3);
+    }
+
+    .treasure-shell::before {
+      top: 1px;
+      transform: rotate(-8deg);
+    }
+
+    .treasure-shell::after {
+      bottom: 1px;
+      border-radius: 10px 10px 50% 50%;
+      transform: rotate(8deg);
+    }
+
+    .pearl {
+      position: absolute;
+      left: 23px;
+      top: 20px;
+      z-index: 1;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, #ffffff, #e5fbff 42%, #8bd4f2 78%);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.95), 0 0 8px rgba(105, 205, 240, 0.75);
+    }
+
+    .race-score {
+      position: absolute;
+      right: 18px;
+      bottom: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.76);
+      color: #123044;
+      font-size: 0.78rem;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(23, 87, 112, 0.13);
+    }
+
+    .milestone-badge {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      z-index: 4;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.9);
+      color: #123044;
+      font-size: 0.78rem;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(21, 78, 104, 0.2);
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+    }
+
+    .milestone-badge.show {
+      display: inline-flex;
+    }
+
+    .milestone-badge.full {
+      left: auto;
+      right: 86px;
+      transform: translateY(-50%);
+      background: rgba(255, 247, 202, 0.94);
+      color: #4a3200;
+    }
+
+    .guide-bubble {
+      position: absolute;
+      right: 18px;
+      top: 12px;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      max-width: min(520px, 58%);
+      min-height: 40px;
+      padding: 6px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.84);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #123044;
+      box-shadow: 0 10px 22px rgba(21, 78, 104, 0.18);
+      backdrop-filter: blur(5px);
+    }
+
+    .guide-avatar {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e4fbff, #f7edff);
+      box-shadow: inset 0 0 0 2px rgba(19, 159, 190, 0.18);
+      font-size: 1.1rem;
+    }
+
+    .guide-text {
+      font-size: 0.76rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .ocean-lanes {
+      display: grid;
+      min-height: 100%;
+    }
+
+    .ocean-lane {
+      position: relative;
+      min-height: 105px;
+      overflow: hidden;
+      border: 0;
+      background: transparent;
+    }
+
+    .ocean-lane.active {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .ocean-lane.active .ocean-label {
+      border-color: rgba(255, 215, 96, 0.95);
+      box-shadow: 0 0 0 3px rgba(255, 215, 96, 0.28), 0 8px 18px rgba(23, 87, 112, 0.18);
+    }
+
+    .ocean-lane .ocean-label {
+      top: 24px;
+      padding: 6px 11px;
+    }
+
+    .ocean-lane .race-track {
+      top: 68%;
+    }
+
+    .ocean-lane .guide-bubble {
+      display: none;
+      top: 8px;
+      min-height: 36px;
+      padding: 4px 9px;
+    }
+
+    .ocean-lane.active .guide-bubble {
+      display: grid;
+    }
+
+    .ocean-lane .milestone-badge {
+      top: 44%;
+    }
+
+    .ocean-lane[data-color="pink"] .race-crab {
+      filter: hue-rotate(315deg) saturate(1.75) brightness(1.08) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
+    }
+
+    .ocean-lane[data-color="blue"] .race-crab {
+      filter: hue-rotate(165deg) saturate(1.85) brightness(1.05) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
+    }
+
+    .ocean-lane[data-color="green"] .race-crab {
+      filter: hue-rotate(78deg) saturate(1.85) brightness(1.04) drop-shadow(0 7px 8px rgba(18, 72, 95, 0.34));
+    }
+
+    /* Children, tasks and calendar */
+    .child-button {
+      width: 100%;
+      min-height: 84px;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      background: #f6fbff;
+      color: var(--ink);
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    #childrenList {
+      display: grid;
+      gap: 12px;
+    }
+
+    .child-button.active {
+      border-color: var(--sea);
+      background: #e7f9ff;
+    }
+
+    .child-button[data-child="olivia"] .avatar {
+      background: linear-gradient(135deg, #fff6fb, #e9fbff);
+      box-shadow: inset 0 0 0 3px rgba(244, 132, 190, .22);
+    }
+
+    .child-button[data-gender="girl"] .avatar {
+      background: linear-gradient(135deg, #fff6fb, #e9fbff);
+      box-shadow: inset 0 0 0 3px rgba(244, 132, 190, .22);
+    }
+
+    .child-button[data-gender="boy"] .avatar {
+      background: linear-gradient(135deg, #eff9ff, #edfff4);
+      box-shadow: inset 0 0 0 3px rgba(13, 138, 168, .18);
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff;
+      font-size: 1.9rem;
+      box-shadow: inset 0 0 0 3px rgba(13, 138, 168, .18);
+    }
+
+    .child-name { font-weight: 800; font-size: 1.15rem; }
+    .shell-count { color: var(--muted); font-size: .95rem; }
+
+    .progress-box {
+      padding: 14px;
+      background: #fff7df;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
+
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .bar {
+      height: 16px;
+      border-radius: 999px;
+      background: #eadfc6;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--sea), var(--leaf), var(--sun));
+      transition: width .25s ease;
+    }
+
+    .main {
+      padding: 18px;
+      min-width: 0;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+
+    .today {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .date-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .date-button, .view-button {
+      min-height: var(--control-height);
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 800;
+      padding: 0 12px;
+    }
+
+    .view-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0;
+    }
+
+    .workspace-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .task-tools {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 0;
+    }
+
+    .tool-button {
+      min-height: var(--control-height);
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 850;
+      padding: 0 10px;
+    }
+
+    .tool-button.primary {
+      border-color: var(--sea);
+      background: #e7f9ff;
+      color: #0c718a;
+    }
+
+    .tool-button.danger {
+      border-color: #f15b61;
+      background: #f15b61;
+      color: #fff;
+    }
+
+    .view-button.active {
+      border-color: var(--sea);
+      background: #e7f9ff;
+      color: #0c718a;
+    }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .task {
+      position: relative;
+      min-height: 112px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: #fff8e7;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 0 2px 8px rgba(31, 54, 71, .04);
+    }
+
+    .task.editing {
+      cursor: default;
+      padding-right: 78px;
+    }
+
+    .task-edit-actions {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .task-edit-actions button {
+      min-width: 58px;
+      min-height: 28px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 850;
+      background: var(--sea);
+      font-size: .78rem;
+    }
+
+    .task-edit-actions .delete-task {
+      background: var(--reef);
+    }
+
+    .task.done {
+      border-color: var(--leaf);
+      background: #ecfff4;
+    }
+
+    .task-grid.pink .task.done,
+    .task-grid.girl .task.done {
+      border-color: #f4a8c8;
+      background: #fff0f7;
+    }
+
+    .task-grid.blue .task.done,
+    .task-grid.boy .task.done {
+      border-color: #8fcdec;
+      background: #eef9ff;
+    }
+
+    .task-grid.green .task.done {
+      border-color: var(--leaf);
+      background: #ecfff4;
+    }
+
+    .task-icon {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #eff9ff;
+      font-size: 1.9rem;
+    }
+
+    .task-title {
+      font-weight: 800;
+      display: block;
+      margin-bottom: 5px;
+      line-height: 1.28;
+      overflow-wrap: anywhere;
+    }
+
+    .task-shells {
+      color: #0c718a;
+      font-weight: 800;
+      font-size: .95rem;
+      line-height: 1.25;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .summary-card {
+      min-height: 104px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .summary-card strong {
+      font-size: 1.05rem;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .summary-button {
+      border: 0;
+      border-radius: 8px;
+      background: #f4f8fa;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 8px;
+      text-align: left;
+      min-height: var(--control-height);
+    }
+
+    .summary-button:hover, .month-day:hover {
+      background: #e7f9ff;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .month-day {
+      min-height: 92px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+      cursor: pointer;
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .month-day.muted {
+      opacity: .48;
+    }
+
+    .month-day.today-mark {
+      border-color: var(--sea);
+      background: #e7f9ff;
+    }
+
+    .month-date {
+      font-weight: 900;
+    }
+
+    .side {
+      padding-top: 4px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .side h2 {
+      margin: 2px 0 0;
+      font-size: 1.05rem;
+    }
+
+    @media (min-width: 941px) {
+      .children {
+        grid-column: 1;
+        grid-row: 2;
+      }
+
+      .ocean-scene {
+        grid-column: 1 / -1;
+        grid-row: 1;
+      }
+
+      .main {
+        grid-column: 2;
+        grid-row: 2;
+      }
+    }
+
+    /* Rewards, corrections and history */
+    .reward {
+      padding: 12px;
+      border-radius: 8px;
+      background: #fff8e7;
+      border: 1px solid #f0dfb7;
+      font-size: 0.88rem;
+      display: grid;
+      gap: 9px;
+    }
+
+    .reward strong { display: block; margin-bottom: 6px; }
+
+    .reward-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .reward-heading strong {
+      margin: 0;
+    }
+
+    .reward-edit-button {
+      flex: 0 0 auto;
+      min-height: 30px;
+      border: 1px solid #dfc98f;
+      border-radius: 8px;
+      padding: 0 9px;
+      background: rgba(255, 255, 255, 0.86);
+      color: #6c4b05;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .reward-edit-button:hover {
+      border-color: #d6a82f;
+      background: #fff;
+    }
+
+    .surprise-picker {
+      display: grid;
+      gap: 8px;
+    }
+
+    .surprise-picker select {
+      min-width: 0;
+      border: 2px solid #ead7a9;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      min-height: 40px;
+      padding: 0 10px;
+    }
+
+    .surprise-picker select:disabled {
+      cursor: not-allowed;
+      opacity: .54;
+    }
+
+    .reset-week {
+      background: #52616d;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .action {
+      min-height: var(--control-height);
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 800;
+      color: #fff;
+      background: var(--sea);
+    }
+
+    .action.secondary {
+      background: #52616d;
+    }
+
+    .penalty-box {
+      padding: 12px;
+      border-radius: 8px;
+      background: #fff1f1;
+      border: 1px solid #f0c1c1;
+      display: grid;
+      gap: 8px;
+      font-size: 0.88rem;
+    }
+
+    .penalty-box label {
+      font-weight: 800;
+    }
+
+    .penalty-controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .penalty-controls select {
+      min-width: 0;
+      border: 2px solid #e3d6d6;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 10px;
+      min-height: var(--control-height);
+    }
+
+    .action.warning {
+      background: var(--reef);
+    }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      max-height: 210px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .log-item {
+      width: 100%;
+      border: 0;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f4f8fa;
+      color: var(--ink);
+      font-size: .84rem;
+      text-align: left;
+      line-height: 1.35;
+    }
+
+    .log-item.clickable {
+      cursor: pointer;
+    }
+
+    .log-item.undone {
+      color: var(--muted);
+      text-decoration: line-through;
+      opacity: .72;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 10px 0;
+    }
+
+    #activeTotal {
+      margin-bottom: 12px;
+    }
+
+    @media (hover: hover) {
+      .child-button:hover:not(.active),
+      .task:hover:not(.done),
+      .date-button:hover,
+      .view-button:hover:not(.active),
+      .tool-button:hover:not(.danger),
+      .summary-button:hover,
+      .month-day:hover {
+        border-color: #b9d8e4;
+        background: #f3fbfe;
+      }
+
+      .task.done:hover {
+        filter: brightness(.985);
+      }
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%) translateY(80px);
+      background: #25313b;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: .25s ease;
+      font-weight: 800;
+      max-width: calc(100% - 24px);
+      text-align: center;
+      z-index: 100;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Dialogs and settings */
+    .edit-dialog {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(28, 43, 54, .28);
+    }
+
+    .edit-dialog.open {
+      display: grid;
+    }
+
+    .edit-card {
+      width: min(420px, 100%);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(31, 54, 71, .22);
+      border: 1px solid #dce8ee;
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .edit-card h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .edit-card label {
+      display: grid;
+      gap: 6px;
+      font-weight: 850;
+      color: var(--ink);
+    }
+
+    .edit-card input {
+      width: 100%;
+      min-width: 0;
+      min-height: var(--control-height);
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      padding: 0 10px;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .edit-card textarea {
+      width: 100%;
+      min-width: 0;
+      min-height: 86px;
+      resize: vertical;
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--ink);
+      font: inherit;
+      line-height: 1.35;
+    }
+
+    .prize-editor-list {
+      display: grid;
+      gap: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 3px;
+    }
+
+    .prize-editor-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 40px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .prize-remove-button {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 8px;
+      background: #fff0f1;
+      color: #c6323b;
+      font-size: 1.35rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .prize-remove-button:hover {
+      background: #f15b61;
+      color: #fff;
+    }
+
+    .edit-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .settings-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    #settingsForm {
+      width: min(520px, 100%);
+      max-height: calc(100vh - 24px);
+      overflow-y: auto;
+    }
+
+    #settingsForm > label,
+    .settings-row label {
+      min-width: 0;
+    }
+
+    #settingsForm > .tool-button,
+    #settingsForm > .edit-actions {
+      width: 100%;
+    }
+
+    .settings-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(96px, .8fr) minmax(96px, .8fr);
+      gap: 10px;
+      align-items: end;
+      border: 1px solid #dce8ee;
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8fcff;
+    }
+
+    .settings-row select {
+      width: 100%;
+      min-width: 0;
+      min-height: 40px;
+      border: 2px solid #dce8ee;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 8px;
+    }
+
+    .remove-child-button {
+      grid-column: 1 / -1;
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      background: #f15b61;
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 0 12px;
+    }
+
+    /* Responsive layout */
+    @media (max-width: 560px) {
+      #settingsDialog {
+        padding: 10px;
+      }
+
+      #settingsForm {
+        padding: 16px;
+      }
+
+      .settings-row {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .settings-row label:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 940px) {
+      .hero, .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .ocean-scene {
+        grid-row: 1;
+      }
+
+      .children {
+        grid-row: 2;
+      }
+
+      .main {
+        grid-row: 3;
+      }
+
+      .children {
+        grid-template-columns: 1fr 1fr;
+        align-content: start;
+      }
+
+      .children .side {
+        grid-column: 1 / -1;
+      }
+
+      .ocean-scene {
+        height: 310px;
+      }
+
+      .race-track {
+        left: 34px;
+        right: 86px;
+      }
+
+      .guide-bubble {
+        max-width: 56%;
+      }
+
+      .milestone-badge {
+        top: 48%;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app {
+        width: calc(100% - 18px);
+        padding-top: 10px;
+      }
+
+      .title-block {
+        padding: 20px 20px 54px;
+      }
+
+      .children, .task-grid, .actions, .penalty-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .date-button,
+      .view-button,
+      .tool-button,
+      .weekend-edit-button,
+      .reward-edit-button,
+      .task-edit-actions button {
+        min-height: 44px;
+      }
+
+      .date-button {
+        min-width: 44px;
+      }
+
+      .month-grid {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        grid-template-columns: repeat(7, minmax(76px, 1fr));
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        padding-bottom: 8px;
+      }
+
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .workspace-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .task-tools {
+        justify-content: flex-start;
+      }
+
+      .task {
+        min-height: 100px;
+      }
+
+      .ocean-scene {
+        height: 330px;
+        position: static;
+      }
+
+      .ocean-label {
+        left: 10px;
+        top: 20px;
+        transform: none;
+        padding: 6px 10px;
+      }
+
+      .ocean-icon {
+        width: 26px;
+        height: 26px;
+      }
+
+      .race-track {
+        left: 28px;
+        right: 74px;
+        top: 62%;
+      }
+
+      .guide-bubble {
+        left: 10px;
+        right: 10px;
+        top: 8px;
+        bottom: auto;
+        max-width: none;
+        min-height: 42px;
+        grid-template-columns: 28px minmax(0, 1fr);
+        padding: 6px 9px;
+      }
+
+      .ocean-lane .guide-bubble {
+        left: 116px;
+        right: 8px;
+        top: 8px;
+      }
+
+      .guide-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+      }
+
+      .guide-text {
+        font-size: 0.74rem;
+      }
+
+      .race-crab {
+        font-size: 33px;
+      }
+
+      .race-score {
+        right: 8px;
+        bottom: 10px;
+        font-size: 0.7rem;
+      }
+
+      .milestone-badge {
+        top: 51%;
+        font-size: 0.7rem;
+        padding: 4px 8px;
+      }
+
+      .milestone-badge.full {
+        right: 72px;
+      }
+
+      .treasure-shell {
+        right: -70px;
+        width: 62px;
+        height: 52px;
+      }
+
+      .treasure-shell::before,
+      .treasure-shell::after {
+        width: 50px;
+        height: 27px;
+      }
+
+      .pearl {
+        left: 21px;
+        top: 18px;
+        width: 19px;
+        height: 19px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero" aria-label="Krabukų nuotykių pradžia">
+      <div class="title-block">
+        <div class="hero-badge">🦀 Dienos kelionė iki perlo</div>
+        <h1 id="appTitle">Kraiklyčių nuotykiai</h1>
+        <p class="subtitle" id="appSubtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
+      </div>
+      <div class="weekend-prize" aria-label="Didysis savaitgalio prizas">
+        <button class="weekend-edit-button" id="weekendPrizeEditButton" type="button">Keisti</button>
+        <div class="weekend-icons" aria-hidden="true">
+          <span class="weekend-icon">🧜‍♀️</span>
+          <span class="weekend-icon dragon">🐉</span>
+        </div>
+        <div class="weekend-title">
+          <strong id="weekendPrizeTitle">Didysis savaitgalio prizas</strong>
+          <span id="weekendPrizeDescription">Čia rodoma visų pasirinktos savaitės dienų suma. Daugiausiai kriauklyčių surinkęs vaikas pasirenka prizą.</span>
+        </div>
+        <div class="weekend-score" id="weekendScores"></div>
+        <div class="weekend-status" id="weekendPrizeStatus">Dar renkami savaitės taškai.</div>
+        <div class="weekend-picker">
+          <select id="weekendPrizeSelect" aria-label="Didžiojo savaitgalio prizo pasirinkimas"></select>
+          <button class="weekend-button" id="weekendPrizeButton" type="button">Pasirinkti prizą</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <aside class="panel children" aria-label="Vaikai">
+        <div id="childrenList"></div>
+        <div class="progress-box">
+          <div class="progress-row">
+            <span>Bendras lobis</span>
+            <span id="familyTotal">0 / 0</span>
+          </div>
+          <div class="bar" aria-hidden="true"><div class="bar-fill" id="familyBar"></div></div>
+        </div>
+        <div class="side" aria-label="Staigmenos ir istorija">
+          <div class="reward">
+            <div class="reward-heading">
+              <strong id="surpriseTitle">Staigmena už ypatingą pagyrimą</strong>
+              <button class="reward-edit-button" id="surpriseEditButton" type="button">Keisti</button>
+            </div>
+            <span id="surpriseText">Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.</span>
+            <button class="action" id="bonusButton" type="button">Ypatingas pagyrimas</button>
+            <div class="surprise-picker">
+              <select id="surpriseSelect" aria-label="Staigmenos pasirinkimas"></select>
+              <button class="action" id="chooseSurpriseButton" type="button">Pasirinkti staigmeną</button>
+            </div>
+          </div>
+          <button class="action secondary reset-week" id="resetButton" type="button">Pradėti naują savaitę</button>
+          <div class="penalty-box">
+            <label for="penaltySelect">Neįvykdyta / reikia pasitaisyti</label>
+            <div class="penalty-controls">
+              <select id="penaltySelect">
+              </select>
+              <button class="action warning" id="penaltyButton" type="button">Atimti</button>
+            </div>
+          </div>
+          <div>
+            <h2 id="logTitle">Šiandien</h2>
+            <div class="log" id="log"></div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel ocean-scene" id="oceanScene" aria-label="Visų vaikų keliai iki perlo">
+        <div class="ocean-lanes" id="oceanLanes"></div>
+      </section>
+
+      <section class="panel main">
+        <div class="section-head">
+          <div>
+            <h2 id="activeName">Olivia</h2>
+            <div class="today" id="todayText"></div>
+          </div>
+          <div class="date-nav">
+            <button class="date-button" id="prevDayButton" type="button" aria-label="Ankstesnis laikotarpis">‹</button>
+            <button class="date-button" id="todayButton" type="button">Šiandien</button>
+            <button class="date-button" id="nextDayButton" type="button" aria-label="Kitas laikotarpis">›</button>
+          </div>
+        </div>
+        <div class="workspace-toolbar">
+          <div class="view-tabs" role="tablist" aria-label="Laikotarpio pasirinkimas">
+            <button class="view-button active" data-view="day" type="button" role="tab" aria-selected="true">Diena</button>
+            <button class="view-button" data-view="week" type="button" role="tab" aria-selected="false">Savaitė</button>
+            <button class="view-button" data-view="month" type="button" role="tab" aria-selected="false">Mėnuo</button>
+          </div>
+          <div class="task-tools">
+            <button class="tool-button" id="settingsButton" type="button">Nustatymai</button>
+            <button class="tool-button primary" id="editTasksButton" type="button">EDIT</button>
+            <button class="tool-button" id="addTaskButton" type="button">+ Nauja užduotis</button>
+          </div>
+        </div>
+        <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
+        <div id="contentArea"></div>
+      </section>
+
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="edit-dialog" id="taskEditDialog" role="dialog" aria-modal="true" aria-labelledby="taskEditHeading" aria-hidden="true">
+    <form class="edit-card" id="taskEditForm">
+      <h3 id="taskEditHeading">Keisti užduotį</h3>
+      <label>
+        Užduoties tekstas
+        <input id="taskEditTitle" type="text" maxlength="160" autocomplete="off">
+      </label>
+      <label>
+        Kriauklyčių skaičius
+        <input id="taskEditShells" type="number" min="0" max="99" step="1">
+      </label>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="taskEditCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
+  <div class="edit-dialog" id="settingsDialog" role="dialog" aria-modal="true" aria-labelledby="settingsHeading" aria-hidden="true">
+    <form class="edit-card" id="settingsForm">
+      <h3 id="settingsHeading">Nustatymai</h3>
+      <label>
+        Projekto pavadinimas
+        <input id="settingsTitle" type="text" maxlength="80" autocomplete="off">
+      </label>
+      <label>
+        Aprašymas
+        <textarea id="settingsSubtitle" rows="3" maxlength="240"></textarea>
+      </label>
+      <div class="settings-grid" id="childSettingsList"></div>
+      <button class="tool-button" id="addChildButton" type="button">+ Pridėti vaiką</button>
+      <button class="tool-button" id="exportDataButton" type="button">Eksportuoti duomenis</button>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="settingsCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
+  <div class="edit-dialog" id="weekendPrizeEditDialog" role="dialog" aria-modal="true" aria-labelledby="weekendPrizeEditHeading" aria-hidden="true">
+    <form class="edit-card" id="weekendPrizeEditForm">
+      <h3 id="weekendPrizeEditHeading">Didžiojo prizo nustatymai</h3>
+      <label>
+        Antraštė
+        <input id="weekendPrizeTitleInput" type="text" maxlength="80" autocomplete="off">
+      </label>
+      <label>
+        Paaiškinimas
+        <textarea id="weekendPrizeDescriptionInput" maxlength="300"></textarea>
+      </label>
+      <label>Prizai</label>
+      <div class="prize-editor-list" id="weekendPrizeEditorList"></div>
+      <button class="tool-button" id="addWeekendPrizeButton" type="button">+ Pridėti prizą</button>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="weekendPrizeEditCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
+  <div class="edit-dialog" id="surpriseEditDialog" role="dialog" aria-modal="true" aria-labelledby="surpriseEditHeading" aria-hidden="true">
+    <form class="edit-card" id="surpriseEditForm">
+      <h3 id="surpriseEditHeading">Staigmenų bloko nustatymai</h3>
+      <label>
+        Antraštė
+        <input id="surpriseTitleInput" type="text" maxlength="80" autocomplete="off">
+      </label>
+      <label>
+        Paaiškinimas
+        <textarea id="surpriseDescriptionInput" maxlength="300"></textarea>
+      </label>
+      <label>Staigmenos</label>
+      <div class="prize-editor-list" id="surpriseEditorList"></div>
+      <button class="tool-button" id="addSurpriseButton" type="button">+ Pridėti staigmeną</button>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="surpriseEditCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Default content and application state
+    const defaultChildTasks = {
+      olivia: [
+        { id: "oliSleepAlone", icon: "🛏️", title: "Pati užmigau be kitų", shells: 3 },
+        { id: "oliWakeUp", icon: "🌞", title: "Kai pažadino, tuoj pat pati atsikėliau", shells: 3 },
+        { id: "oliBed", icon: "🛌", title: "Pati pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
+        { id: "oliGettingReady", icon: "🎒", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
+        { id: "oliToKindergarten", icon: "🏫", title: "Gražiai elgiausi einant į darželį", shells: 1 },
+        { id: "oliKindergarten", icon: "🌈", title: "Gražiai elgiausi darželyje", shells: 1 },
+        { id: "oliFromKindergarten", icon: "🌤️", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
+        { id: "oliBagShoesJacket", icon: "🧥", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+        { id: "oliHands", icon: "🧼", title: "Pati nusiploviau rankas", shells: 1 },
+        { id: "oliTable", icon: "🍴", title: "Padėjau padengti stalą", shells: 1 },
+        { id: "oliMeal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 5 },
+        { id: "oliThanksMeal", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
+        { id: "oliDishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
+        { id: "oliNoHurtBrother", icon: "🕊️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau brolio", shells: 5 },
+        { id: "oliPlayBrother", icon: "🧩", title: "Gražiai žaidžiau su broliu", shells: 2 },
+        { id: "oliNiceWordsBrother", icon: "💛", title: "Pasakiau broliui kažką malonaus", shells: 2 },
+        { id: "oliMom", icon: "🌷", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
+        { id: "oliQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
+        { id: "oliOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
+        { id: "oliHelp", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+        { id: "oliThanksNeeded", icon: "💬", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
+        { id: "oliSorry", icon: "🤍", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+        { id: "oliChooseActivity", icon: "🖍️", title: "Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
+        { id: "oliPraise", icon: "🏅", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
+        { id: "oliSpeech", icon: "🗣️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
+        { id: "oliToysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 }
+      ],
+      dominik: [
+        { id: "domSleepAlone", icon: "🛏️", title: "Pats užmigau be kitų", shells: 3 },
+        { id: "domWakeUp", icon: "🌞", title: "Kai pažadino, tuoj pat pats atsikėliau", shells: 3 },
+        { id: "domBed", icon: "🛌", title: "Pats pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
+        { id: "domGettingReady", icon: "🎒", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
+        { id: "domToKindergarten", icon: "🏫", title: "Gražiai elgiausi einant į darželį", shells: 1 },
+        { id: "domKindergarten", icon: "🌈", title: "Gražiai elgiausi darželyje", shells: 1 },
+        { id: "domFromKindergarten", icon: "🌤️", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
+        { id: "domBagShoesJacket", icon: "🧥", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+        { id: "domHands", icon: "🧼", title: "Pats nusiploviau rankas", shells: 1 },
+        { id: "domTable", icon: "🍴", title: "Padėjau padengti stalą", shells: 1 },
+        { id: "domMeal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 5 },
+        { id: "domThanksMeal", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
+        { id: "domDishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
+        { id: "domNoHurtSister", icon: "🕊️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau sesės", shells: 5 },
+        { id: "domPlaySister", icon: "🧩", title: "Gražiai žaidžiau su sese", shells: 2 },
+        { id: "domNiceWordsSister", icon: "💛", title: "Pasakiau sesei kažką malonaus", shells: 2 },
+        { id: "domMom", icon: "🌷", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
+        { id: "domQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
+        { id: "domOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
+        { id: "domHelp", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+        { id: "domThanksNeeded", icon: "💬", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
+        { id: "domSorry", icon: "🤍", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+        { id: "domChooseActivity", icon: "🖍️", title: "Pats ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
+        { id: "domPraise", icon: "🏅", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
+        { id: "domSpeech", icon: "🗣️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
+        { id: "domToysBooks", icon: "🧸", title: "Pats susidėjau savo žaislus ir knygutes", shells: 2 }
+      ]
+    };
+
+    const surprises = [
+      "1 pasirinktas filmukas",
+      "Pasaka prieš miegą",
+      "Mažas skanėstas",
+      "Kakava arba arbata",
+      "Kartu nupiešti piešinį",
+      "Pasirinkti vakarienės desertą",
+      "Mažas lobio akmenukas / perliukas į stiklainį",
+      "Pasirinkti dainelę šokiui",
+      "Mini piknikas namuose ant pledo",
+      "Pasivaikščiojimas iki mėgstamos vietos",
+      "Muilo burbulai lauke",
+      "Išsirinkti knygelę skaitymui",
+      "5 minutės kutuliukų / linksmo žaidimo",
+      "Pasirinkti stalo žaidimą"
+    ];
+
+    const defaultSurpriseSettings = {
+      title: "Staigmena už ypatingą pagyrimą",
+      description: "Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.",
+      surprises
+    };
+
+    const weekendPrizes = [
+      "Kinas",
+      "Zoologijos sodas",
+      "Pramogų parkas",
+      "Batutų parkas",
+      "Žaidimų kambarys",
+      "Išvyka į parką su pikniku",
+      "Ledainė / desertas kavinėje",
+      "Baseinas / vandens pramogos",
+      "Lėlių teatras",
+      "Boulingas"
+    ];
+
+    const defaultWeekendPrizeSettings = {
+      title: "Didysis savaitgalio prizas",
+      description: "Čia rodoma visų pasirinktos savaitės dienų suma. Daugiausiai kriauklyčių surinkęs vaikas pasirenka prizą.",
+      prizes: weekendPrizes
+    };
+
+    const defaultChildProfiles = {
+      olivia: { name: "Olivia", gender: "girl", color: "pink", avatar: "👧" },
+      dominik: { name: "Dominik", gender: "boy", color: "blue", avatar: "👦" }
+    };
+
+    const defaultAppSettings = {
+      title: "Kraiklyčių nuotykiai",
+      subtitle: "Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio."
+    };
+
+    const initialState = {
+      active: "olivia",
+      view: "day",
+      selectedDate: todayKey(),
+      lastCalendarDate: todayKey(),
+      oliviaGuide: null,
+      dominikGuide: null,
+      childGuides: {},
+      records: {},
+      weekendPrizes: {},
+      weekendPrizeSettings: defaultWeekendPrizeSettings,
+      surpriseSettings: defaultSurpriseSettings,
+      customTasks: null,
+      taskSchemaVersion: 3,
+      childProfiles: defaultChildProfiles,
+      appSettings: defaultAppSettings,
+      editMode: false
+    };
+
+    const storageKey = "kriauklyciu-nuotykis";
+    const legacyStorageKey = "kriauklyciu-nuotykis-v2";
+    const backupKeyPrefix = "kriauklyciu-nuotykis-backup_";
+    const backupFormat = "kriauklyciu-nuotykis-backup";
+    const backupVersion = 1;
+    const retainedDailyBackups = 14;
+
+    // Persistence and date helpers
+    function readSavedState(key) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function isRestorableState(value) {
+      return Boolean(value && typeof value === "object" && value.records && typeof value.records === "object");
+    }
+
+    function createBackupEnvelope(data, reason) {
+      return {
+        format: backupFormat,
+        version: backupVersion,
+        createdAt: new Date().toISOString(),
+        reason,
+        data
+      };
+    }
+
+    function dailyBackupKeys() {
+      return Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index))
+        .filter(Boolean)
+        .filter(key => key.startsWith(backupKeyPrefix) && /^\d{4}-\d{2}-\d{2}$/.test(key.slice(backupKeyPrefix.length)))
+        .sort();
+    }
+
+    function pruneDailyBackups() {
+      const keys = dailyBackupKeys();
+      keys.slice(0, Math.max(0, keys.length - retainedDailyBackups)).forEach(key => {
+        localStorage.removeItem(key);
+      });
+    }
+
+    function latestRestorableBackup() {
+      const keys = dailyBackupKeys().reverse();
+      for (const key of keys) {
+        const backup = readSavedState(key);
+        const data = backup?.format === backupFormat ? backup.data : backup;
+        if (isRestorableState(data)) return data;
+      }
+      return null;
+    }
+
+    function readPrimaryStateWithRecovery() {
+      const primary = readSavedState(storageKey);
+      if (isRestorableState(primary)) return primary;
+
+      const recovered = latestRestorableBackup();
+      if (!recovered) return primary;
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(recovered));
+      } catch {
+        // The recovered state is still returned and will be saved again when storage is available.
+      }
+      return recovered;
+    }
+
+    function ensureDailyBackup(data) {
+      if (!isRestorableState(data)) return false;
+      const key = `${backupKeyPrefix}${todayKey()}`;
+      if (localStorage.getItem(key)) return true;
+
+      try {
+        localStorage.setItem(key, JSON.stringify(createBackupEnvelope(data, "daily")));
+        pruneDailyBackups();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function exportData() {
+      const envelope = {
+        ...createBackupEnvelope(state, "manual-export"),
+        storageKey
+      };
+      const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `kriauklyciu-nuotykis-${todayKey()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+      showToast("Duomenų kopija paruošta.");
+    }
+
+    function mergeSavedRecords(primary, legacy) {
+      const merged = primary ? { ...primary, records: { ...(primary.records || {}) } } : { ...initialState };
+      if (!legacy?.records) return merged;
+
+      Object.entries(legacy.records).forEach(([date, legacyDay]) => {
+        if (!merged.records[date]) merged.records[date] = {};
+        Object.entries(legacyDay || {}).forEach(([childId, legacyChild]) => {
+          if (!legacyChild) return;
+          const currentChild = merged.records[date][childId];
+          const legacyShells = legacyChild.shells || 0;
+          const currentShells = currentChild?.shells || 0;
+          const legacyLogCount = Array.isArray(legacyChild.log) ? legacyChild.log.length : 0;
+          const currentLogCount = Array.isArray(currentChild?.log) ? currentChild.log.length : 0;
+
+          if (!currentChild || legacyShells > currentShells || legacyLogCount > currentLogCount) {
+            merged.records[date][childId] = legacyChild;
+          }
+        });
+      });
+
+      return merged;
+    }
+
+    const saved = mergeSavedRecords(readPrimaryStateWithRecovery(), readSavedState(legacyStorageKey));
+    const state = normalizeState(saved);
+    let lastSavedSnapshot = JSON.stringify(state);
+    ensureDailyBackup(state);
+
+    const contentArea = document.getElementById("contentArea");
+    const log = document.getElementById("log");
+    const toast = document.getElementById("toast");
+    const taskEditDialog = document.getElementById("taskEditDialog");
+    const taskEditForm = document.getElementById("taskEditForm");
+    const taskEditTitle = document.getElementById("taskEditTitle");
+    const taskEditShells = document.getElementById("taskEditShells");
+    let editingTaskId = null;
+
+    function save() {
+      try {
+        ensureDailyBackup(readSavedState(storageKey) || state);
+        const serializedState = JSON.stringify(state);
+        localStorage.setItem(storageKey, serializedState);
+        lastSavedSnapshot = serializedState;
+        return true;
+      } catch {
+        showToast("Nepavyko išsaugoti duomenų šioje naršyklėje.");
+        return false;
+      }
+    }
+
+    function autoSave() {
+      const currentSnapshot = JSON.stringify(state);
+      if (currentSnapshot !== lastSavedSnapshot) save();
+    }
+
+    function todayKey() {
+      return dateKey(new Date());
+    }
+
+    function dateKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseDate(key) {
+      const [year, month, day] = key.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function addDays(key, amount) {
+      const date = parseDate(key);
+      date.setDate(date.getDate() + amount);
+      return dateKey(date);
+    }
+
+    function monthKey(key) {
+      return key.slice(0, 7);
+    }
+
+    function formatDate(key, mode = "full") {
+      const date = parseDate(key);
+      const options = mode === "month"
+        ? { month: "long", year: "numeric" }
+        : { month: "long", day: "numeric", weekday: "long" };
+      return new Intl.DateTimeFormat("lt-LT", options).format(date);
+    }
+
+    function startOfWeek(key) {
+      const date = parseDate(key);
+      const day = date.getDay() || 7;
+      date.setDate(date.getDate() - day + 1);
+      return dateKey(date);
+    }
+
+    function getWeekKeys(key) {
+      const start = startOfWeek(key);
+      return Array.from({ length: 7 }, (_, index) => addDays(start, index));
+    }
+
+    function normalizeState(raw) {
+      const currentDay = todayKey();
+      const next = {
+        active: raw.active || "olivia",
+        view: raw.view || "day",
+        selectedDate: raw.selectedDate || currentDay,
+        lastCalendarDate: raw.lastCalendarDate || currentDay,
+        oliviaGuide: raw.oliviaGuide || null,
+        dominikGuide: raw.dominikGuide || null,
+        childGuides: { ...(raw.childGuides || {}) },
+        records: raw.records || {},
+        weekendPrizes: raw.weekendPrizes || {},
+        weekendPrizeSettings: {
+          title: raw.weekendPrizeSettings?.title || defaultWeekendPrizeSettings.title,
+          description: raw.weekendPrizeSettings?.description || defaultWeekendPrizeSettings.description,
+          prizes: Array.isArray(raw.weekendPrizeSettings?.prizes) && raw.weekendPrizeSettings.prizes.length
+            ? [...raw.weekendPrizeSettings.prizes]
+            : [...defaultWeekendPrizeSettings.prizes]
+        },
+        surpriseSettings: {
+          title: raw.surpriseSettings?.title || defaultSurpriseSettings.title,
+          description: raw.surpriseSettings?.description || defaultSurpriseSettings.description,
+          surprises: Array.isArray(raw.surpriseSettings?.surprises) && raw.surpriseSettings.surprises.length
+            ? [...raw.surpriseSettings.surprises]
+            : [...defaultSurpriseSettings.surprises]
+        },
+        customTasks: raw.customTasks || null,
+        taskSchemaVersion: raw.taskSchemaVersion || 0,
+        childProfiles: raw.childProfiles
+          ? { ...raw.childProfiles }
+          : { ...defaultChildProfiles },
+        appSettings: { ...defaultAppSettings, ...(raw.appSettings || {}) },
+        editMode: false,
+        legacyBonusPointsRemoved: Boolean(raw.legacyBonusPointsRemoved)
+      };
+
+      if (["Krabukų nuotykiai", "Krabukų nuotykiai..."].includes(next.appSettings.title)) {
+        next.appSettings.title = defaultAppSettings.title;
+      }
+
+      if (!next.childProfiles[next.active]) {
+        next.active = Object.keys(next.childProfiles)[0] || "olivia";
+      }
+
+      if (next.lastCalendarDate !== currentDay) {
+        next.selectedDate = currentDay;
+        next.view = "day";
+        next.lastCalendarDate = currentDay;
+        next.oliviaGuide = null;
+        next.dominikGuide = null;
+        next.childGuides = {};
+      }
+
+      if (raw.children && !raw.records) {
+        const key = currentDay;
+        next.records[key] = {
+          olivia: {
+            shells: raw.children.olivia?.shells || 0,
+            done: raw.children.olivia?.done || {},
+            log: raw.children.olivia?.log || []
+          },
+          dominik: {
+            shells: raw.children.dominik?.shells || 0,
+            done: raw.children.dominik?.done || {},
+            log: raw.children.dominik?.log || []
+          }
+        };
+      }
+
+      migrateLegacyBonusPoints(next);
+      ensureDay(next.selectedDate, next);
+      return next;
+    }
+
+    function childProfiles(targetState = state) {
+      return targetState.childProfiles || defaultChildProfiles;
+    }
+
+    function childIds(targetState = state) {
+      return Object.keys(childProfiles(targetState));
+    }
+
+    function childProfile(childId = state.active) {
+      return childProfiles()[childId] || defaultChildProfiles.olivia;
+    }
+
+    function childName(childId = state.active) {
+      return childProfile(childId).name || childId;
+    }
+
+    function childGender(childId = state.active) {
+      return childProfile(childId).gender || "girl";
+    }
+
+    function migrateLegacyBonusPoints(targetState) {
+      if (targetState.legacyBonusPointsRemoved) return;
+      Object.values(targetState.records || {}).forEach(day => {
+        childIds(targetState).forEach(childId => {
+          const child = day[childId];
+          if (!child || !Array.isArray(child.log)) return;
+          const legacyBonusTotal = child.log.reduce((sum, item) => {
+            if (typeof item === "string" || item.undone) return sum;
+            return item.kind === "bonus" && item.delta > 0 ? sum + item.delta : sum;
+          }, 0);
+          if (legacyBonusTotal > 0) {
+            child.shells = Math.max(0, (child.shells || 0) - legacyBonusTotal);
+            child.log.forEach(item => {
+              if (typeof item !== "string" && item.kind === "bonus" && item.delta > 0) {
+                item.delta = 0;
+                item.text = item.text.replace(/\(\+\d+\)/, "(staigmena)");
+              }
+            });
+          }
+        });
+      });
+      targetState.legacyBonusPointsRemoved = true;
+    }
+
+    function ensureDay(key, targetState = state) {
+      if (!targetState.records[key]) targetState.records[key] = {};
+      childIds(targetState).forEach(childId => {
+        if (!targetState.records[key][childId]) {
+          targetState.records[key][childId] = { shells: 0, done: {}, log: [] };
+        }
+      });
+      return targetState.records[key];
+    }
+
+    function shellWord(count) {
+      const last = count % 10;
+      const lastTwo = count % 100;
+      if (lastTwo >= 10 && lastTwo <= 20) return "kriauklyčių";
+      if (last === 1) return "kriauklytė";
+      if (last > 1 && last < 10) return "kriauklytės";
+      return "kriauklyčių";
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[character]);
+    }
+
+    // Task model and child-specific behavior
+    function cloneTasks(tasks) {
+      return tasks.map(task => ({ ...task }));
+    }
+
+    function taskIdSignature(tasks) {
+      return (tasks || []).map(task => task.id).join("|");
+    }
+
+    function taskFullSignature(tasks) {
+      return (tasks || []).map(task => `${task.id}:${task.title}:${task.shells}`).join("|");
+    }
+
+    function defaultTasksForChild(childId) {
+      if (defaultChildTasks[childId]) return defaultChildTasks[childId];
+      return childGender(childId) === "boy" ? defaultChildTasks.dominik : defaultChildTasks.olivia;
+    }
+
+    function tasksWithUniqueIds(childId, tasks) {
+      if (defaultChildTasks[childId]) return cloneTasks(tasks);
+      return tasks.map(task => ({ ...task, id: `${childId}_${task.id}` }));
+    }
+
+    function ensureCustomTasks() {
+      if (!state.customTasks) {
+        state.customTasks = {
+          olivia: cloneTasks(defaultChildTasks.olivia),
+          dominik: cloneTasks(defaultChildTasks.dominik)
+        };
+      }
+      if (state.taskSchemaVersion < 4) {
+        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
+        state.taskSchemaVersion = 4;
+        save();
+      }
+      if (
+        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia) ||
+        taskFullSignature(state.customTasks.olivia) !== taskFullSignature(defaultChildTasks.olivia)
+      ) {
+        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
+        state.taskSchemaVersion = 4;
+        save();
+      }
+      childIds().forEach(childId => {
+        if (!state.customTasks[childId]) {
+          state.customTasks[childId] = tasksWithUniqueIds(childId, defaultTasksForChild(childId));
+        }
+      });
+      return state.customTasks;
+    }
+
+    function tasksForChild(childId = state.active) {
+      const customTasks = ensureCustomTasks();
+      return customTasks[childId] || customTasks.olivia;
+    }
+
+    function maxDailyShells(childId = state.active) {
+      return tasksForChild(childId).reduce((sum, task) => sum + task.shells, 0);
+    }
+
+    function maxFamilyDailyShells() {
+      return childIds().reduce((sum, childId) => sum + maxDailyShells(childId), 0);
+    }
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    let dialogReturnFocus = null;
+
+    function openDialog(dialog, focusTarget) {
+      dialogReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      dialog.classList.add("open");
+      dialog.setAttribute("aria-hidden", "false");
+      document.body.classList.add("dialog-open");
+      requestAnimationFrame(() => focusTarget?.focus());
+    }
+
+    function closeDialog(dialog) {
+      dialog.classList.remove("open");
+      dialog.setAttribute("aria-hidden", "true");
+      if (!document.querySelector(".edit-dialog.open")) document.body.classList.remove("dialog-open");
+      dialogReturnFocus?.focus();
+      dialogReturnFocus = null;
+    }
+
+    function oliviaDefaultGuide(shells) {
+      const max = maxDailyShells("olivia");
+      if (shells <= 0) return "Undinė laukia pirmosios Olivijos kriauklytės.";
+      if (shells >= max) return "Olivia pasiekė perlą! Undinė labai didžiuojasi.";
+      if (shells >= max * 0.75) return "Olivia jau visai arti perlo. Dar keli gražūs darbeliai!";
+      if (shells >= max * 0.35) return "Olivia gražiai keliauja per vandenyną. Undinė saugo jos kriauklytes.";
+      return "Puiki pradžia, Olivia. Kiekviena kriauklytė artina prie perlo.";
+    }
+
+    function dominikDefaultGuide(shells) {
+      const max = maxDailyShells("dominik");
+      if (shells <= 0) return "Drakonas laukia pirmosios Dominik kriauklytės.";
+      if (shells >= max) return "Dominik pasiekė perlą! Drakonas atrakino perlo kriauklę.";
+      if (shells >= max * 0.75) return "Dominik jau labai arti lobio. Drakonas ruošia raktą!";
+      if (shells >= max * 0.35) return "Dominik stipriai juda pirmyn. Drakonas saugo kelią iki perlo.";
+      return "Gera pradžia, Dominik. Drakonas mato pirmas kriauklytes.";
+    }
+
+    function setOliviaGuide(text) {
+      setChildGuide("olivia", text);
+    }
+
+    function setDominikGuide(text) {
+      setChildGuide("dominik", text);
+    }
+
+    function setChildGuide(childId, text) {
+      state.childGuides ||= {};
+      state.childGuides[childId] = { date: state.selectedDate, text };
+      if (childId === "olivia") state.oliviaGuide = state.childGuides[childId];
+      if (childId === "dominik") state.dominikGuide = state.childGuides[childId];
+      const guide = document.getElementById(`${childId}GuideText`);
+      if (guide) guide.textContent = text;
+    }
+
+    function childGuideAvatar(childId) {
+      if (childId === "olivia") return "🧜‍♀️";
+      if (childId === "dominik") return "🐉";
+      return "🐠";
+    }
+
+    function childDefaultGuide(childId, shells) {
+      if (childId === "olivia") return oliviaDefaultGuide(shells);
+      if (childId === "dominik") return dominikDefaultGuide(shells);
+      const name = childName(childId);
+      const max = maxDailyShells(childId);
+      if (shells <= 0) return `Jūros draugas laukia pirmosios ${name} kriauklytės.`;
+      if (shells >= max) return `${name} pasiekė perlą! Jūros draugas labai didžiuojasi.`;
+      if (shells >= max * 0.75) return `${name} jau visai arti perlo!`;
+      if (shells >= max * 0.35) return `${name} gražiai keliauja pirmyn per vandenyną.`;
+      return `Puiki pradžia, ${name}! Kiekviena kriauklytė artina prie perlo.`;
+    }
+
+    function childGuideText(childId, shells) {
+      const modernGuide = state.childGuides?.[childId];
+      const legacyGuide = childId === "olivia" ? state.oliviaGuide : childId === "dominik" ? state.dominikGuide : null;
+      const savedGuide = modernGuide || legacyGuide;
+      return savedGuide?.date === state.selectedDate ? savedGuide.text : childDefaultGuide(childId, shells);
+    }
+
+    function renderMilestoneBadge(childId, shells) {
+      const badge = document.getElementById(`${childId}MilestoneBadge`);
+      if (!badge) return;
+      const max = maxDailyShells(childId);
+      const halfway = Math.ceil(max / 2);
+      badge.classList.remove("show", "full");
+
+      if (shells >= max) {
+        badge.textContent = "🏆 Perlas pasiektas!";
+        badge.classList.add("show", "full");
+        return;
+      }
+
+      if (shells >= halfway) {
+        badge.textContent = "⭐ Pusė kelio!";
+        badge.classList.add("show");
+      }
+    }
+
+    function checkChildMilestones(childId) {
+      const day = ensureDay(state.selectedDate);
+      const child = day[childId];
+      const name = childName(childId);
+      const max = maxDailyShells(childId);
+      const halfway = Math.ceil(max / 2);
+
+      if (child.shells >= max && !child.dailyTreasureAwarded) {
+        child.dailyTreasureAwarded = true;
+        addLog(child, {
+          text: childId === "olivia"
+            ? "Olivia: dienos lobis pasiektas - Undinė atvėrė perlo kriauklę (prizas)"
+            : childId === "dominik"
+              ? "Dominik: dienos lobis pasiektas - Drakonas atrakino perlo kriauklę (prizas)"
+              : `${name}: dienos lobis pasiektas - perlo kriauklė atsivėrė (prizas)`,
+          delta: 0,
+          kind: "dailyPrize"
+        });
+        const message = childId === "olivia"
+          ? "Olivia surinko visas kriauklytes! Undinė atvėrė perlo kriauklę - šiandien priklauso ypatingas prizas."
+          : childId === "dominik"
+            ? "Dominik surinko visas kriauklytes! Drakonas atrakino perlo kriauklę - šiandien priklauso ypatingas prizas."
+            : `${name} surinko visas kriauklytes! Jūros draugas atvėrė perlo kriauklę - šiandien priklauso ypatingas prizas.`;
+        setChildGuide(childId, message);
+        return "full";
+      }
+
+      if (child.shells >= halfway && !child.halfwayTreasureNoticed) {
+        child.halfwayTreasureNoticed = true;
+        addLog(child, {
+          text: `${name}: pusė kelio iki perlo jau nueita`,
+          delta: 0,
+          kind: "halfwayNotice"
+        });
+        const message = childId === "olivia"
+          ? "Olivia jau nuėjo pusę kelio iki perlo! Undinė mato, kaip gražiai juda krabiukas."
+          : childId === "dominik"
+            ? "Dominik jau nuėjo pusę kelio iki perlo! Drakonas mato, kaip drąsiai juda krabiukas."
+            : `${name} jau nuėjo pusę kelio iki perlo! Jūros draugas džiaugiasi šia pažanga.`;
+        setChildGuide(childId, message);
+        return "half";
+      }
+
+      return "";
+    }
+
+    function activeChild() {
+      return ensureDay(state.selectedDate)[state.active];
+    }
+
+    function activeName() {
+      return childName(state.active);
+    }
+
+    function taskTitleForGender(title, gender) {
+      const forms = gender === "boy"
+        ? { Pati: "Pats", pati: "pats", Pats: "Pats", pats: "pats" }
+        : { Pati: "Pati", pati: "pati", Pats: "Pati", pats: "pati" };
+      return title.replace(/\b(Pati|Pats|pati|pats)\b/g, form => forms[form]);
+    }
+
+    function taskTitle(task, childId = state.active) {
+      const title = typeof task.title === "string"
+        ? task.title
+        : task.title[childId] || task.title.olivia || task.title.dominik;
+      return taskTitleForGender(title, childGender(childId));
+    }
+
+    function addLog(child, entry) {
+      const normalized = typeof entry === "string"
+        ? entry
+        : { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, undone: false, ...entry };
+      child.log.unshift(normalized);
+      child.log = child.log.slice(0, 12);
+    }
+
+    function logText(item) {
+      return typeof item === "string" ? item : item.text;
+    }
+
+    function undoLogItem(item) {
+      if (typeof item === "string" || item.undone || item.kind === "undoNotice") return;
+
+      const child = activeChild();
+      child.shells = Math.max(0, child.shells - (item.delta || 0));
+
+      if (item.taskId && item.kind === "complete") child.done[item.taskId] = false;
+      if (item.taskId && item.kind === "toggleOff") child.done[item.taskId] = true;
+
+      item.undone = true;
+      addLog(child, {
+        text: `${activeName()}: atšauktas istorijos įrašas`,
+        delta: 0,
+        kind: "undoNotice"
+      });
+      save();
+      render();
+      showToast("Istorijos įrašas atšauktas.");
+    }
+
+    function completeTask(task) {
+      if (state.editMode) return;
+      const child = activeChild();
+      const title = taskTitle(task);
+      if (child.done[task.id]) {
+        child.done[task.id] = false;
+        child.shells = Math.max(0, child.shells - task.shells);
+        addLog(child, {
+          text: `${activeName()}: atšaukta - ${title} (-${task.shells})`,
+          delta: -task.shells,
+          taskId: task.id,
+          kind: "toggleOff"
+        });
+        save();
+        render();
+        const retryMessage = state.active === "olivia"
+          ? "Nieko tokio, Olivia. Galime pabandyti dar kartą ir kriauklytė sugrįš."
+          : state.active === "dominik"
+            ? "Nieko tokio, Dominik. Drakonas saugo kelią - galima pabandyti dar kartą."
+            : `Nieko tokio, ${activeName()}. Jūros draugas laukia, kol pabandysi dar kartą.`;
+        setChildGuide(state.active, retryMessage);
+        save();
+        showToast(`${title} atšaukta: -${task.shells} ${shellWord(task.shells)}.`);
+        return;
+      }
+      child.done[task.id] = true;
+      child.shells += task.shells;
+      addLog(child, {
+        text: `${activeName()}: ${title} (+${task.shells})`,
+        delta: task.shells,
+        taskId: task.id,
+        kind: "complete"
+      });
+      const milestone = checkChildMilestones(state.active);
+      if (!milestone) {
+        const successMessage = state.active === "olivia"
+          ? `Puiku, Olivia! Undinė įdėjo ${task.shells} ${shellWord(task.shells)} į tavo lobį.`
+          : state.active === "dominik"
+            ? `Šaunu, Dominik! Drakonas pridėjo ${task.shells} ${shellWord(task.shells)} prie tavo kelio.`
+            : `Puiku, ${activeName()}! Jūros draugas pridėjo ${task.shells} ${shellWord(task.shells)} prie tavo kelio.`;
+        setChildGuide(state.active, successMessage);
+      }
+      save();
+      render();
+      showToast(`${activeName()} gavo ${task.shells} ${shellWord(task.shells)}!`);
+    }
+
+    function editTask(taskId) {
+      const tasks = tasksForChild();
+      const task = tasks.find(item => item.id === taskId);
+      if (!task) return;
+      editingTaskId = taskId;
+      taskEditTitle.value = taskTitle(task);
+      taskEditShells.value = task.shells;
+      openDialog(taskEditDialog, taskEditTitle);
+    }
+
+    function closeTaskEditor() {
+      closeDialog(taskEditDialog);
+      editingTaskId = null;
+    }
+
+    function saveEditedTask() {
+      if (!editingTaskId) return;
+      const tasks = tasksForChild();
+      const task = tasks.find(item => item.id === editingTaskId);
+      if (!task) return;
+      const cleanTitle = taskEditTitle.value.trim().slice(0, 160);
+      if (!cleanTitle) return;
+      const nextShells = Number(taskEditShells.value);
+      if (!Number.isFinite(nextShells) || nextShells < 0 || nextShells > 99) return;
+      const oldShells = task.shells;
+      task.title = cleanTitle;
+      task.shells = Math.round(nextShells);
+      const child = activeChild();
+      if (child.done[task.id]) {
+        child.shells = Math.max(0, child.shells + task.shells - oldShells);
+      }
+      closeTaskEditor();
+      save();
+      render();
+      showToast("Užduotis pakeista.");
+    }
+
+    function deleteTask(taskId) {
+      const tasks = tasksForChild();
+      const task = tasks.find(item => item.id === taskId);
+      if (!task) return;
+      const ok = confirm(`Ištrinti užduotį „${taskTitle(task)}“?`);
+      if (!ok) return;
+      const index = tasks.findIndex(item => item.id === taskId);
+      tasks.splice(index, 1);
+      Object.values(state.records || {}).forEach(day => {
+        const child = day[state.active];
+        if (child?.done) delete child.done[taskId];
+      });
+      save();
+      render();
+      showToast("Užduotis ištrinta.");
+    }
+
+    function addTask() {
+      const title = prompt("Naujos užduoties tekstas:");
+      if (title === null) return;
+      const cleanTitle = title.trim().slice(0, 160);
+      if (!cleanTitle) return;
+      const shells = Number(prompt("Kiek kriauklyčių?", "1"));
+      if (!Number.isFinite(shells) || shells < 0 || shells > 99) return;
+      const tasks = tasksForChild();
+      tasks.push({
+        id: `${state.active}Custom${Date.now()}`,
+        icon: "✨",
+        title: cleanTitle,
+        shells: Math.round(shells)
+      });
+      save();
+      render();
+      showToast("Nauja užduotis pridėta.");
+    }
+
+    // UI renderers
+    function renderTasks() {
+      const child = activeChild();
+      contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
+      contentArea.innerHTML = "";
+      tasksForChild().forEach(task => {
+        const title = taskTitle(task);
+        const safeTaskId = escapeHtml(task.id);
+        const button = document.createElement(state.editMode ? "div" : "button");
+        if (!state.editMode) button.type = "button";
+        button.className = `task${child.done[task.id] ? " done" : ""}${state.editMode ? " editing" : ""}`;
+        button.innerHTML = `
+          <span class="task-icon" aria-hidden="true">${escapeHtml(task.icon)}</span>
+          <span>
+            <span class="task-title">${escapeHtml(title)}</span>
+            <span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span>
+          </span>
+          ${state.editMode ? `
+            <span class="task-edit-actions">
+              <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
+              <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
+            </span>
+          ` : ""}
+        `;
+        if (!state.editMode) {
+          button.addEventListener("click", () => completeTask(task));
+        }
+        button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
+          event.stopPropagation();
+          editTask(task.id);
+        });
+        button.querySelector("[data-delete-task]")?.addEventListener("click", event => {
+          event.stopPropagation();
+          deleteTask(task.id);
+        });
+        contentArea.appendChild(button);
+      });
+    }
+
+    function renderLog() {
+      const child = activeChild();
+      log.innerHTML = "";
+      document.getElementById("logTitle").textContent = formatDate(state.selectedDate);
+      if (!child.log.length) {
+        log.innerHTML = `<div class="empty">Dar nėra pažymėtų darbelių.</div>`;
+        return;
+      }
+      child.log.forEach(item => {
+        const reversible = typeof item !== "string"
+          && !item.undone
+          && !["undoNotice", "halfwayNotice", "dailyPrize"].includes(item.kind);
+        const row = document.createElement(reversible ? "button" : "div");
+        row.className = `log-item${reversible ? " clickable" : ""}${typeof item !== "string" && item.undone ? " undone" : ""}`;
+        row.textContent = logText(item);
+        if (reversible) {
+          row.type = "button";
+          row.title = "Paspauskite, jei norite atšaukti šį įrašą";
+          row.addEventListener("click", () => undoLogItem(item));
+        }
+        log.appendChild(row);
+      });
+    }
+
+    function childTotal(childId, keys) {
+      return keys.reduce((sum, key) => sum + (ensureDay(key)[childId]?.shells || 0), 0);
+    }
+
+    function renderWeekendPrize(weekScores) {
+      const weekKey = startOfWeek(state.selectedDate);
+      const selected = state.weekendPrizes[weekKey];
+      const entries = Object.entries(weekScores);
+      const total = entries.reduce((sum, [, score]) => sum + score, 0);
+      const maxScore = Math.max(...entries.map(([, score]) => score), 0);
+      const leaders = entries.filter(([, score]) => score === maxScore && score > 0).map(([childId]) => childId);
+      const winnerId = leaders.length === 1 ? leaders[0] : null;
+      const winnerName = winnerId ? childName(winnerId) : "visi vaikai";
+      const status = document.getElementById("weekendPrizeStatus");
+      const select = document.getElementById("weekendPrizeSelect");
+      const button = document.getElementById("weekendPrizeButton");
+
+      document.getElementById("weekendPrizeTitle").textContent = state.weekendPrizeSettings.title;
+      document.getElementById("weekendPrizeDescription").textContent = state.weekendPrizeSettings.description;
+      document.querySelector(".weekend-prize").setAttribute("aria-label", state.weekendPrizeSettings.title);
+
+      const scoreBox = document.getElementById("weekendScores");
+      scoreBox.innerHTML = "";
+      entries.forEach(([childId, score]) => {
+        const item = document.createElement("span");
+        item.textContent = `${childName(childId)}: ${score} ${shellWord(score)}`;
+        scoreBox.appendChild(item);
+      });
+
+      select.innerHTML = "";
+      state.weekendPrizeSettings.prizes.forEach(prize => {
+        const option = document.createElement("option");
+        option.value = prize;
+        option.textContent = prize;
+        select.appendChild(option);
+      });
+
+      if (selected) {
+        if (!state.weekendPrizeSettings.prizes.includes(selected.prize)) {
+          const historicOption = document.createElement("option");
+          historicOption.value = selected.prize;
+          historicOption.textContent = selected.prize;
+          select.appendChild(historicOption);
+        }
+        status.textContent = `Šios savaitės prizas: ${selected.winner} pasirinko „${selected.prize}“.`;
+        button.textContent = "Prizas pasirinktas";
+        button.disabled = true;
+        select.disabled = true;
+        select.value = selected.prize;
+        return;
+      }
+
+      if (total === 0) {
+        status.textContent = "Dar renkami savaitės taškai.";
+        button.textContent = "Pasirinkti prizą";
+        button.disabled = true;
+        select.disabled = true;
+        return;
+      }
+
+      status.textContent = winnerId
+        ? `Šią savaitę renkasi: ${winnerName}.`
+        : "Šią savaitę abu surinko po tiek pat. Pasirinkite bendrą šeimos prizą.";
+      button.textContent = "Pasirinkti prizą";
+      button.disabled = false;
+      select.disabled = false;
+    }
+
+    function chooseWeekendPrize() {
+      const weekKey = startOfWeek(state.selectedDate);
+      if (state.weekendPrizes[weekKey]) return;
+
+      const weekKeys = getWeekKeys(state.selectedDate);
+      const weekScores = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, weekKeys)]));
+      const entries = Object.entries(weekScores);
+      const total = entries.reduce((sum, [, score]) => sum + score, 0);
+      if (total === 0) return;
+
+      const maxScore = Math.max(...entries.map(([, score]) => score), 0);
+      const leaders = entries.filter(([, score]) => score === maxScore).map(([childId]) => childId);
+      const winnerId = leaders.length === 1 ? leaders[0] : null;
+      const winner = winnerId ? childName(winnerId) : "Visi vaikai";
+      const prize = document.getElementById("weekendPrizeSelect").value;
+      state.weekendPrizes[weekKey] = { winner, prize };
+
+      if (winnerId) {
+        addLog(ensureDay(state.selectedDate)[winnerId], {
+          text: `${winner}: didysis savaitgalio prizas - ${prize}`,
+          delta: 0,
+          kind: "weekendPrize"
+        });
+      } else {
+        childIds().forEach(childId => {
+          addLog(ensureDay(state.selectedDate)[childId], {
+            text: `Bendras savaitgalio prizas - ${prize}`,
+            delta: 0,
+            kind: "weekendPrize"
+          });
+        });
+      }
+
+      save();
+      render();
+      showToast(`Pasirinktas savaitgalio prizas: ${prize}.`);
+    }
+
+    function renderReward(familyTodayTotal, activeWeekTotal) {
+      const max = maxFamilyDailyShells();
+      document.getElementById("familyTotal").textContent = `${familyTodayTotal} / ${max}`;
+      document.getElementById("familyBar").style.width = `${Math.min(familyTodayTotal / max * 100, 100)}%`;
+    }
+
+    function renderSurprises() {
+      const child = activeChild();
+      const unlocked = Boolean(child.surpriseUnlocked);
+      const text = document.getElementById("surpriseText");
+      const button = document.getElementById("bonusButton");
+      const select = document.getElementById("surpriseSelect");
+      const chooseButton = document.getElementById("chooseSurpriseButton");
+
+      document.getElementById("surpriseTitle").textContent = state.surpriseSettings.title;
+
+      if (unlocked) {
+        text.textContent = `${activeName()} gavo ypatingą pagyrimą. Galima pasirinkti vieną staigmeną.`;
+        button.textContent = "Staigmena atrakinta";
+        button.disabled = true;
+      } else if (child.lastSurprise) {
+        text.textContent = `Paskutinė pasirinkta staigmena: ${child.lastSurprise}.`;
+        button.textContent = "Ypatingas pagyrimas";
+        button.disabled = false;
+      } else {
+        text.textContent = state.surpriseSettings.description;
+        button.textContent = "Ypatingas pagyrimas";
+        button.disabled = false;
+      }
+
+      select.innerHTML = "";
+      state.surpriseSettings.surprises.forEach(surprise => {
+        const option = document.createElement("option");
+        option.value = surprise;
+        option.textContent = surprise;
+        select.appendChild(option);
+      });
+      select.disabled = !unlocked;
+      chooseButton.disabled = !unlocked;
+    }
+
+    function renderPenaltyOptions() {
+      const select = document.getElementById("penaltySelect");
+      select.innerHTML = "";
+      tasksForChild().forEach(task => {
+        const option = document.createElement("option");
+        option.value = task.id;
+        option.textContent = `${taskTitle(task)} (-${task.shells})`;
+        select.appendChild(option);
+      });
+    }
+
+    function renderChildren(weekKeys) {
+      const list = document.getElementById("childrenList");
+      list.innerHTML = "";
+      childIds().forEach(childId => {
+        const profile = childProfile(childId);
+        const total = childTotal(childId, [state.selectedDate]);
+        const button = document.createElement("button");
+        button.className = `child-button${childId === state.active ? " active" : ""}`;
+        button.dataset.child = childId;
+        button.dataset.gender = profile.gender;
+        button.type = "button";
+        button.setAttribute("aria-pressed", String(childId === state.active));
+        button.innerHTML = `
+          <span class="avatar" aria-hidden="true">${escapeHtml(profile.avatar || (profile.gender === "boy" ? "👦" : "👧"))}</span>
+          <span>
+            <span class="child-name">${escapeHtml(profile.name)}</span><br>
+            <span class="shell-count">${total} ${shellWord(total)} pasirinktą dieną</span>
+          </span>
+        `;
+        button.addEventListener("click", () => {
+          state.active = childId;
+          save();
+          render();
+        });
+        list.appendChild(button);
+      });
+    }
+
+    function openSettings() {
+      document.getElementById("settingsTitle").value = state.appSettings.title;
+      document.getElementById("settingsSubtitle").value = state.appSettings.subtitle;
+      renderChildSettings();
+      openDialog(document.getElementById("settingsDialog"), document.getElementById("settingsTitle"));
+    }
+
+    function closeSettings() {
+      closeDialog(document.getElementById("settingsDialog"));
+    }
+
+    function weekendPrizeEditorValues() {
+      return Array.from(document.querySelectorAll("[data-weekend-prize-input]"))
+        .map(input => input.value.trim())
+        .filter(Boolean);
+    }
+
+    function renderWeekendPrizeEditor(prizes = state.weekendPrizeSettings.prizes) {
+      const list = document.getElementById("weekendPrizeEditorList");
+      list.innerHTML = "";
+      prizes.forEach(prize => {
+        const row = document.createElement("div");
+        row.className = "prize-editor-row";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 80;
+        input.value = prize;
+        input.dataset.weekendPrizeInput = "";
+        input.setAttribute("aria-label", "Prizo pavadinimas");
+        const removeButton = document.createElement("button");
+        removeButton.className = "prize-remove-button";
+        removeButton.type = "button";
+        removeButton.dataset.removeWeekendPrize = "";
+        removeButton.setAttribute("aria-label", `Pašalinti prizą ${prize || "be pavadinimo"}`);
+        removeButton.title = "Pašalinti prizą";
+        removeButton.textContent = "×";
+        row.append(input, removeButton);
+        list.appendChild(row);
+      });
+    }
+
+    function openWeekendPrizeEditor() {
+      document.getElementById("weekendPrizeTitleInput").value = state.weekendPrizeSettings.title;
+      document.getElementById("weekendPrizeDescriptionInput").value = state.weekendPrizeSettings.description;
+      renderWeekendPrizeEditor();
+      openDialog(document.getElementById("weekendPrizeEditDialog"), document.getElementById("weekendPrizeTitleInput"));
+    }
+
+    function closeWeekendPrizeEditor() {
+      closeDialog(document.getElementById("weekendPrizeEditDialog"));
+    }
+
+    function saveWeekendPrizeSettings() {
+      const prizes = [...new Set(weekendPrizeEditorValues())];
+      if (!prizes.length) {
+        showToast("Palikite bent vieną prizą.");
+        return;
+      }
+      state.weekendPrizeSettings = {
+        title: document.getElementById("weekendPrizeTitleInput").value.trim() || defaultWeekendPrizeSettings.title,
+        description: document.getElementById("weekendPrizeDescriptionInput").value.trim() || defaultWeekendPrizeSettings.description,
+        prizes
+      };
+      save();
+      closeWeekendPrizeEditor();
+      render();
+      showToast("Didžiojo prizo blokas atnaujintas.");
+    }
+
+    function surpriseEditorValues() {
+      return Array.from(document.querySelectorAll("[data-surprise-input]"))
+        .map(input => input.value.trim())
+        .filter(Boolean);
+    }
+
+    function renderSurpriseEditor(items = state.surpriseSettings.surprises) {
+      const list = document.getElementById("surpriseEditorList");
+      list.innerHTML = "";
+      items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "prize-editor-row";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 80;
+        input.value = item;
+        input.dataset.surpriseInput = "";
+        input.setAttribute("aria-label", "Staigmenos pavadinimas");
+        const removeButton = document.createElement("button");
+        removeButton.className = "prize-remove-button";
+        removeButton.type = "button";
+        removeButton.dataset.removeSurprise = "";
+        removeButton.setAttribute("aria-label", `Pašalinti staigmeną ${item || "be pavadinimo"}`);
+        removeButton.title = "Pašalinti staigmeną";
+        removeButton.textContent = "×";
+        row.append(input, removeButton);
+        list.appendChild(row);
+      });
+    }
+
+    function openSurpriseEditor() {
+      document.getElementById("surpriseTitleInput").value = state.surpriseSettings.title;
+      document.getElementById("surpriseDescriptionInput").value = state.surpriseSettings.description;
+      renderSurpriseEditor();
+      openDialog(document.getElementById("surpriseEditDialog"), document.getElementById("surpriseTitleInput"));
+    }
+
+    function closeSurpriseEditor() {
+      closeDialog(document.getElementById("surpriseEditDialog"));
+    }
+
+    function saveSurpriseSettings() {
+      const items = [...new Set(surpriseEditorValues())];
+      if (!items.length) {
+        showToast("Palikite bent vieną staigmeną.");
+        return;
+      }
+      state.surpriseSettings = {
+        title: document.getElementById("surpriseTitleInput").value.trim() || defaultSurpriseSettings.title,
+        description: document.getElementById("surpriseDescriptionInput").value.trim() || defaultSurpriseSettings.description,
+        surprises: items
+      };
+      save();
+      closeSurpriseEditor();
+      render();
+      showToast("Staigmenų blokas atnaujintas.");
+    }
+
+    function renderChildSettings() {
+      const list = document.getElementById("childSettingsList");
+      list.innerHTML = "";
+      childIds().forEach(childId => {
+        const profile = childProfile(childId);
+        const canRemove = childIds().length > 1;
+        const row = document.createElement("div");
+        row.className = "settings-row";
+        const safeChildId = escapeHtml(childId);
+        row.innerHTML = `
+          <label>Vardas<input data-child-name="${safeChildId}" type="text" maxlength="40" value="${escapeHtml(profile.name)}"></label>
+          <label>Lytis<select data-child-gender="${safeChildId}">
+            <option value="girl"${profile.gender === "girl" ? " selected" : ""}>Mergaitė</option>
+            <option value="boy"${profile.gender === "boy" ? " selected" : ""}>Berniukas</option>
+          </select></label>
+          <label>Spalva<select data-child-color="${safeChildId}">
+            <option value="pink"${profile.color === "pink" ? " selected" : ""}>Rožinė</option>
+            <option value="blue"${profile.color === "blue" ? " selected" : ""}>Melsva</option>
+            <option value="green"${profile.color === "green" ? " selected" : ""}>Žalsva</option>
+          </select></label>
+          ${canRemove
+            ? `<button class="remove-child-button" data-remove-child="${safeChildId}" type="button">Pašalinti vaiką</button>`
+            : ""}
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function removeChildFromSettings(childId) {
+      if (childIds().length <= 1) {
+        showToast("Sąraše turi likti bent vienas vaikas.");
+        return;
+      }
+      delete state.childProfiles[childId];
+      if (state.customTasks) delete state.customTasks[childId];
+      if (state.childGuides) delete state.childGuides[childId];
+      Object.values(state.records || {}).forEach(day => {
+        delete day[childId];
+      });
+      if (state.active === childId) {
+        state.active = childIds()[0] || "olivia";
+      }
+      save();
+      renderChildSettings();
+      render();
+      showToast("Vaikas pašalintas iš sąrašo.");
+    }
+
+    function saveSettings() {
+      state.appSettings.title = document.getElementById("settingsTitle").value.trim() || defaultAppSettings.title;
+      state.appSettings.subtitle = document.getElementById("settingsSubtitle").value.trim() || defaultAppSettings.subtitle;
+      childIds().forEach(childId => {
+        const name = document.querySelector(`[data-child-name="${childId}"]`).value.trim().slice(0, 40) || childName(childId);
+        const gender = document.querySelector(`[data-child-gender="${childId}"]`).value;
+        const color = document.querySelector(`[data-child-color="${childId}"]`).value;
+        state.childProfiles[childId] = {
+          ...state.childProfiles[childId],
+          name,
+          gender,
+          color,
+          avatar: gender === "boy" ? "👦" : "👧"
+        };
+      });
+      closeSettings();
+      save();
+      render();
+      showToast("Nustatymai išsaugoti.");
+    }
+
+    function addChildFromSettings() {
+      const name = prompt("Vaiko vardas:");
+      if (name === null) return;
+      const cleanName = name.trim().slice(0, 40);
+      if (!cleanName) return;
+      const childId = `child${Date.now()}`;
+      state.childProfiles[childId] = {
+        name: cleanName,
+        gender: "girl",
+        color: "pink",
+        avatar: "👧"
+      };
+      ensureCustomTasks();
+      ensureDay(state.selectedDate);
+      renderChildSettings();
+    }
+
+    function chooseSurprise(surprise) {
+      const child = activeChild();
+      if (!child.surpriseUnlocked) return;
+      child.surpriseUnlocked = false;
+      child.lastSurprise = surprise;
+      addLog(child, {
+        text: `${activeName()}: pasirinkta staigmena - ${surprise}`,
+        delta: 0,
+        kind: "surprise"
+      });
+      save();
+      render();
+      showToast(`Pasirinkta staigmena: ${surprise}.`);
+    }
+
+    function renderRace(todayTotals) {
+      const scene = document.getElementById("oceanScene");
+      const lanes = document.getElementById("oceanLanes");
+      const ids = childIds();
+      const laneHeight = ids.length <= 2 ? 150 : 105;
+      scene.style.height = `${Math.min(525, Math.max(220, ids.length * laneHeight))}px`;
+      scene.style.overflowY = ids.length > 5 ? "auto" : "hidden";
+      lanes.style.gridTemplateRows = `repeat(${ids.length}, minmax(${laneHeight}px, 1fr))`;
+      lanes.innerHTML = "";
+
+      ids.forEach(childId => {
+        const shells = todayTotals[childId] || 0;
+        const profile = childProfile(childId);
+        const max = maxDailyShells(childId);
+        const percent = max > 0 ? Math.min(Math.max(shells / max, 0), 1) * 100 : 0;
+        const lane = document.createElement("div");
+        lane.className = `ocean-lane${childId === state.active ? " active" : ""}`;
+        lane.dataset.child = childId;
+        lane.dataset.color = profile.color || (profile.gender === "girl" ? "pink" : "blue");
+        lane.setAttribute("role", "img");
+        lane.setAttribute("aria-label", `${profile.name} kelias iki perlo: ${shells} iš ${max}`);
+        const safeChildId = escapeHtml(childId);
+        lane.innerHTML = `
+          <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">${escapeHtml(profile.avatar)}</span>${escapeHtml(profile.name)}</span>
+          <div class="guide-bubble" aria-live="polite">
+            <span class="guide-avatar" aria-hidden="true">${escapeHtml(childGuideAvatar(childId))}</span>
+            <span class="guide-text" id="${safeChildId}GuideText">${escapeHtml(childGuideText(childId, shells))}</span>
+          </div>
+          <span class="milestone-badge" id="${safeChildId}MilestoneBadge">⭐ Pusė kelio!</span>
+          <div class="race-track" id="${safeChildId}RaceTrack" aria-hidden="true" style="--progress: ${percent}%">
+            <span class="race-path"></span>
+            <span class="race-progress"></span>
+            <span class="race-crab">🦀</span>
+            <span class="treasure-shell"><span class="pearl"></span></span>
+          </div>
+          <span class="race-score" id="${safeChildId}RaceScore">${shells} / ${max} ${shellWord(max)}</span>
+        `;
+        lanes.appendChild(lane);
+      });
+    }
+
+    function openDay(key, childId = state.active) {
+      state.selectedDate = key;
+      state.active = childId;
+      state.view = "day";
+      save();
+      render();
+    }
+
+    function refreshCalendarDay() {
+      const currentDay = todayKey();
+      if (state.lastCalendarDate === currentDay) return;
+
+      state.selectedDate = currentDay;
+      state.view = "day";
+      state.lastCalendarDate = currentDay;
+      ensureDay(currentDay);
+      save();
+      render();
+      showToast("Prasidėjo nauja diena.");
+    }
+
+    function renderWeek() {
+      const keys = getWeekKeys(state.selectedDate);
+      contentArea.className = "summary-grid";
+      contentArea.innerHTML = "";
+
+      keys.forEach(key => {
+        const card = document.createElement("div");
+        card.className = "summary-card";
+        card.innerHTML = `
+          <strong>${formatDate(key)}</strong>
+          ${childIds().map(childId => {
+            const total = childTotal(childId, [key]);
+            return `<button class="summary-button summary-line" data-child="${escapeHtml(childId)}" type="button"><span>${escapeHtml(childName(childId))}</span><span>${total} ${shellWord(total)}</span></button>`;
+          }).join("")}
+        `;
+        card.querySelectorAll(".summary-button").forEach(button => {
+          button.addEventListener("click", () => openDay(key, button.dataset.child));
+        });
+        contentArea.appendChild(card);
+      });
+    }
+
+    function renderMonth() {
+      const selected = parseDate(state.selectedDate);
+      const first = new Date(selected.getFullYear(), selected.getMonth(), 1);
+      const startDay = first.getDay() || 7;
+      const gridStart = new Date(first);
+      gridStart.setDate(first.getDate() - startDay + 1);
+      const selectedMonth = selected.getMonth();
+
+      contentArea.className = "month-grid";
+      contentArea.innerHTML = "";
+
+      for (let index = 0; index < 42; index += 1) {
+        const date = new Date(gridStart);
+        date.setDate(gridStart.getDate() + index);
+        const key = dateKey(date);
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `month-day${date.getMonth() !== selectedMonth ? " muted" : ""}${key === todayKey() ? " today-mark" : ""}`;
+        card.innerHTML = `
+          <span class="month-date">${date.getDate()}</span>
+          ${childIds().map(childId => {
+            const initial = childName(childId).slice(0, 1);
+            return `<span>${escapeHtml(initial)}: ${childTotal(childId, [key])}</span>`;
+          }).join("")}
+        `;
+        card.title = "Paspauskite, kad matytumėte tos dienos istoriją";
+        card.addEventListener("click", () => openDay(key, state.active));
+        contentArea.appendChild(card);
+      }
+    }
+
+    function render() {
+      ensureDay(state.selectedDate);
+      const weekKeys = getWeekKeys(state.selectedDate);
+      const todayTotals = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, [state.selectedDate])]));
+      const weekTotals = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, weekKeys)]));
+      const child = activeChild();
+      const familyTodayTotal = Object.values(todayTotals).reduce((sum, value) => sum + value, 0);
+      const milestoneChanges = childIds().map(childId => checkChildMilestones(childId));
+      if (milestoneChanges.some(Boolean)) save();
+
+      const displayTitle = state.appSettings.title;
+      document.getElementById("appTitle").textContent = displayTitle;
+      document.getElementById("appSubtitle").textContent = state.appSettings.subtitle;
+      document.title = displayTitle;
+      renderChildren(weekKeys);
+
+      document.querySelectorAll(".view-button").forEach(button => {
+        const isActive = button.dataset.view === state.view;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
+      });
+
+      const editButton = document.getElementById("editTasksButton");
+      editButton.textContent = state.editMode ? "Baigti" : "EDIT";
+      editButton.classList.toggle("danger", state.editMode);
+      editButton.setAttribute("aria-pressed", String(state.editMode));
+      document.getElementById("addTaskButton").style.display = state.editMode && state.view === "day" ? "" : "none";
+
+      document.getElementById("todayText").textContent = state.view === "month"
+        ? formatDate(state.selectedDate, "month")
+        : formatDate(state.selectedDate);
+      document.getElementById("activeName").textContent = activeName();
+      document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
+
+      if (state.view === "day") renderTasks();
+      if (state.view === "week") renderWeek();
+      if (state.view === "month") renderMonth();
+      renderLog();
+      renderReward(familyTodayTotal, weekTotals[state.active] || 0);
+      renderWeekendPrize(weekTotals);
+      renderSurprises();
+      renderPenaltyOptions();
+      renderRace(todayTotals);
+      childIds().forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
+    }
+
+    // User interactions
+    document.querySelectorAll(".child-button").forEach(button => {
+      button.addEventListener("click", () => {
+        state.active = button.dataset.child;
+        save();
+        render();
+      });
+    });
+
+    document.querySelectorAll(".view-button").forEach(button => {
+      button.addEventListener("click", () => {
+        state.view = button.dataset.view;
+        save();
+        render();
+      });
+    });
+
+    document.getElementById("editTasksButton").addEventListener("click", () => {
+      state.editMode = !state.editMode;
+      state.view = "day";
+      ensureCustomTasks();
+      save();
+      render();
+    });
+
+    document.getElementById("addTaskButton").addEventListener("click", addTask);
+    document.getElementById("settingsButton").addEventListener("click", openSettings);
+    document.getElementById("addChildButton").addEventListener("click", addChildFromSettings);
+    document.getElementById("exportDataButton").addEventListener("click", exportData);
+    document.getElementById("settingsCancel").addEventListener("click", closeSettings);
+    document.getElementById("settingsForm").addEventListener("submit", event => {
+      event.preventDefault();
+      saveSettings();
+    });
+    document.getElementById("settingsDialog").addEventListener("click", event => {
+      const removeButton = event.target.closest("[data-remove-child]");
+      if (removeButton) {
+        removeChildFromSettings(removeButton.dataset.removeChild);
+        return;
+      }
+      if (event.target.id === "settingsDialog") closeSettings();
+    });
+
+    document.getElementById("weekendPrizeEditButton").addEventListener("click", openWeekendPrizeEditor);
+    document.getElementById("weekendPrizeEditCancel").addEventListener("click", closeWeekendPrizeEditor);
+    document.getElementById("addWeekendPrizeButton").addEventListener("click", () => {
+      renderWeekendPrizeEditor([...weekendPrizeEditorValues(), ""]);
+      const inputs = document.querySelectorAll("[data-weekend-prize-input]");
+      inputs[inputs.length - 1]?.focus();
+    });
+    document.getElementById("weekendPrizeEditForm").addEventListener("submit", event => {
+      event.preventDefault();
+      saveWeekendPrizeSettings();
+    });
+    document.getElementById("weekendPrizeEditDialog").addEventListener("click", event => {
+      const removeButton = event.target.closest("[data-remove-weekend-prize]");
+      if (removeButton) {
+        const rows = document.querySelectorAll("#weekendPrizeEditorList .prize-editor-row");
+        if (rows.length <= 1) {
+          showToast("Palikite bent vieną prizą.");
+          return;
+        }
+        removeButton.closest(".prize-editor-row").remove();
+        return;
+      }
+      if (event.target.id === "weekendPrizeEditDialog") closeWeekendPrizeEditor();
+    });
+
+    document.getElementById("surpriseEditButton").addEventListener("click", openSurpriseEditor);
+    document.getElementById("surpriseEditCancel").addEventListener("click", closeSurpriseEditor);
+    document.getElementById("addSurpriseButton").addEventListener("click", () => {
+      renderSurpriseEditor([...surpriseEditorValues(), ""]);
+      const inputs = document.querySelectorAll("[data-surprise-input]");
+      inputs[inputs.length - 1]?.focus();
+    });
+    document.getElementById("surpriseEditForm").addEventListener("submit", event => {
+      event.preventDefault();
+      saveSurpriseSettings();
+    });
+    document.getElementById("surpriseEditDialog").addEventListener("click", event => {
+      const removeButton = event.target.closest("[data-remove-surprise]");
+      if (removeButton) {
+        const rows = document.querySelectorAll("#surpriseEditorList .prize-editor-row");
+        if (rows.length <= 1) {
+          showToast("Palikite bent vieną staigmeną.");
+          return;
+        }
+        removeButton.closest(".prize-editor-row").remove();
+        return;
+      }
+      if (event.target.id === "surpriseEditDialog") closeSurpriseEditor();
+    });
+
+    taskEditForm.addEventListener("submit", event => {
+      event.preventDefault();
+      saveEditedTask();
+    });
+
+    document.getElementById("taskEditCancel").addEventListener("click", closeTaskEditor);
+
+    taskEditDialog.addEventListener("click", event => {
+      if (event.target === taskEditDialog) closeTaskEditor();
+    });
+
+    document.addEventListener("keydown", event => {
+      const dialog = document.querySelector(".edit-dialog.open");
+      if (!dialog) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        if (dialog.id === "taskEditDialog") closeTaskEditor();
+        if (dialog.id === "settingsDialog") closeSettings();
+        if (dialog.id === "weekendPrizeEditDialog") closeWeekendPrizeEditor();
+        if (dialog.id === "surpriseEditDialog") closeSurpriseEditor();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const focusable = [...dialog.querySelectorAll("button, input, select, textarea, [tabindex]:not([tabindex='-1'])")]
+        .filter(element => !element.disabled && element.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    document.getElementById("prevDayButton").addEventListener("click", () => {
+      const step = state.view === "month" ? -30 : state.view === "week" ? -7 : -1;
+      state.selectedDate = addDays(state.selectedDate, step);
+      save();
+      render();
+    });
+
+    document.getElementById("todayButton").addEventListener("click", () => {
+      state.selectedDate = todayKey();
+      save();
+      render();
+    });
+
+    document.getElementById("nextDayButton").addEventListener("click", () => {
+      const step = state.view === "month" ? 30 : state.view === "week" ? 7 : 1;
+      state.selectedDate = addDays(state.selectedDate, step);
+      save();
+      render();
+    });
+
+    document.getElementById("bonusButton").addEventListener("click", () => {
+      const child = activeChild();
+      child.surpriseUnlocked = true;
+      addLog(child, {
+        text: `${activeName()}: ypatingas pagyrimas - galima rinktis staigmeną`,
+        delta: 0,
+        kind: "bonusSurprise"
+      });
+      save();
+      render();
+      const praiseMessage = state.active === "olivia"
+        ? "Olivia gavo ypatingą pagyrimą! Undinė atrakino mažą staigmeną."
+        : state.active === "dominik"
+          ? "Dominik gavo ypatingą pagyrimą! Drakonas atrakino mažą staigmeną."
+          : `${activeName()} gavo ypatingą pagyrimą! Jūros draugas atrakino mažą staigmeną.`;
+      setChildGuide(state.active, praiseMessage);
+      save();
+      showToast("Ypatingas pagyrimas atrakino staigmeną!");
+    });
+
+    document.getElementById("chooseSurpriseButton").addEventListener("click", () => {
+      const surprise = document.getElementById("surpriseSelect").value;
+      chooseSurprise(surprise);
+    });
+
+    document.getElementById("weekendPrizeButton").addEventListener("click", chooseWeekendPrize);
+
+    document.getElementById("penaltyButton").addEventListener("click", () => {
+      const child = activeChild();
+      const key = document.getElementById("penaltySelect").value;
+      const penaltyTask = tasksForChild().find(task => task.id === key);
+      if (!penaltyTask) return;
+      const title = taskTitle(penaltyTask);
+      const removed = Math.min(child.shells, penaltyTask.shells);
+
+      if (removed === 0) {
+        addLog(child, {
+          text: `${activeName()}: pasitaisyti - ${title} (0)`,
+          delta: 0,
+          kind: "penalty"
+        });
+        save();
+        render();
+        const emptyPenaltyMessage = state.active === "olivia"
+          ? "Viskas gerai, Olivia. Undinė laukia pirmos kriauklytės ir tiki tavimi."
+          : state.active === "dominik"
+            ? "Viskas gerai, Dominik. Drakonas laukia pirmos kriauklytės ir saugo kelią."
+            : `Viskas gerai, ${activeName()}. Jūros draugas tiki tavimi.`;
+        setChildGuide(state.active, emptyPenaltyMessage);
+        save();
+        showToast("Kriauklyčių dar nėra, todėl nieko neatimta.");
+        return;
+      }
+
+      child.shells -= removed;
+      addLog(child, {
+        text: `${activeName()}: pasitaisyti - ${title} (-${removed})`,
+        delta: -removed,
+        kind: "penalty"
+      });
+      save();
+      render();
+      const penaltyMessage = state.active === "olivia"
+        ? "Nieko tokio, Olivia. Undinė primena: galima pasitaisyti ir vėl rinkti kriauklytes."
+        : state.active === "dominik"
+          ? "Nieko tokio, Dominik. Drakonas primena: galima pasitaisyti ir vėl judėti link perlo."
+          : `Nieko tokio, ${activeName()}. Jūros draugas primena, kad galima pasitaisyti ir judėti pirmyn.`;
+      setChildGuide(state.active, penaltyMessage);
+      save();
+      showToast(`${activeName()} prarado ${removed} ${shellWord(removed)}.`);
+    });
+
+    document.getElementById("resetButton").addEventListener("click", () => {
+      const ok = confirm("Pradėti naują savaitę? Šios savaitės įrašai bus išvalyti.");
+      if (!ok) return;
+      getWeekKeys(state.selectedDate).forEach(key => {
+        delete state.records[key];
+      });
+      ensureDay(state.selectedDate);
+      save();
+      render();
+      showToast("Pradėta nauja savaitė.");
+    });
+
+    render();
+    save();
+    setInterval(autoSave, 30000);
+    setInterval(refreshCalendarDay, 60000);
+    window.addEventListener("pagehide", autoSave);
+    window.addEventListener("focus", refreshCalendarDay);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) autoSave();
+      else refreshCalendarDay();
+    });
+  </script>
+</body>
+</html>
