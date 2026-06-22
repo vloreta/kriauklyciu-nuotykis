@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kraiklyčių nuotykiai</title>
+  <title>Tėvų valdymas - Kraiklyčių nuotykiai</title>
   <style>
     /* Foundation and shared controls */
     :root {
@@ -135,6 +135,147 @@
       font-weight: 900;
       font-size: .92rem;
       box-shadow: 0 8px 18px rgba(31, 54, 71, .1);
+    }
+
+    .parent-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .parent-link {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 2px solid var(--sea);
+      background: #e7f9ff;
+      color: #0c718a;
+      font-weight: 900;
+      padding: 0 14px;
+      text-decoration: none;
+    }
+
+    .parent-page .hero {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .parent-page .title-block {
+      min-height: 0;
+      padding-bottom: 24px;
+    }
+
+    .parent-overview {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .parent-overview a,
+    .parent-overview button {
+      min-height: 72px;
+      border: 1px solid #dceaf1;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink);
+      display: grid;
+      gap: 4px;
+      align-content: center;
+      padding: 10px;
+      text-align: left;
+      text-decoration: none;
+      font: inherit;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(31, 54, 71, .08);
+    }
+
+    .parent-overview strong {
+      font-size: .95rem;
+      color: var(--ink);
+    }
+
+    .parent-overview span {
+      font-size: .76rem;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .parent-page .dashboard {
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      align-items: start;
+    }
+
+    .parent-page .ocean-scene {
+      display: none;
+    }
+
+    .parent-page .children {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      position: sticky;
+      top: 12px;
+    }
+
+    .parent-page .main {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .parent-section-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .parent-section-title h2,
+    .parent-section-title h3 {
+      margin: 0;
+      font-size: 1.08rem;
+      line-height: 1.2;
+    }
+
+    .parent-section-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.35;
+    }
+
+    .parent-page .weekend-prize {
+      width: 100%;
+      min-height: 0;
+    }
+
+    .parent-page .side {
+      gap: 14px;
+    }
+
+    .parent-control-card {
+      padding: 12px;
+      border: 1px solid #dceaf1;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .88);
+      display: grid;
+      gap: 10px;
+    }
+
+    .parent-data-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .parent-page .task-tools {
+      justify-content: flex-start;
     }
 
     .weekend-prize {
@@ -1320,6 +1461,21 @@
         grid-template-columns: 1fr;
       }
 
+      .parent-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .parent-page .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .parent-page .children,
+      .parent-page .main {
+        grid-column: 1;
+        grid-row: auto;
+        position: static;
+      }
+
       .ocean-scene {
         grid-row: 1;
       }
@@ -1363,6 +1519,11 @@
       .app {
         width: calc(100% - 18px);
         padding-top: 10px;
+      }
+
+      .parent-overview,
+      .parent-data-actions {
+        grid-template-columns: 1fr;
       }
 
       .title-block {
@@ -1516,14 +1677,43 @@
     }
   </style>
 </head>
-<body>
+<body class="parent-page">
   <main class="app">
     <section class="hero" aria-label="Krabukų nuotykių pradžia">
       <div class="title-block">
-        <div class="hero-badge">🦀 Dienos kelionė iki perlo</div>
+        <div class="hero-badge">⚙️ Tėvų valdymas</div>
         <h1 id="appTitle">Kraiklyčių nuotykiai</h1>
         <p class="subtitle" id="appSubtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
+        <div class="parent-actions">
+          <a class="parent-link" href="child.html">Atidaryti Vaiko puslapį</a>
+        </div>
       </div>
+      <nav class="parent-overview" aria-label="Tėvų valdymo skyriai">
+        <button type="button" data-open-settings>
+          <strong>Vaikai</strong>
+          <span>Vardai, lytis, spalva, avatarai.</span>
+        </button>
+        <a href="#taskManagement">
+          <strong>Užduotys</strong>
+          <span>Atskiros užduotys ir kriauklytės.</span>
+        </a>
+        <a href="#surpriseManagement">
+          <strong>Staigmenos</strong>
+          <span>Ypatingo pagyrimo sąrašas.</span>
+        </a>
+        <a href="#weekendPrizeManagement">
+          <strong>Savaitės prizas</strong>
+          <span>Rezultatai, lyderis ir prizas.</span>
+        </a>
+        <a href="#historyManagement">
+          <strong>Istorija</strong>
+          <span>Diena, savaitė ir mėnuo.</span>
+        </a>
+        <a href="#dataManagement">
+          <strong>Duomenys</strong>
+          <span>Eksportas, importas ir kopijos.</span>
+        </a>
+      </nav>
       <div class="weekend-prize" aria-label="Didysis savaitgalio prizas">
         <button class="weekend-edit-button" id="weekendPrizeEditButton" type="button">Keisti</button>
         <div class="weekend-icons" aria-hidden="true">
@@ -1545,6 +1735,13 @@
 
     <section class="dashboard">
       <aside class="panel children" aria-label="Vaikai">
+        <div class="parent-section-title">
+          <div>
+            <h2>Vaikų valdymas</h2>
+            <p>Pasirinkite vaiką arba atidarykite nustatymus vardams, lyčiai, spalvai ir avatarui.</p>
+          </div>
+          <button class="tool-button" type="button" data-open-settings>Tvarkyti</button>
+        </div>
         <div id="childrenList"></div>
         <div class="progress-box">
           <div class="progress-row">
@@ -1554,7 +1751,7 @@
           <div class="bar" aria-hidden="true"><div class="bar-fill" id="familyBar"></div></div>
         </div>
         <div class="side" aria-label="Staigmenos ir istorija">
-          <div class="reward">
+          <div class="reward" id="surpriseManagement">
             <div class="reward-heading">
               <strong id="surpriseTitle">Staigmena už ypatingą pagyrimą</strong>
               <button class="reward-edit-button" id="surpriseEditButton" type="button">Keisti</button>
@@ -1566,8 +1763,16 @@
               <button class="action" id="chooseSurpriseButton" type="button">Pasirinkti staigmeną</button>
             </div>
           </div>
-          <button class="action secondary reset-week" id="resetButton" type="button">Pradėti naują savaitę</button>
-          <div class="penalty-box">
+          <div class="parent-control-card">
+            <div class="parent-section-title">
+              <div>
+                <h3>Sisteminiai veiksmai</h3>
+                <p>Naujos savaitės pradžia naudojama tik tėvų puslapyje.</p>
+              </div>
+            </div>
+            <button class="action secondary reset-week" id="resetButton" type="button">Pradėti naują savaitę</button>
+          </div>
+          <div class="penalty-box" id="penaltyManagement">
             <label for="penaltySelect">Neįvykdyta / reikia pasitaisyti</label>
             <div class="penalty-controls">
               <select id="penaltySelect">
@@ -1575,7 +1780,20 @@
               <button class="action warning" id="penaltyButton" type="button">Atimti</button>
             </div>
           </div>
-          <div>
+          <div class="parent-control-card" id="dataManagement">
+            <div class="parent-section-title">
+              <div>
+                <h3>Duomenų saugumas</h3>
+                <p>Eksportuokite kopiją arba importuokite anksčiau išsaugotą JSON failą.</p>
+              </div>
+            </div>
+            <div class="parent-data-actions">
+              <button class="tool-button" id="parentExportDataButton" type="button">Eksportuoti duomenis</button>
+              <button class="tool-button" id="importDataButton" type="button">Importuoti duomenis</button>
+            </div>
+            <input id="importDataInput" type="file" accept="application/json,.json" hidden>
+          </div>
+          <div class="parent-control-card" id="historyManagement">
             <h2 id="logTitle">Šiandien</h2>
             <div class="log" id="log"></div>
           </div>
@@ -1587,6 +1805,12 @@
       </section>
 
       <section class="panel main">
+        <div class="parent-section-title" id="taskManagement">
+          <div>
+            <h2>Užduočių, istorijos ir statistikos valdymas</h2>
+            <p>Pasirinkite vaiką, tvarkykite jo užduotis ir peržiūrėkite dieną, savaitę arba mėnesį.</p>
+          </div>
+        </div>
         <div class="section-head">
           <div>
             <h2 id="activeName">Olivia</h2>
@@ -1649,6 +1873,7 @@
       <div class="settings-grid" id="childSettingsList"></div>
       <button class="tool-button" id="addChildButton" type="button">+ Pridėti vaiką</button>
       <button class="tool-button" id="exportDataButton" type="button">Eksportuoti duomenis</button>
+      <button class="tool-button" id="settingsImportDataButton" type="button">Importuoti duomenis</button>
       <div class="edit-actions">
         <button class="action" type="submit">Išsaugoti</button>
         <button class="action secondary" id="settingsCancel" type="button">Atšaukti</button>
@@ -1929,6 +2154,42 @@
       showToast("Duomenų kopija paruošta.");
     }
 
+    function importDataFromFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        try {
+          const parsed = JSON.parse(String(reader.result || "{}"));
+          const importedState = parsed?.format === backupFormat ? parsed.data : parsed;
+          if (!isRestorableState(importedState)) {
+            alert("Šis failas netinka: nerasta programėlės duomenų struktūros.");
+            return;
+          }
+
+          const ok = confirm("Importuoti duomenis? Dabartinė būsena prieš importą bus išsaugota atsarginėje kopijoje.");
+          if (!ok) return;
+
+          const beforeImportKey = `${backupKeyPrefix}${todayKey()}-before-import-${Date.now()}`;
+          localStorage.setItem(beforeImportKey, JSON.stringify(createBackupEnvelope(state, "before-import")));
+
+          const normalized = normalizeState(importedState);
+          Object.keys(state).forEach(key => delete state[key]);
+          Object.assign(state, normalized);
+          state.editMode = false;
+          save();
+          render();
+          showToast("Duomenys importuoti.");
+        } catch (error) {
+          alert("Nepavyko importuoti duomenų. Patikrinkite JSON failą.");
+        }
+      });
+      reader.readAsText(file, "utf-8");
+    }
+
+    function openImportPicker() {
+      document.getElementById("importDataInput")?.click();
+    }
+
     function mergeSavedRecords(primary, legacy) {
       const merged = primary ? { ...primary, records: { ...(primary.records || {}) } } : { ...initialState };
       if (!legacy?.records) return merged;
@@ -1956,6 +2217,9 @@
     const state = normalizeState(saved);
     let lastSavedSnapshot = JSON.stringify(state);
     ensureDailyBackup(state);
+    if (document.body.classList.contains("parent-page")) {
+      state.editMode = true;
+    }
 
     const contentArea = document.getElementById("contentArea");
     const log = document.getElementById("log");
@@ -3230,8 +3494,18 @@
 
     document.getElementById("addTaskButton").addEventListener("click", addTask);
     document.getElementById("settingsButton").addEventListener("click", openSettings);
+    document.querySelectorAll("[data-open-settings]").forEach(button => {
+      button.addEventListener("click", openSettings);
+    });
     document.getElementById("addChildButton").addEventListener("click", addChildFromSettings);
     document.getElementById("exportDataButton").addEventListener("click", exportData);
+    document.getElementById("parentExportDataButton")?.addEventListener("click", exportData);
+    document.getElementById("importDataButton")?.addEventListener("click", openImportPicker);
+    document.getElementById("settingsImportDataButton")?.addEventListener("click", openImportPicker);
+    document.getElementById("importDataInput")?.addEventListener("change", event => {
+      importDataFromFile(event.target.files?.[0]);
+      event.target.value = "";
+    });
     document.getElementById("settingsCancel").addEventListener("click", closeSettings);
     document.getElementById("settingsForm").addEventListener("submit", event => {
       event.preventDefault();
