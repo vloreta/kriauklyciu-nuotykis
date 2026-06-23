@@ -2539,6 +2539,19 @@
       return typeof item === "string" ? item : item.text;
     }
 
+    function taskWasDoneOnSelectedDay(child, task) {
+      if (child.done?.[task.id]) return true;
+
+      const latestTaskEntry = (child.log || []).find(item => typeof item !== "string" && item.taskId === task.id);
+      if (latestTaskEntry) return latestTaskEntry.kind === "complete";
+
+      const title = taskTitle(task).toLowerCase();
+      return (child.log || []).some(item => {
+        const text = logText(item).toLowerCase();
+        return text.includes(title) && text.includes(`+${task.shells}`);
+      });
+    }
+
     function undoLogItem(item) {
       if (typeof item === "string" || item.undone || item.kind === "undoNotice") return;
 
@@ -2687,7 +2700,7 @@
       const isToday = state.selectedDate === todayKey();
       const visibleTasks = isToday
         ? tasksForChild()
-        : tasksForChild().filter(task => child.done[task.id]);
+        : tasksForChild().filter(task => taskWasDoneOnSelectedDay(child, task));
 
       if (!visibleTasks.length) {
         contentArea.className = "summary-grid";
@@ -2700,7 +2713,8 @@
         const safeTaskId = escapeHtml(task.id);
         const button = document.createElement(state.editMode || !isToday ? "div" : "button");
         if (!state.editMode && isToday) button.type = "button";
-        button.className = `task${child.done[task.id] ? " done" : ""}${state.editMode ? " editing" : ""}`;
+        const isDone = isToday ? child.done[task.id] : taskWasDoneOnSelectedDay(child, task);
+        button.className = `task${isDone ? " done" : ""}${state.editMode ? " editing" : ""}`;
         button.innerHTML = `
           <span class="task-icon" aria-hidden="true">${escapeHtml(task.icon)}</span>
           <span>
