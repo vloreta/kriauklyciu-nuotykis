@@ -834,6 +834,11 @@
       background: #ecfff4;
     }
 
+    .task-grid.girl .task,
+    .task-grid.pink .task {
+      grid-template-columns: 66px 1fr;
+    }
+
     .task-icon {
       width: 52px;
       height: 52px;
@@ -844,12 +849,26 @@
       font-size: 1.9rem;
     }
 
+    .task-grid.girl .task-icon,
+    .task-grid.pink .task-icon {
+      width: 66px;
+      height: 66px;
+      background: #fff0f7;
+      font-size: 2.65rem;
+    }
+
     .task-title {
       font-weight: 800;
       display: block;
       margin-bottom: 5px;
       line-height: 1.28;
       overflow-wrap: anywhere;
+    }
+
+    .task-grid.girl .task-title,
+    .task-grid.pink .task-title {
+      font-size: .94rem;
+      line-height: 1.22;
     }
 
     .task-shells {
@@ -1835,30 +1854,30 @@
     // Default content and application state
     const defaultChildTasks = {
       olivia: [
-        { id: "oliSleepAlone", icon: "🛏️", title: "Pati užmigau be kitų", shells: 3 },
-        { id: "oliWakeUp", icon: "🌞", title: "Kai pažadino, tuoj pat pati atsikėliau", shells: 3 },
+        { id: "oliSleepAlone", icon: "🌙", title: "Pati užmigau be kitų", shells: 3 },
+        { id: "oliWakeUp", icon: "🌅", title: "Kai pažadino, tuoj pat pati atsikėliau", shells: 3 },
         { id: "oliBed", icon: "🛌", title: "Pati pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
-        { id: "oliGettingReady", icon: "🎒", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
+        { id: "oliGettingReady", icon: "🎀", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
         { id: "oliToKindergarten", icon: "🏫", title: "Gražiai elgiausi einant į darželį", shells: 1 },
-        { id: "oliKindergarten", icon: "🌈", title: "Gražiai elgiausi darželyje", shells: 1 },
-        { id: "oliFromKindergarten", icon: "🌤️", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
-        { id: "oliBagShoesJacket", icon: "🧥", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
-        { id: "oliHands", icon: "🧼", title: "Pati nusiploviau rankas", shells: 1 },
-        { id: "oliTable", icon: "🍴", title: "Padėjau padengti stalą", shells: 1 },
-        { id: "oliMeal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 5 },
-        { id: "oliThanksMeal", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
+        { id: "oliKindergarten", icon: "🦄", title: "Gražiai elgiausi darželyje", shells: 1 },
+        { id: "oliFromKindergarten", icon: "🌸", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
+        { id: "oliBagShoesJacket", icon: "👗", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+        { id: "oliHands", icon: "🫧", title: "Pati nusiploviau rankas", shells: 1 },
+        { id: "oliTable", icon: "🍽️", title: "Padėjau padengti stalą", shells: 1 },
+        { id: "oliMeal", icon: "🫖", title: "Gražiai sėdėjau valgant", shells: 5 },
+        { id: "oliThanksMeal", icon: "💝", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
         { id: "oliDishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
         { id: "oliNoHurtBrother", icon: "🕊️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau brolio", shells: 5 },
         { id: "oliPlayBrother", icon: "🧩", title: "Gražiai žaidžiau su broliu", shells: 2 },
         { id: "oliNiceWordsBrother", icon: "💛", title: "Pasakiau broliui kažką malonaus", shells: 2 },
         { id: "oliMom", icon: "🌷", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
-        { id: "oliQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
-        { id: "oliOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
-        { id: "oliHelp", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+        { id: "oliQuietVoice", icon: "🧚", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
+        { id: "oliOutsidePlay", icon: "🛼", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
+        { id: "oliHelp", icon: "🤍", title: "Padėjau kitam", shells: 2 },
         { id: "oliThanksNeeded", icon: "💬", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
-        { id: "oliSorry", icon: "🤍", title: "Atsiprašiau, kai reikėjo", shells: 2 },
-        { id: "oliChooseActivity", icon: "🖍️", title: "Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
-        { id: "oliPraise", icon: "🏅", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
+        { id: "oliSorry", icon: "💗", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+        { id: "oliChooseActivity", icon: "🎨", title: "Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
+        { id: "oliPraise", icon: "🏆", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
         { id: "oliSpeech", icon: "🗣️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
         { id: "oliToysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 }
       ],
@@ -2337,6 +2356,14 @@
       return childGender(childId) === "boy" ? defaultChildTasks.dominik : defaultChildTasks.olivia;
     }
 
+    function syncTaskIcons(childId) {
+      const defaultTasks = defaultTasksForChild(childId);
+      const iconsById = Object.fromEntries(defaultTasks.map(task => [task.id, task.icon]));
+      (state.customTasks?.[childId] || []).forEach(task => {
+        if (iconsById[task.id]) task.icon = iconsById[task.id];
+      });
+    }
+
     function tasksWithUniqueIds(childId, tasks) {
       if (defaultChildTasks[childId]) return cloneTasks(tasks);
       return tasks.map(task => ({ ...task, id: `${childId}_${task.id}` }));
@@ -2365,6 +2392,7 @@
         if (!state.customTasks[childId]) {
           state.customTasks[childId] = tasksWithUniqueIds(childId, defaultTasksForChild(childId));
         }
+        syncTaskIcons(childId);
       });
       return state.customTasks;
     }
