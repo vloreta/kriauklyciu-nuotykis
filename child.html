@@ -836,7 +836,7 @@
 
     .task-grid.girl .task,
     .task-grid.pink .task {
-      grid-template-columns: 66px 1fr;
+      grid-template-columns: 78px 1fr;
     }
 
     .task-icon {
@@ -851,10 +851,10 @@
 
     .task-grid.girl .task-icon,
     .task-grid.pink .task-icon {
-      width: 66px;
-      height: 66px;
+      width: 78px;
+      height: 78px;
       background: #fff0f7;
-      font-size: 2.65rem;
+      font-size: 3.15rem;
     }
 
     .task-title {
@@ -867,8 +867,8 @@
 
     .task-grid.girl .task-title,
     .task-grid.pink .task-title {
-      font-size: .94rem;
-      line-height: 1.22;
+      font-size: .88rem;
+      line-height: 1.18;
     }
 
     .task-shells {
@@ -1878,7 +1878,7 @@
         { id: "oliSorry", icon: "💗", title: "Atsiprašiau, kai reikėjo", shells: 2 },
         { id: "oliChooseActivity", icon: "🎨", title: "Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
         { id: "oliPraise", icon: "🏆", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
-        { id: "oliSpeech", icon: "🗣️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
+        { id: "oliSpeech", icon: "🎤", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
         { id: "oliToysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 }
       ],
       dominik: [
@@ -2356,11 +2356,46 @@
       return childGender(childId) === "boy" ? defaultChildTasks.dominik : defaultChildTasks.olivia;
     }
 
+    function iconByOliviaTaskText(task, fallbackIcon) {
+      const text = String(task?.title || "").toLowerCase();
+      const has = (...words) => words.some(word => text.includes(word));
+      if (has("užmig", "mieg")) return "🌙";
+      if (has("atsikėl", "pažadino")) return "🌅";
+      if (has("lov", "pižam")) return "🛌";
+      if (has("apsireng", "rūb", "rub", "suknel", "striuk", "bat", "kuprin")) return "👗";
+      if (has("ruošiantis")) return "🎀";
+      if (has("einant į daržel", "i daržel")) return "🏫";
+      if (has("grįžtant", "griztant", "iš daržel", "is daržel")) return "🌸";
+      if (has("darželyje")) return "🦄";
+      if (has("rank")) return "🫧";
+      if (has("stal")) return "🍽️";
+      if (has("valg")) return "🫖";
+      if (has("ačiū", "aciu")) return "💝";
+      if (has("ind")) return "🥣";
+      if (has("neerzin", "nemuš", "nemus", "nestumd", "neužgav", "neuzgav")) return "🕊️";
+      if (has("žaid", "zaid")) return "🧩";
+      if (has("broliui")) return "💛";
+      if (has("mamyt")) return "🌷";
+      if (has("tyliau", "ramiau")) return "🧚";
+      if (has("pasivaik", "aikštel", "aikstel", "dvira")) return "🛼";
+      if (has("padėjau kitam", "padejau kitam")) return "🤍";
+      if (has("atsipraš", "atsipras")) return "💗";
+      if (has("pieš", "pies", "skaity", "raš", "ras", "lipd")) return "🎨";
+      if (has("pagyr")) return "🏆";
+      if (has("kalbos", "tarti", "gars")) return "🎤";
+      if (has("žaisl", "zaisl", "knygut")) return "🧸";
+      return fallbackIcon || "🌸";
+    }
+
     function syncTaskIcons(childId) {
       const defaultTasks = defaultTasksForChild(childId);
       const iconsById = Object.fromEntries(defaultTasks.map(task => [task.id, task.icon]));
       (state.customTasks?.[childId] || []).forEach(task => {
-        if (iconsById[task.id]) task.icon = iconsById[task.id];
+        if (childGender(childId) === "girl") {
+          task.icon = iconByOliviaTaskText(task, iconsById[task.id]);
+        } else if (iconsById[task.id]) {
+          task.icon = iconsById[task.id];
+        }
       });
     }
 
