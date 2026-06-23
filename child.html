@@ -838,6 +838,64 @@
       line-height: 1.25;
     }
 
+    .child-calendar {
+      margin-top: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .child-calendar h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .child-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .child-calendar-day {
+      min-height: 132px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: #fffdf4;
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--ink);
+      box-shadow: 0 2px 8px rgba(31, 54, 71, .04);
+    }
+
+    .child-calendar-day.active {
+      border-color: var(--sea);
+      box-shadow: 0 0 0 2px rgba(18, 150, 179, .14);
+    }
+
+    .child-calendar-date {
+      display: block;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .child-calendar-total {
+      display: block;
+      color: var(--sea);
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .child-calendar-tasks {
+      display: grid;
+      gap: 5px;
+      font-size: .9rem;
+      color: var(--muted);
+    }
+
+    .child-calendar-task {
+      overflow-wrap: anywhere;
+    }
+
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1667,6 +1725,10 @@
         </div>
         <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
         <div id="contentArea"></div>
+        <section class="child-calendar" aria-labelledby="childCalendarTitle">
+          <h3 id="childCalendarTitle">Savaitės kalendorius</h3>
+          <div class="child-calendar-grid" id="childTaskCalendar"></div>
+        </section>
       </section>
 
     </section>
@@ -2666,6 +2728,39 @@
       });
     }
 
+    function renderChildTaskCalendar() {
+      const calendar = document.getElementById("childTaskCalendar");
+      if (!calendar) return;
+
+      const keys = getWeekKeys(state.selectedDate);
+      const childId = state.active;
+      const tasks = tasksForChild(childId);
+      calendar.innerHTML = "";
+
+      keys.forEach(key => {
+        const childDay = ensureDay(key)[childId] || { shells: 0, done: {} };
+        const doneTasks = tasks.filter(task => childDay.done?.[task.id]);
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `child-calendar-day${key === state.selectedDate ? " active" : ""}`;
+        card.innerHTML = `
+          <span class="child-calendar-date">${escapeHtml(formatDate(key))}</span>
+          <span class="child-calendar-total">${childDay.shells || 0} ${shellWord(childDay.shells || 0)}</span>
+          <span class="child-calendar-tasks">
+            ${doneTasks.length
+              ? doneTasks.slice(0, 3).map(task => `<span class="child-calendar-task">${escapeHtml(task.icon)} ${escapeHtml(taskTitle(task, childId))}</span>`).join("")
+              : `<span class="child-calendar-task">Dar laukia užduotys</span>`}
+          </span>
+        `;
+        card.addEventListener("click", () => {
+          state.selectedDate = key;
+          state.view = "day";
+          render();
+        });
+        calendar.appendChild(card);
+      });
+    }
+
     function renderLog() {
       const child = activeChild();
       log.innerHTML = "";
@@ -3256,6 +3351,7 @@
       if (state.view === "day") renderTasks();
       if (state.view === "week") renderWeek();
       if (state.view === "month") renderMonth();
+      renderChildTaskCalendar();
       renderLog();
       renderReward(familyTodayTotal, weekTotals[state.active] || 0);
       renderWeekendPrize(weekTotals);
