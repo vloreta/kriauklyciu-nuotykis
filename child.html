@@ -1769,7 +1769,6 @@
         <div class="workspace-toolbar">
           <div class="view-tabs" role="tablist" aria-label="Laikotarpio pasirinkimas">
             <button class="view-button active" data-view="day" type="button" role="tab" aria-selected="true">Diena</button>
-            <button class="view-button" data-view="week" type="button" role="tab" aria-selected="false">Savaitė</button>
             <button class="view-button" data-view="month" type="button" role="tab" aria-selected="false">Mėnuo</button>
           </div>
           <div class="task-tools">
@@ -2839,22 +2838,14 @@
       contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
       contentArea.innerHTML = "";
       const isToday = state.selectedDate === todayKey();
-      const visibleTasks = isToday
-        ? tasksForChild()
-        : tasksForChild().filter(task => taskWasDoneOnSelectedDay(child, task));
-
-      if (!visibleTasks.length) {
-        contentArea.className = "summary-grid";
-        contentArea.innerHTML = `<div class="summary-card">Šią dieną pažymėtų užduočių nėra.</div>`;
-        return;
-      }
+      const visibleTasks = tasksForChild();
 
       visibleTasks.forEach(task => {
         const title = taskTitle(task);
         const safeTaskId = escapeHtml(task.id);
-        const button = document.createElement(state.editMode || !isToday ? "div" : "button");
-        if (!state.editMode && isToday) button.type = "button";
-        const isDone = isToday ? child.done[task.id] : taskWasDoneOnSelectedDay(child, task);
+        const button = document.createElement(state.editMode ? "div" : "button");
+        if (!state.editMode) button.type = "button";
+        const isDone = child.done[task.id] || taskWasDoneOnSelectedDay(child, task);
         button.className = `task${isDone ? " done" : ""}${state.editMode ? " editing" : ""}`;
         button.innerHTML = `
           <span class="task-icon" aria-hidden="true">${escapeHtml(task.icon)}</span>
@@ -2869,7 +2860,7 @@
             </span>
           ` : ""}
         `;
-        if (!state.editMode && isToday) {
+        if (!state.editMode) {
           button.addEventListener("click", () => completeTask(task));
         }
         button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
@@ -3438,6 +3429,7 @@
     }
 
     function render() {
+      if (state.view === "week") state.view = "day";
       ensureDay(state.selectedDate);
       const weekKeys = getWeekKeys(state.selectedDate);
       const todayTotals = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, [state.selectedDate])]));
@@ -3472,7 +3464,6 @@
       document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
 
       if (state.view === "day") renderTasks();
-      if (state.view === "week") renderWeek();
       if (state.view === "month") renderMonth();
       renderLog();
       renderReward(familyTodayTotal, weekTotals[state.active] || 0);
@@ -3635,7 +3626,7 @@
     });
 
     document.getElementById("prevDayButton").addEventListener("click", () => {
-      const step = state.view === "month" ? -30 : state.view === "week" ? -7 : -1;
+      const step = state.view === "month" ? -30 : -1;
       state.selectedDate = addDays(state.selectedDate, step);
       save();
       render();
@@ -3648,7 +3639,7 @@
     });
 
     document.getElementById("nextDayButton").addEventListener("click", () => {
-      const step = state.view === "month" ? 30 : state.view === "week" ? 7 : 1;
+      const step = state.view === "month" ? 30 : 1;
       state.selectedDate = addDays(state.selectedDate, step);
       save();
       render();
