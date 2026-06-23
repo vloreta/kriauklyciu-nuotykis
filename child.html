@@ -2355,8 +2355,7 @@
         save();
       }
       if (
-        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia) ||
-        taskFullSignature(state.customTasks.olivia) !== taskFullSignature(defaultChildTasks.olivia)
+        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia)
       ) {
         state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
         state.taskSchemaVersion = 4;
