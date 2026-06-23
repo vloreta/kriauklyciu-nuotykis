@@ -973,19 +973,6 @@
       font-weight: 900;
     }
 
-    .calendar-efforts {
-      display: grid;
-      gap: 4px;
-      margin-top: 6px;
-      font-size: .78rem;
-      line-height: 1.25;
-      color: var(--muted);
-    }
-
-    .calendar-effort {
-      overflow-wrap: anywhere;
-    }
-
     .side {
       padding-top: 4px;
       display: grid;
@@ -2697,11 +2684,22 @@
       const child = activeChild();
       contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
       contentArea.innerHTML = "";
-      tasksForChild().forEach(task => {
+      const isToday = state.selectedDate === todayKey();
+      const visibleTasks = isToday
+        ? tasksForChild()
+        : tasksForChild().filter(task => child.done[task.id]);
+
+      if (!visibleTasks.length) {
+        contentArea.className = "summary-grid";
+        contentArea.innerHTML = `<div class="summary-card">Šią dieną pažymėtų užduočių nėra.</div>`;
+        return;
+      }
+
+      visibleTasks.forEach(task => {
         const title = taskTitle(task);
         const safeTaskId = escapeHtml(task.id);
-        const button = document.createElement(state.editMode ? "div" : "button");
-        if (!state.editMode) button.type = "button";
+        const button = document.createElement(state.editMode || !isToday ? "div" : "button");
+        if (!state.editMode && isToday) button.type = "button";
         button.className = `task${child.done[task.id] ? " done" : ""}${state.editMode ? " editing" : ""}`;
         button.innerHTML = `
           <span class="task-icon" aria-hidden="true">${escapeHtml(task.icon)}</span>
@@ -2709,14 +2707,14 @@
             <span class="task-title">${escapeHtml(title)}</span>
             <span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span>
           </span>
-          ${state.editMode ? `
+          ${state.editMode && isToday ? `
             <span class="task-edit-actions">
               <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
               <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
             </span>
           ` : ""}
         `;
-        if (!state.editMode) {
+        if (!state.editMode && isToday) {
           button.addEventListener("click", () => completeTask(task));
         }
         button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
@@ -2757,12 +2755,6 @@
 
     function childTotal(childId, keys) {
       return keys.reduce((sum, key) => sum + (ensureDay(key)[childId]?.shells || 0), 0);
-    }
-
-    function calendarEfforts(key, limit = 4) {
-      return childIds()
-        .flatMap(childId => (ensureDay(key)[childId]?.log || []).map(item => `${childName(childId)}: ${logText(item)}`))
-        .slice(0, limit);
     }
 
     function renderWeekendPrize(weekScores) {
@@ -3251,9 +3243,6 @@
             const total = childTotal(childId, [key]);
             return `<button class="summary-button summary-line" data-child="${escapeHtml(childId)}" type="button"><span>${escapeHtml(childName(childId))}</span><span>${total} ${shellWord(total)}</span></button>`;
           }).join("")}
-          <div class="calendar-efforts">
-            ${calendarEfforts(key, 5).map(item => `<span class="calendar-effort">${escapeHtml(item)}</span>`).join("") || `<span class="calendar-effort">Dar nėra pažymėtų pastangų.</span>`}
-          </div>
         `;
         card.querySelectorAll(".summary-button").forEach(button => {
           button.addEventListener("click", () => openDay(key, button.dataset.child));
@@ -3286,9 +3275,6 @@
             const initial = childName(childId).slice(0, 1);
             return `<span>${escapeHtml(initial)}: ${childTotal(childId, [key])}</span>`;
           }).join("")}
-          <span class="calendar-efforts">
-            ${calendarEfforts(key, 2).map(item => `<span class="calendar-effort">${escapeHtml(item)}</span>`).join("") || `<span class="calendar-effort">-</span>`}
-          </span>
         `;
         card.title = "Paspauskite, kad matytumėte tos dienos istoriją";
         card.addEventListener("click", () => openDay(key, state.active));
