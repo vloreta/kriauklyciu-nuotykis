@@ -955,7 +955,9 @@
     }
 
     .task-grid.girl .task,
-    .task-grid.pink .task {
+    .task-grid.pink .task,
+    .task-grid.boy .task,
+    .task-grid.blue .task {
       grid-template-columns: 86px 1fr;
     }
 
@@ -978,6 +980,15 @@
       font-size: 3.35rem;
     }
 
+    .task-grid.boy .task-icon,
+    .task-grid.blue .task-icon {
+      width: 86px;
+      height: 86px;
+      background: linear-gradient(145deg, #f4fbff, #dff3ff);
+      box-shadow: inset 0 0 0 1px rgba(143, 205, 236, .42), 0 8px 18px rgba(12, 113, 138, .14);
+      font-size: 3.35rem;
+    }
+
     .task-title {
       font-weight: 800;
       display: block;
@@ -987,7 +998,9 @@
     }
 
     .task-grid.girl .task-title,
-    .task-grid.pink .task-title {
+    .task-grid.pink .task-title,
+    .task-grid.boy .task-title,
+    .task-grid.blue .task-title {
       font-size: .88rem;
       line-height: 1.18;
     }
@@ -1973,31 +1986,31 @@
         { id: "oliToysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 }
       ],
       dominik: [
-        { id: "domSleepAlone", icon: "🛏️", title: "Pats užmigau be kitų", shells: 3 },
+        { id: "domSleepAlone", icon: "🌌", title: "Pats užmigau be kitų", shells: 3 },
         { id: "domWakeUp", icon: "🌞", title: "Kai pažadino, tuoj pat pats atsikėliau", shells: 3 },
-        { id: "domBed", icon: "🛌", title: "Pats pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
-        { id: "domGettingReady", icon: "🎒", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
-        { id: "domToKindergarten", icon: "🏫", title: "Gražiai elgiausi einant į darželį", shells: 1 },
-        { id: "domKindergarten", icon: "🌈", title: "Gražiai elgiausi darželyje", shells: 1 },
+        { id: "domBed", icon: "🛏️", title: "Pats pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
+        { id: "domGettingReady", icon: "🧢", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
+        { id: "domToKindergarten", icon: "🚶‍♂️", title: "Gražiai elgiausi einant į darželį", shells: 1 },
+        { id: "domKindergarten", icon: "🏫", title: "Gražiai elgiausi darželyje", shells: 1 },
         { id: "domFromKindergarten", icon: "🌤️", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
-        { id: "domBagShoesJacket", icon: "🧥", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+        { id: "domBagShoesJacket", icon: "🎒", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
         { id: "domHands", icon: "🧼", title: "Pats nusiploviau rankas", shells: 1 },
-        { id: "domTable", icon: "🍴", title: "Padėjau padengti stalą", shells: 1 },
-        { id: "domMeal", icon: "🍽️", title: "Gražiai sėdėjau valgant", shells: 5 },
+        { id: "domTable", icon: "🍽️", title: "Padėjau padengti stalą", shells: 1 },
+        { id: "domMeal", icon: "🍝", title: "Gražiai sėdėjau valgant", shells: 5 },
         { id: "domThanksMeal", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
-        { id: "domDishes", icon: "🥣", title: "Nunešiau indus po valgio", shells: 1 },
-        { id: "domNoHurtSister", icon: "🕊️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau sesės", shells: 5 },
-        { id: "domPlaySister", icon: "🧩", title: "Gražiai žaidžiau su sese", shells: 2 },
-        { id: "domNiceWordsSister", icon: "💛", title: "Pasakiau sesei kažką malonaus", shells: 2 },
-        { id: "domMom", icon: "🌷", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
+        { id: "domDishes", icon: "🧽", title: "Nunešiau indus po valgio", shells: 1 },
+        { id: "domNoHurtSister", icon: "🛡️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau sesės", shells: 5 },
+        { id: "domPlaySister", icon: "🎲", title: "Gražiai žaidžiau su sese", shells: 2 },
+        { id: "domNiceWordsSister", icon: "💬", title: "Pasakiau sesei kažką malonaus", shells: 2 },
+        { id: "domMom", icon: "👩‍👦", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
         { id: "domQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
         { id: "domOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
         { id: "domHelp", icon: "🤝", title: "Padėjau kitam", shells: 2 },
-        { id: "domThanksNeeded", icon: "💬", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
-        { id: "domSorry", icon: "🤍", title: "Atsiprašiau, kai reikėjo", shells: 2 },
-        { id: "domChooseActivity", icon: "🖍️", title: "Pats ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
+        { id: "domThanksNeeded", icon: "🙌", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
+        { id: "domSorry", icon: "💙", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+        { id: "domChooseActivity", icon: "🧱", title: "Pats ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
         { id: "domPraise", icon: "🏅", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
-        { id: "domSpeech", icon: "🗣️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
+        { id: "domSpeech", icon: "🎙️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
         { id: "domToysBooks", icon: "🧸", title: "Pats susidėjau savo žaislus ir knygutes", shells: 2 }
       ]
     };
@@ -2512,12 +2525,47 @@
       return fallbackIcon || "🌈";
     }
 
+    function iconByDominikTaskText(task, fallbackIcon) {
+      const text = String(task?.title || "").toLowerCase();
+      const has = (...words) => words.some(word => text.includes(word));
+      if (has("užmig", "mieg")) return "🌌";
+      if (has("atsikėl", "pažadino")) return "🌞";
+      if (has("lov", "pižam")) return "🛏️";
+      if (has("ruošiantis")) return "🧢";
+      if (has("einant į daržel", "i daržel")) return "🚶‍♂️";
+      if (has("grįžtant", "griztant", "iš daržel", "is daržel")) return "🌤️";
+      if (has("darželyje")) return "🏫";
+      if (has("kuprin", "bat", "striuk", "rūb", "rub")) return "🎒";
+      if (has("rank")) return "🧼";
+      if (has("ačiū", "aciu") && has("pavalg")) return "🙏";
+      if (has("ačiū", "aciu")) return "🙌";
+      if (has("ind")) return "🧽";
+      if (has("stal")) return "🍽️";
+      if (has("valg")) return "🍝";
+      if (has("pasisveikin", "atsisveikin", "sveikin")) return "👋";
+      if (has("neerzin", "nemuš", "nemus", "nestumd", "neužgav", "neuzgav")) return "🛡️";
+      if (has("dvira", "pasivaik", "aikštel", "aikstel")) return "🚲";
+      if (has("žaid", "zaid")) return "🎲";
+      if (has("sesei")) return "💬";
+      if (has("mamyt")) return "👩‍👦";
+      if (has("tyliau", "ramiau")) return "🤫";
+      if (has("padėjau kitam", "padejau kitam")) return "🤝";
+      if (has("atsipraš", "atsipras")) return "💙";
+      if (has("pieš", "pies", "skaity", "raš", "ras", "lipd")) return "🧱";
+      if (has("pagyr")) return "🏅";
+      if (has("kalbos", "tarti", "gars")) return "🎙️";
+      if (has("žaisl", "zaisl", "knygut")) return "🧸";
+      return fallbackIcon || "🚲";
+    }
+
     function syncTaskIcons(childId) {
       const defaultTasks = defaultTasksForChild(childId);
       const iconsById = Object.fromEntries(defaultTasks.map(task => [task.id, task.icon]));
       (state.customTasks?.[childId] || []).forEach(task => {
         if (childGender(childId) === "girl") {
           task.icon = iconByOliviaTaskText(task, iconsById[task.id]);
+        } else if (childGender(childId) === "boy") {
+          task.icon = iconByDominikTaskText(task, iconsById[task.id]);
         } else if (iconsById[task.id]) {
           task.icon = iconsById[task.id];
         }
