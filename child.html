@@ -973,6 +973,19 @@
       font-weight: 900;
     }
 
+    .calendar-efforts {
+      display: grid;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: .78rem;
+      line-height: 1.25;
+      color: var(--muted);
+    }
+
+    .calendar-effort {
+      overflow-wrap: anywhere;
+    }
+
     .side {
       padding-top: 4px;
       display: grid;
@@ -1013,8 +1026,6 @@
 
     .child-page .progress-box,
     .child-page .date-nav,
-    .child-page .view-button[data-view="week"],
-    .child-page .view-button[data-view="month"],
     .child-page #settingsButton,
     .child-page #editTasksButton,
     .child-page #addTaskButton,
@@ -1028,10 +1039,6 @@
 
     .child-page .workspace-toolbar {
       justify-content: flex-start;
-    }
-
-    .child-page .view-tabs {
-      pointer-events: none;
     }
 
     .child-page .reward,
@@ -1724,10 +1731,6 @@
           </div>
         </div>
         <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
-        <section class="child-calendar" aria-labelledby="childCalendarTitle">
-          <h3 id="childCalendarTitle">Savaitės kalendorius</h3>
-          <div class="child-calendar-grid" id="childTaskCalendar"></div>
-        </section>
         <div id="contentArea"></div>
       </section>
 
@@ -2728,39 +2731,6 @@
       });
     }
 
-    function renderChildTaskCalendar() {
-      const calendar = document.getElementById("childTaskCalendar");
-      if (!calendar) return;
-
-      const keys = getWeekKeys(state.selectedDate);
-      const childId = state.active;
-      const tasks = tasksForChild(childId);
-      calendar.innerHTML = "";
-
-      keys.forEach(key => {
-        const childDay = ensureDay(key)[childId] || { shells: 0, done: {} };
-        const doneTasks = tasks.filter(task => childDay.done?.[task.id]);
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = `child-calendar-day${key === state.selectedDate ? " active" : ""}`;
-        card.innerHTML = `
-          <span class="child-calendar-date">${escapeHtml(formatDate(key))}</span>
-          <span class="child-calendar-total">${childDay.shells || 0} ${shellWord(childDay.shells || 0)}</span>
-          <span class="child-calendar-tasks">
-            ${doneTasks.length
-              ? doneTasks.slice(0, 3).map(task => `<span class="child-calendar-task">${escapeHtml(task.icon)} ${escapeHtml(taskTitle(task, childId))}</span>`).join("")
-              : `<span class="child-calendar-task">Dar laukia užduotys</span>`}
-          </span>
-        `;
-        card.addEventListener("click", () => {
-          state.selectedDate = key;
-          state.view = "day";
-          render();
-        });
-        calendar.appendChild(card);
-      });
-    }
-
     function renderLog() {
       const child = activeChild();
       log.innerHTML = "";
@@ -2787,6 +2757,12 @@
 
     function childTotal(childId, keys) {
       return keys.reduce((sum, key) => sum + (ensureDay(key)[childId]?.shells || 0), 0);
+    }
+
+    function calendarEfforts(key, limit = 4) {
+      return childIds()
+        .flatMap(childId => (ensureDay(key)[childId]?.log || []).map(item => `${childName(childId)}: ${logText(item)}`))
+        .slice(0, limit);
     }
 
     function renderWeekendPrize(weekScores) {
@@ -3275,6 +3251,9 @@
             const total = childTotal(childId, [key]);
             return `<button class="summary-button summary-line" data-child="${escapeHtml(childId)}" type="button"><span>${escapeHtml(childName(childId))}</span><span>${total} ${shellWord(total)}</span></button>`;
           }).join("")}
+          <div class="calendar-efforts">
+            ${calendarEfforts(key, 5).map(item => `<span class="calendar-effort">${escapeHtml(item)}</span>`).join("") || `<span class="calendar-effort">Dar nėra pažymėtų pastangų.</span>`}
+          </div>
         `;
         card.querySelectorAll(".summary-button").forEach(button => {
           button.addEventListener("click", () => openDay(key, button.dataset.child));
@@ -3307,6 +3286,9 @@
             const initial = childName(childId).slice(0, 1);
             return `<span>${escapeHtml(initial)}: ${childTotal(childId, [key])}</span>`;
           }).join("")}
+          <span class="calendar-efforts">
+            ${calendarEfforts(key, 2).map(item => `<span class="calendar-effort">${escapeHtml(item)}</span>`).join("") || `<span class="calendar-effort">-</span>`}
+          </span>
         `;
         card.title = "Paspauskite, kad matytumėte tos dienos istoriją";
         card.addEventListener("click", () => openDay(key, state.active));
@@ -3351,7 +3333,6 @@
       if (state.view === "day") renderTasks();
       if (state.view === "week") renderWeek();
       if (state.view === "month") renderMonth();
-      renderChildTaskCalendar();
       renderLog();
       renderReward(familyTodayTotal, weekTotals[state.active] || 0);
       renderWeekendPrize(weekTotals);
