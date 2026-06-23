@@ -137,6 +137,27 @@
       box-shadow: 0 8px 18px rgba(31, 54, 71, .1);
     }
 
+    .parent-gate {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 2;
+      min-height: 36px;
+      border: 1px solid rgba(13, 138, 168, .28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--sea);
+      cursor: pointer;
+      font-weight: 900;
+      padding: 7px 12px;
+      box-shadow: 0 6px 14px rgba(31, 54, 71, .1);
+    }
+
+    .parent-gate.holding {
+      background: #fff3d2;
+      color: #6c4b05;
+    }
+
     .weekend-prize {
       position: relative;
       min-height: 220px;
@@ -1476,6 +1497,12 @@
         padding: 20px 20px 54px;
       }
 
+      .parent-gate {
+        top: auto;
+        right: 14px;
+        bottom: 12px;
+      }
+
       .children, .task-grid, .actions, .penalty-controls {
         grid-template-columns: 1fr;
       }
@@ -1627,6 +1654,7 @@
   <main class="app">
     <section class="hero" aria-label="Krabukų nuotykių pradžia">
       <div class="title-block">
+        <button class="parent-gate" id="parentGateButton" type="button" aria-label="Palaikykite paspaudę, kad atidarytumėte tėvų puslapį">⚙ Tėvams</button>
         <div class="hero-badge">🦀 Dienos kelionė iki perlo</div>
         <h1 id="appTitle">Kraiklyčių nuotykiai</h1>
         <p class="subtitle" id="appSubtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
@@ -3358,6 +3386,25 @@
         render();
       });
     });
+
+    const parentGateButton = document.getElementById("parentGateButton");
+    let parentGateTimer = null;
+    const cancelParentGate = () => {
+      clearTimeout(parentGateTimer);
+      parentGateTimer = null;
+      parentGateButton.classList.remove("holding");
+      parentGateButton.textContent = "⚙ Tėvams";
+    };
+    parentGateButton.addEventListener("pointerdown", () => {
+      parentGateButton.classList.add("holding");
+      parentGateButton.textContent = "Laikykite...";
+      parentGateTimer = setTimeout(() => {
+        window.location.href = "parent.html";
+      }, 1800);
+    });
+    parentGateButton.addEventListener("pointerup", cancelParentGate);
+    parentGateButton.addEventListener("pointerleave", cancelParentGate);
+    parentGateButton.addEventListener("pointercancel", cancelParentGate);
 
     document.getElementById("editTasksButton").addEventListener("click", () => {
       state.editMode = !state.editMode;
