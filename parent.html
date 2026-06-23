@@ -904,8 +904,22 @@
     }
 
     .task.editing {
-      cursor: default;
+      cursor: grab;
       padding-right: 78px;
+    }
+
+    .task.editing:active {
+      cursor: grabbing;
+    }
+
+    .task.dragging {
+      opacity: .55;
+      transform: scale(.98);
+    }
+
+    .task.drag-over {
+      border-color: var(--sea);
+      box-shadow: 0 0 0 3px rgba(14, 149, 171, .16);
     }
 
     .task-edit-actions {
@@ -2923,6 +2937,23 @@
       showToast("Užduotis ištrinta.");
     }
 
+    function moveTask(beforeTaskId, movedTaskId) {
+      if (!state.editMode || beforeTaskId === movedTaskId) return;
+      const tasks = tasksForChild();
+      const fromIndex = tasks.findIndex(task => task.id === movedTaskId);
+      const toIndex = tasks.findIndex(task => task.id === beforeTaskId);
+      if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
+      const [movedTask] = tasks.splice(fromIndex, 1);
+      tasks.splice(toIndex, 0, movedTask);
+      save();
+      render();
+      showToast("Užduočių eiliškumas pakeistas.");
+    }
+
+    function readDraggedTaskId(event) {
+      return event.dataTransfer?.getData("text/plain") || "";
+    }
+
     function addTask() {
       const title = prompt("Naujos užduoties tekstas:");
       if (title === null) return;
@@ -2953,6 +2984,10 @@
         const button = document.createElement(state.editMode ? "div" : "button");
         if (!state.editMode) button.type = "button";
         button.className = `task${child.done[task.id] ? " done" : ""}${state.editMode ? " editing" : ""}`;
+        if (state.editMode) {
+          button.draggable = true;
+          button.dataset.taskId = task.id;
+        }
         button.innerHTML = `
           <span class="task-icon" aria-hidden="true">${escapeHtml(task.icon)}</span>
           <span>
@@ -2968,6 +3003,26 @@
         `;
         if (!state.editMode) {
           button.addEventListener("click", () => completeTask(task));
+        } else {
+          button.addEventListener("dragstart", event => {
+            event.dataTransfer?.setData("text/plain", task.id);
+            event.dataTransfer.effectAllowed = "move";
+            button.classList.add("dragging");
+          });
+          button.addEventListener("dragend", () => {
+            button.classList.remove("dragging");
+            document.querySelectorAll(".task.drag-over").forEach(item => item.classList.remove("drag-over"));
+          });
+          button.addEventListener("dragover", event => {
+            event.preventDefault();
+            if (readDraggedTaskId(event) !== task.id) button.classList.add("drag-over");
+          });
+          button.addEventListener("dragleave", () => button.classList.remove("drag-over"));
+          button.addEventListener("drop", event => {
+            event.preventDefault();
+            button.classList.remove("drag-over");
+            moveTask(task.id, readDraggedTaskId(event));
+          });
         }
         button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
           event.stopPropagation();
