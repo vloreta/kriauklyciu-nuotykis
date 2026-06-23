@@ -206,6 +206,15 @@
       line-height: 1.25;
     }
 
+    .parent-page #dataManagement,
+    .parent-page #historyManagement,
+    .parent-page .parent-overview a[href="#dataManagement"],
+    .parent-page .parent-overview a[href="#historyManagement"],
+    #settingsModal #exportDataButton,
+    #settingsModal #settingsImportDataButton {
+      display: none;
+    }
+
     .parent-page .dashboard {
       grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
       grid-template-rows: auto auto;
