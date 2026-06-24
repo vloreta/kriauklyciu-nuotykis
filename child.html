@@ -429,12 +429,26 @@
     .treasure-shell::before {
       top: 1px;
       transform: rotate(-8deg);
+      transform-origin: 50% 100%;
     }
 
     .treasure-shell::after {
       bottom: 1px;
       border-radius: 10px 10px 50% 50%;
       transform: rotate(8deg);
+      transform-origin: 50% 0;
+    }
+
+    .treasure-shell.collecting::before {
+      animation: shellTopOpen 760ms ease-in-out;
+    }
+
+    .treasure-shell.collecting::after {
+      animation: shellBottomOpen 760ms ease-in-out;
+    }
+
+    .treasure-shell.collecting .pearl {
+      animation: pearlGlow 760ms ease-in-out;
     }
 
     .pearl {
@@ -447,6 +461,21 @@
       border-radius: 50%;
       background: radial-gradient(circle at 30% 25%, #ffffff, #e5fbff 42%, #8bd4f2 78%);
       box-shadow: 0 0 18px rgba(255, 255, 255, 0.95), 0 0 8px rgba(105, 205, 240, 0.75);
+    }
+
+    @keyframes shellTopOpen {
+      0%, 100% { transform: rotate(-8deg) translateY(0); }
+      42%, 62% { transform: rotate(-28deg) translateY(-7px); }
+    }
+
+    @keyframes shellBottomOpen {
+      0%, 100% { transform: rotate(8deg) translateY(0); }
+      42%, 62% { transform: rotate(20deg) translateY(5px); }
+    }
+
+    @keyframes pearlGlow {
+      0%, 100% { transform: scale(1); filter: brightness(1); }
+      45%, 62% { transform: scale(1.22); filter: brightness(1.22); }
     }
 
     .race-score {
@@ -2771,6 +2800,7 @@
       }
       save();
       render();
+      animateTreasureShell(state.active);
       showToast(`${activeName()} gavo ${task.shells} ${shellWord(task.shells)}!`);
     }
 
@@ -3366,6 +3396,19 @@
           <span class="race-score" id="${safeChildId}RaceScore">${shells} / ${max} ${shellWord(max)}</span>
         `;
         lanes.appendChild(lane);
+      });
+    }
+
+    function animateTreasureShell(childId) {
+      requestAnimationFrame(() => {
+        const lane = Array.from(document.querySelectorAll(".ocean-lane"))
+          .find(item => item.dataset.child === childId);
+        const shell = lane?.querySelector(".treasure-shell");
+        if (!shell) return;
+        shell.classList.remove("collecting");
+        void shell.offsetWidth;
+        shell.classList.add("collecting");
+        window.setTimeout(() => shell.classList.remove("collecting"), 820);
       });
     }
 
