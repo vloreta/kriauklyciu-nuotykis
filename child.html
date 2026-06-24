@@ -2734,14 +2734,6 @@
         };
       }
       if (state.taskSchemaVersion < 4) {
-        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
-        state.taskSchemaVersion = 4;
-        save();
-      }
-      if (
-        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia)
-      ) {
-        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
         state.taskSchemaVersion = 4;
         save();
       }

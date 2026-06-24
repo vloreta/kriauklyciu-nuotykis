@@ -277,6 +277,20 @@
       gap: 10px;
     }
 
+    .actions-history-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 4px;
+      font-size: 1rem;
+    }
+
+    .actions-history-date {
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
     .parent-data-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1854,7 +1868,8 @@
             <input id="importDataInput" type="file" accept="application/json,.json" hidden>
           </div>
           <div class="parent-control-card" id="historyManagement">
-            <h2 id="logTitle">Šiandien</h2>
+            <h2 class="actions-history-title"><span aria-hidden="true">✅</span> Atlikti veiksmai</h2>
+            <div class="actions-history-date" id="logTitle">Šiandien</div>
             <div class="log" id="log"></div>
           </div>
         </div>
@@ -2612,14 +2627,6 @@
         };
       }
       if (state.taskSchemaVersion < 4) {
-        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
-        state.taskSchemaVersion = 4;
-        save();
-      }
-      if (
-        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia)
-      ) {
-        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
         state.taskSchemaVersion = 4;
         save();
       }
