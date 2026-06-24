@@ -623,30 +623,52 @@
     /* Children, tasks and calendar */
     .child-button {
       width: 100%;
-      min-height: 72px;
+      min-height: 48px;
+      max-width: 176px;
       border: 2px solid transparent;
       border-radius: 8px;
       background: #f6fbff;
       color: var(--ink);
       display: grid;
-      grid-template-columns: 46px 1fr;
-      gap: 10px;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 8px;
       align-items: center;
       text-align: left;
-      padding: 10px;
+      padding: 7px 9px;
       cursor: pointer;
     }
 
     #childrenList {
       display: grid;
-      gap: 10px;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      margin-bottom: 14px;
+      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 176px));
+      justify-content: start;
+      margin-bottom: 10px;
     }
 
     .child-button.active {
       border-color: var(--sea);
       background: #e7f9ff;
+    }
+
+    .child-button[data-child="olivia"] {
+      background: #fff0f7;
+      border-color: rgba(244, 168, 200, .36);
+    }
+
+    .child-button[data-child="dominik"] {
+      background: #edfced;
+      border-color: rgba(80, 180, 120, .34);
+    }
+
+    .child-button[data-child="olivia"].active {
+      background: #ffe6f2;
+      border-color: #f4a8c8;
+    }
+
+    .child-button[data-child="dominik"].active {
+      background: #ddf8e3;
+      border-color: #6fc789;
     }
 
     .child-button[data-child="olivia"] .avatar {
@@ -665,18 +687,29 @@
     }
 
     .avatar {
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       display: grid;
       place-items: center;
       border-radius: 50%;
       background: #fff;
       font-size: 1.55rem;
       box-shadow: inset 0 0 0 3px rgba(13, 138, 168, .18);
+      overflow: hidden;
     }
 
-    .child-name { font-weight: 800; font-size: 1.05rem; }
-    .shell-count { color: var(--muted); font-size: .88rem; }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center 28%;
+      transform: scale(1.22);
+      filter: saturate(1.08) contrast(1.04);
+    }
+
+    .child-name { font-weight: 800; font-size: .92rem; line-height: 1.05; }
+    .shell-count { color: var(--muted); font-size: .72rem; line-height: 1.15; }
 
     .progress-box {
       padding: 14px;
@@ -3097,6 +3130,20 @@
       });
     }
 
+    function childCardAvatarMarkup(childId, profile) {
+      const avatarSrc = childId === "olivia"
+        ? "assets/avatar-olivia.png"
+        : childId === "dominik"
+          ? "assets/avatar-dominik.png"
+          : "";
+
+      if (avatarSrc) {
+        return `<img src="${avatarSrc}" alt="" loading="lazy">`;
+      }
+
+      return escapeHtml(profile.avatar || (profile.gender === "boy" ? "👦" : "👧"));
+    }
+
     function renderChildren(weekKeys) {
       const list = document.getElementById("childrenList");
       list.innerHTML = "";
@@ -3110,7 +3157,7 @@
         button.type = "button";
         button.setAttribute("aria-pressed", String(childId === state.active));
         button.innerHTML = `
-          <span class="avatar" aria-hidden="true">${escapeHtml(profile.avatar || (profile.gender === "boy" ? "👦" : "👧"))}</span>
+          <span class="avatar" aria-hidden="true">${childCardAvatarMarkup(childId, profile)}</span>
           <span>
             <span class="child-name">${escapeHtml(profile.name)}</span><br>
             <span class="shell-count">${total} ${shellWord(total)} pasirinktą dieną</span>
