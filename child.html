@@ -440,11 +440,11 @@
     }
 
     .treasure-shell.collecting {
-      animation: shellOpenGlow 880ms ease-in-out;
+      animation: shellOpenGlow 980ms ease-in-out;
     }
 
     .treasure-shell.collecting .pearl {
-      animation: pearlGlow 880ms ease-in-out;
+      animation: pearlGlow 980ms ease-in-out;
     }
 
     .pearl {
@@ -466,12 +466,13 @@
         filter: drop-shadow(0 10px 14px rgba(20, 73, 93, 0.28)) brightness(1);
       }
       42%, 62% {
-        transform: translateY(-50%) scale(1.12);
+        transform: translateY(-50%) scale(1.18);
         filter:
-          drop-shadow(0 0 12px rgba(255, 255, 255, 0.96))
-          drop-shadow(0 0 22px rgba(255, 219, 132, 0.86))
+          drop-shadow(0 0 18px rgba(255, 255, 255, 1))
+          drop-shadow(0 0 34px rgba(255, 219, 132, 0.98))
+          drop-shadow(0 0 52px rgba(137, 222, 255, 0.78))
           drop-shadow(0 10px 16px rgba(20, 73, 93, 0.3))
-          brightness(1.2);
+          brightness(1.34);
       }
     }
 
@@ -1823,8 +1824,12 @@
       }
 
       .ocean-scene {
-        height: 330px;
-        position: static;
+        height: 430px;
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        margin-inline: -9px;
+        border-radius: 0 0 8px 8px;
       }
 
       .ocean-label {
@@ -1842,7 +1847,7 @@
       .race-track {
         left: 28px;
         right: 74px;
-        top: 62%;
+        top: 66%;
       }
 
       .guide-bubble {
@@ -3635,7 +3640,8 @@
       const lanes = document.getElementById("oceanLanes");
       const ids = childIds();
       const laneHeight = ids.length <= 2 ? 150 : 105;
-      scene.style.height = `${Math.min(525, Math.max(220, ids.length * laneHeight))}px`;
+      const mobileOcean = window.matchMedia("(max-width: 620px)").matches;
+      scene.style.height = mobileOcean ? "" : `${Math.min(525, Math.max(220, ids.length * laneHeight))}px`;
       scene.style.overflowY = ids.length > 5 ? "auto" : "hidden";
       lanes.style.gridTemplateRows = `repeat(${ids.length}, minmax(${laneHeight}px, 1fr))`;
       lanes.innerHTML = "";
