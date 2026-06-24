@@ -1687,13 +1687,13 @@
 
       .hero {
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 8px;
+        gap: 6px;
         align-items: stretch;
       }
 
       .title-block {
-        min-height: 210px;
-        padding: 14px 10px;
+        min-height: 118px;
+        padding: 8px 7px;
         display: grid;
         align-content: start;
         justify-items: center;
@@ -1709,22 +1709,22 @@
       }
 
       .title-block h1 {
-        margin-top: 2px;
-        font-size: clamp(1.72rem, 8vw, 2.28rem);
-        line-height: .96;
+        margin-top: 0;
+        font-size: clamp(1.12rem, 5.3vw, 1.48rem);
+        line-height: .94;
       }
 
       .title-block .subtitle {
-        max-width: 19ch;
-        margin-top: 10px;
-        font-size: clamp(.84rem, 3.45vw, 1rem);
-        line-height: 1.34;
+        max-width: 21ch;
+        margin-top: 6px;
+        font-size: clamp(.62rem, 2.6vw, .76rem);
+        line-height: 1.22;
         text-align: center;
       }
 
       .weekend-prize {
-        min-height: 210px;
-        padding: 42px 10px 10px;
+        min-height: 118px;
+        padding: 8px 7px;
         grid-template-columns: 1fr;
         align-content: start;
         justify-items: stretch;
@@ -1738,44 +1738,55 @@
       .weekend-title {
         padding: 0;
         justify-items: center;
+        gap: 1px;
       }
 
       .weekend-title strong {
-        max-width: 11ch;
-        font-size: clamp(1.05rem, 4.6vw, 1.36rem);
-        line-height: 1.02;
+        max-width: none;
+        padding-right: 34px;
+        font-size: clamp(.78rem, 3.35vw, .96rem);
+        line-height: 1;
       }
 
       .weekend-title span,
       .weekend-status {
-        font-size: clamp(.68rem, 2.8vw, .78rem);
-        line-height: 1.24;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: clamp(.56rem, 2.25vw, .66rem);
+        line-height: 1.12;
         text-align: center;
       }
 
       .weekend-score {
-        grid-template-columns: 1fr;
-        gap: 4px;
+        grid-template-columns: 1fr 1fr;
+        gap: 3px;
       }
 
       .weekend-score span {
-        padding: 4px 6px;
-        font-size: .76rem;
+        padding: 3px 4px;
+        font-size: clamp(.54rem, 2.25vw, .64rem);
       }
 
       .weekend-picker {
-        gap: 4px;
+        gap: 3px;
       }
 
       .weekend-picker select,
       .weekend-button {
-        min-height: 34px;
+        min-height: 26px;
+        font-size: clamp(.62rem, 2.6vw, .74rem);
       }
 
       .parent-gate {
-        top: 8px;
-        right: 8px;
+        top: 6px;
+        right: 6px;
         bottom: auto;
+        width: 30px;
+        height: 30px;
+        min-height: 30px;
+        padding: 3px;
       }
 
       .children, .task-grid, .actions, .penalty-controls {
