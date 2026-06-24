@@ -905,7 +905,7 @@
     }
 
     .parent-tip-trigger:hover + .parent-tip-popover,
-    .parent-tip-trigger:focus + .parent-tip-popover {
+    .task.parent-tip-open .parent-tip-popover {
       display: block;
     }
 
@@ -919,47 +919,6 @@
       margin: 6px 0 0;
     }
 
-    .parent-tip-sheet {
-      position: fixed;
-      inset: 0;
-      z-index: 80;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      background: rgba(16, 38, 52, .24);
-      padding: 18px;
-    }
-
-    .parent-tip-sheet.open {
-      display: flex;
-    }
-
-    .parent-tip-card {
-      width: min(440px, 100%);
-      padding: 16px;
-      border-radius: 16px;
-      background: #fff8e8;
-      border: 1px solid rgba(236, 199, 127, .55);
-      box-shadow: 0 18px 44px rgba(31, 54, 71, .2);
-    }
-
-    .parent-tip-card h3 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-    }
-
-    .parent-tip-card p {
-      margin: 8px 0;
-      color: var(--ink);
-      font-size: .9rem;
-      line-height: 1.4;
-    }
-
-    .parent-tip-card button {
-      width: 100%;
-      margin-top: 8px;
-      min-height: 40px;
-    }
 
     .task-edit-actions {
       position: absolute;
@@ -3039,31 +2998,14 @@
       `;
     }
 
-    function openParentTip(task) {
-      if (!hasParentTip(task)) return;
-      let sheet = document.getElementById("parentTipSheet");
-      if (!sheet) {
-        sheet = document.createElement("div");
-        sheet.id = "parentTipSheet";
-        sheet.className = "parent-tip-sheet";
-        sheet.innerHTML = `<div class="parent-tip-card" role="dialog" aria-modal="true"></div>`;
-        sheet.addEventListener("click", event => {
-          if (event.target === sheet) sheet.classList.remove("open");
-        });
-        document.body.appendChild(sheet);
-      }
-      const card = sheet.querySelector(".parent-tip-card");
-      card.innerHTML = `
-        <h3>${escapeHtml(task.parentTipTitle)}</h3>
-        <p>${escapeHtml(task.parentTipText)}</p>
-        <p><strong>Kodėl svarbu:</strong> ${escapeHtml(task.parentTipWhy)}</p>
-        <p><strong>Ko geriau nesakyti:</strong> ${escapeHtml(task.parentTipAvoid)}</p>
-        <button type="button" class="secondary" data-close-parent-tip>Uždaryti</button>
-      `;
-      sheet.classList.add("open");
-      card.querySelector("[data-close-parent-tip]")?.addEventListener("click", () => {
-        sheet.classList.remove("open");
+    function toggleParentTip(trigger) {
+      const taskCard = trigger.closest(".task");
+      if (!taskCard) return;
+      const isOpen = taskCard.classList.contains("parent-tip-open");
+      document.querySelectorAll(".task.parent-tip-open").forEach(card => {
+        card.classList.remove("parent-tip-open");
       });
+      taskCard.classList.toggle("parent-tip-open", !isOpen);
     }
 
     function renderTasks() {
@@ -3100,13 +3042,13 @@
         button.querySelector("[data-parent-tip]")?.addEventListener("click", event => {
           event.preventDefault();
           event.stopPropagation();
-          openParentTip(task);
+          toggleParentTip(event.currentTarget);
         });
         button.querySelector("[data-parent-tip]")?.addEventListener("keydown", event => {
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
           event.stopPropagation();
-          openParentTip(task);
+          toggleParentTip(event.currentTarget);
         });
         button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
           event.stopPropagation();
@@ -3119,6 +3061,13 @@
         contentArea.appendChild(button);
       });
     }
+
+    document.addEventListener("click", event => {
+      if (event.target.closest("[data-parent-tip]") || event.target.closest(".parent-tip-popover")) return;
+      document.querySelectorAll(".task.parent-tip-open").forEach(card => {
+        card.classList.remove("parent-tip-open");
+      });
+    });
 
     function renderLog() {
       const child = activeChild();
