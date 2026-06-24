@@ -862,6 +862,105 @@
       padding-right: 78px;
     }
 
+    .parent-tip-trigger {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 24px;
+      height: 24px;
+      border: 1px solid rgba(12, 113, 138, .14);
+      border-radius: 999px;
+      background: rgba(255, 248, 224, .86);
+      display: grid;
+      place-items: center;
+      font-size: .78rem;
+      line-height: 1;
+      opacity: .66;
+      cursor: help;
+    }
+
+    .parent-tip-trigger:hover,
+    .parent-tip-trigger:focus {
+      opacity: 1;
+      outline: 2px solid rgba(13, 138, 168, .22);
+      outline-offset: 2px;
+    }
+
+    .parent-tip-popover {
+      position: absolute;
+      right: 8px;
+      bottom: 38px;
+      z-index: 8;
+      width: min(280px, calc(100vw - 32px));
+      padding: 12px;
+      border: 1px solid rgba(236, 199, 127, .55);
+      border-radius: 12px;
+      background: #fff8e8;
+      box-shadow: 0 14px 30px rgba(31, 54, 71, .16);
+      color: var(--ink);
+      font-size: .78rem;
+      line-height: 1.35;
+      display: none;
+      text-align: left;
+    }
+
+    .parent-tip-trigger:hover + .parent-tip-popover,
+    .parent-tip-trigger:focus + .parent-tip-popover {
+      display: block;
+    }
+
+    .parent-tip-popover strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: .84rem;
+    }
+
+    .parent-tip-popover p {
+      margin: 6px 0 0;
+    }
+
+    .parent-tip-sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(16, 38, 52, .24);
+      padding: 18px;
+    }
+
+    .parent-tip-sheet.open {
+      display: flex;
+    }
+
+    .parent-tip-card {
+      width: min(440px, 100%);
+      padding: 16px;
+      border-radius: 16px;
+      background: #fff8e8;
+      border: 1px solid rgba(236, 199, 127, .55);
+      box-shadow: 0 18px 44px rgba(31, 54, 71, .2);
+    }
+
+    .parent-tip-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .parent-tip-card p {
+      margin: 8px 0;
+      color: var(--ink);
+      font-size: .9rem;
+      line-height: 1.4;
+    }
+
+    .parent-tip-card button {
+      width: 100%;
+      margin-top: 8px;
+      min-height: 40px;
+    }
+
     .task-edit-actions {
       position: absolute;
       right: 8px;
@@ -1981,7 +2080,16 @@
         { id: "domDishes", icon: "🧽", title: "Nunešiau indus po valgio", shells: 1 },
         { id: "domNoHurtSister", icon: "🛡️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau sesės", shells: 5 },
         { id: "domPlaySister", icon: "🎲", title: "Gražiai žaidžiau su sese", shells: 2 },
-        { id: "domNiceWordsSister", icon: "💬", title: "Pasakiau sesei kažką malonaus", shells: 2 },
+        {
+          id: "domNiceWordsSister",
+          icon: "💬",
+          title: "Pasakiau sesei kažką malonaus",
+          shells: 2,
+          parentTipTitle: "Patarimas tėvams",
+          parentTipText: "Man labai patinka, kad moki pasakyti gerų žodžių.",
+          parentTipWhy: "Vaikas mokosi pastebėti kitą žmogų, kurti draugišką ryšį ir stiprinti empatiją.",
+          parentTipAvoid: "Neapsiribokite vien žodžiu „šaunuolis“, nes jis nepasako, ką tiksliai vaikas padarė gerai."
+        },
         { id: "domMom", icon: "👩‍👦", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
         { id: "domQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
         { id: "domOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
@@ -2506,6 +2614,14 @@
       return fallbackIcon || "🚲";
     }
 
+    function applyParentTipTemplates(task) {
+      if (task.id !== "domNiceWordsSister") return;
+      task.parentTipTitle = "Patarimas tėvams";
+      task.parentTipText = "Man labai patinka, kad moki pasakyti gerų žodžių.";
+      task.parentTipWhy = "Vaikas mokosi pastebėti kitą žmogų, kurti draugišką ryšį ir stiprinti empatiją.";
+      task.parentTipAvoid = "Neapsiribokite vien žodžiu „šaunuolis“, nes jis nepasako, ką tiksliai vaikas padarė gerai.";
+    }
+
     function syncTaskIcons(childId) {
       const defaultTasks = defaultTasksForChild(childId);
       const iconsById = Object.fromEntries(defaultTasks.map(task => [task.id, task.icon]));
@@ -2517,6 +2633,7 @@
         } else if (iconsById[task.id]) {
           task.icon = iconsById[task.id];
         }
+        applyParentTipTemplates(task);
       });
     }
 
@@ -2905,6 +3022,50 @@
     }
 
     // UI renderers
+    function hasParentTip(task) {
+      return Boolean(task.parentTipTitle && task.parentTipText && task.parentTipWhy && task.parentTipAvoid);
+    }
+
+    function parentTipMarkup(task) {
+      if (!hasParentTip(task)) return "";
+      return `
+        <span class="parent-tip-trigger" role="button" tabindex="0" data-parent-tip="${escapeHtml(task.id)}" aria-label="Patarimas tėvams">💡</span>
+        <span class="parent-tip-popover" role="tooltip">
+          <strong>${escapeHtml(task.parentTipTitle)}</strong>
+          <p>${escapeHtml(task.parentTipText)}</p>
+          <p><strong>Kodėl svarbu:</strong> ${escapeHtml(task.parentTipWhy)}</p>
+          <p><strong>Ko geriau nesakyti:</strong> ${escapeHtml(task.parentTipAvoid)}</p>
+        </span>
+      `;
+    }
+
+    function openParentTip(task) {
+      if (!hasParentTip(task)) return;
+      let sheet = document.getElementById("parentTipSheet");
+      if (!sheet) {
+        sheet = document.createElement("div");
+        sheet.id = "parentTipSheet";
+        sheet.className = "parent-tip-sheet";
+        sheet.innerHTML = `<div class="parent-tip-card" role="dialog" aria-modal="true"></div>`;
+        sheet.addEventListener("click", event => {
+          if (event.target === sheet) sheet.classList.remove("open");
+        });
+        document.body.appendChild(sheet);
+      }
+      const card = sheet.querySelector(".parent-tip-card");
+      card.innerHTML = `
+        <h3>${escapeHtml(task.parentTipTitle)}</h3>
+        <p>${escapeHtml(task.parentTipText)}</p>
+        <p><strong>Kodėl svarbu:</strong> ${escapeHtml(task.parentTipWhy)}</p>
+        <p><strong>Ko geriau nesakyti:</strong> ${escapeHtml(task.parentTipAvoid)}</p>
+        <button type="button" class="secondary" data-close-parent-tip>Uždaryti</button>
+      `;
+      sheet.classList.add("open");
+      card.querySelector("[data-close-parent-tip]")?.addEventListener("click", () => {
+        sheet.classList.remove("open");
+      });
+    }
+
     function renderTasks() {
       const child = activeChild();
       contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
@@ -2931,10 +3092,22 @@
               <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
             </span>
           ` : ""}
+          ${parentTipMarkup(task)}
         `;
         if (!state.editMode) {
           button.addEventListener("click", () => completeTask(task));
         }
+        button.querySelector("[data-parent-tip]")?.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openParentTip(task);
+        });
+        button.querySelector("[data-parent-tip]")?.addEventListener("keydown", event => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          event.stopPropagation();
+          openParentTip(task);
+        });
         button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
           event.stopPropagation();
           editTask(task.id);
