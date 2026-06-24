@@ -2159,6 +2159,7 @@
 
     const storageKey = "kriauklyciu-nuotykis";
     const legacyStorageKey = "kriauklyciu-nuotykis-v2";
+    const undoStorageKey = "kriauklyciu-nuotykis-undo-stack";
     const backupKeyPrefix = "kriauklyciu-nuotykis-backup_";
     const backupFormat = "kriauklyciu-nuotykis-backup";
     const backupVersion = 1;
@@ -2320,6 +2321,9 @@
     const saved = mergeSavedRecords(readPrimaryStateWithRecovery(), readSavedState(legacyStorageKey));
     const state = normalizeState(saved);
     let lastSavedSnapshot = JSON.stringify(state);
+    let pendingUndoSnapshot = null;
+    let undoFlushTimer = null;
+    let isRestoringUndo = false;
     ensureDailyBackup(state);
     if (document.body.classList.contains("parent-page")) {
       state.editMode = true;
@@ -2334,10 +2338,49 @@
     const taskEditShells = document.getElementById("taskEditShells");
     let editingTaskId = null;
 
+    function readUndoStack() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(undoStorageKey) || "[]");
+        return Array.isArray(parsed) ? parsed.filter(item => typeof item === "string") : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function writeUndoStack(stack) {
+      try {
+        localStorage.setItem(undoStorageKey, JSON.stringify(stack.slice(-50)));
+      } catch {
+        // Undo is a safety layer; saving the main state must still continue.
+      }
+    }
+
+    function pushUndoSnapshot(snapshot) {
+      if (!snapshot) return;
+      const stack = readUndoStack();
+      if (stack[stack.length - 1] !== snapshot) {
+        stack.push(snapshot);
+        writeUndoStack(stack);
+      }
+    }
+
+    function rememberUndoSnapshot(snapshot) {
+      if (isRestoringUndo || !snapshot) return;
+      if (!pendingUndoSnapshot) pendingUndoSnapshot = snapshot;
+      if (undoFlushTimer) return;
+      undoFlushTimer = setTimeout(() => {
+        pushUndoSnapshot(pendingUndoSnapshot);
+        pendingUndoSnapshot = null;
+        undoFlushTimer = null;
+      }, 0);
+    }
+
     function save() {
       try {
         ensureDailyBackup(readSavedState(storageKey) || state);
         const serializedState = JSON.stringify(state);
+        const previousSnapshot = localStorage.getItem(storageKey) || lastSavedSnapshot;
+        if (previousSnapshot !== serializedState) rememberUndoSnapshot(previousSnapshot);
         localStorage.setItem(storageKey, serializedState);
         lastSavedSnapshot = serializedState;
         return true;
@@ -2891,14 +2934,34 @@
     }
 
     function undoLastAction() {
-      const child = activeChild();
-      const item = child.log.find(logItem => typeof logItem !== "string"
-        && !logItem.undone);
-      if (!item) {
+      if (undoFlushTimer) {
+        clearTimeout(undoFlushTimer);
+        pushUndoSnapshot(pendingUndoSnapshot);
+        pendingUndoSnapshot = null;
+        undoFlushTimer = null;
+      }
+      const stack = readUndoStack();
+      const snapshot = stack.pop();
+      if (!snapshot) {
         showToast("Nėra ką grąžinti.");
         return;
       }
-      undoLogItem(item);
+      try {
+        const restored = normalizeState(JSON.parse(snapshot));
+        isRestoringUndo = true;
+        Object.keys(state).forEach(key => delete state[key]);
+        Object.assign(state, restored);
+        if (document.body.classList.contains("parent-page")) state.editMode = true;
+        writeUndoStack(stack);
+        localStorage.setItem(storageKey, JSON.stringify(state));
+        lastSavedSnapshot = JSON.stringify(state);
+        isRestoringUndo = false;
+        render();
+        showToast("Paskutinis veiksmas grąžintas.");
+      } catch {
+        isRestoringUndo = false;
+        showToast("Nepavyko grąžinti paskutinio veiksmo.");
+      }
     }
 
     function completeTask(task) {
