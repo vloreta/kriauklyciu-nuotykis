@@ -1739,7 +1739,7 @@
       }
 
       .weekend-title span {
-        max-width: 23ch;
+        display: none;
       }
 
       .weekend-score {
@@ -3844,6 +3844,10 @@
     parentGateButton.addEventListener("pointerup", cancelParentGate);
     parentGateButton.addEventListener("pointerleave", cancelParentGate);
     parentGateButton.addEventListener("pointercancel", cancelParentGate);
+    parentGateButton.addEventListener("click", event => {
+      event.preventDefault();
+      window.location.href = "parent.html";
+    });
 
     document.getElementById("editTasksButton").addEventListener("click", () => {
       state.editMode = !state.editMode;
