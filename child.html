@@ -68,22 +68,22 @@
       width: calc(100% - 24px);
       max-width: none;
       margin: 0 auto;
-      padding: 12px 0 24px;
+      padding: 8px 0 22px;
     }
 
     /* Hero and weekend prize */
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(360px, 2fr);
-      gap: 10px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 8px;
       align-items: stretch;
-      min-height: 118px;
+      min-height: 96px;
     }
 
     .title-block {
       position: relative;
       overflow: hidden;
-      padding: 14px 104px 14px 20px;
+      padding: 10px 98px 10px 16px;
       border-radius: 8px;
       background:
         linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(229, 250, 255, .78)),
@@ -96,8 +96,8 @@
       content: "🦀  🐚  🫧  💎";
       position: absolute;
       right: 18px;
-      bottom: 10px;
-      font-size: clamp(1.1rem, 1.6vw, 1.55rem);
+      bottom: 8px;
+      font-size: clamp(1rem, 1.35vw, 1.35rem);
       letter-spacing: 0;
       opacity: .34;
       pointer-events: none;
@@ -105,7 +105,7 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(2rem, 3.7vw, 3.35rem);
+      font-size: clamp(1.65rem, 3vw, 2.65rem);
       line-height: .96;
       letter-spacing: 0;
       max-width: 680px;
@@ -115,8 +115,8 @@
     .subtitle {
       position: relative;
       z-index: 1;
-      margin: 8px 0 0;
-      font-size: .96rem;
+      margin: 5px 0 0;
+      font-size: .86rem;
       color: #3d5966;
       max-width: 680px;
       font-weight: 600;
@@ -126,30 +126,30 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 8px;
-      padding: 5px 10px;
+      margin-bottom: 5px;
+      padding: 4px 9px;
       border-radius: 999px;
       background: rgba(255, 248, 231, .92);
       border: 1px solid rgba(255, 209, 102, .65);
       color: #6c4b05;
       font-weight: 900;
-      font-size: .82rem;
+      font-size: .76rem;
       box-shadow: 0 8px 18px rgba(31, 54, 71, .1);
     }
 
     .parent-gate {
       position: absolute;
-      top: 12px;
-      right: 12px;
+      top: 9px;
+      right: 9px;
       z-index: 2;
-      min-height: 32px;
+      min-height: 28px;
       border: 1px solid rgba(13, 138, 168, .28);
       border-radius: 999px;
       background: rgba(255, 255, 255, .9);
       color: var(--sea);
       cursor: pointer;
       font-weight: 900;
-      padding: 5px 10px;
+      padding: 4px 9px;
       box-shadow: 0 6px 14px rgba(31, 54, 71, .1);
     }
 
@@ -160,16 +160,16 @@
 
     .weekend-prize {
       position: relative;
-      min-height: 118px;
+      min-height: 96px;
       border-radius: 8px;
-      padding: 12px;
+      padding: 9px;
       background:
         radial-gradient(circle at 92% 8%, rgba(255, 230, 145, .34), transparent 28%),
         linear-gradient(180deg, rgba(255,255,255,.95), rgba(239, 252, 255, .88));
       box-shadow: var(--shadow);
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
-      gap: 6px;
+      gap: 5px;
       align-content: start;
       align-items: start;
       border: 1px solid rgba(255,255,255,.78);
@@ -177,20 +177,20 @@
 
     .weekend-title {
       display: grid;
-      gap: 3px;
-      padding: 0 58px 0 0;
+      gap: 2px;
+      padding: 0 54px 0 0;
     }
 
     .weekend-title strong {
-      font-size: 1.02rem;
-      line-height: 1.15;
+      font-size: .94rem;
+      line-height: 1.1;
     }
 
     .weekend-title span,
     .weekend-status {
       color: var(--muted);
-      font-size: .76rem;
-      line-height: 1.22;
+      font-size: .7rem;
+      line-height: 1.16;
     }
 
     .weekend-icons {
@@ -200,12 +200,12 @@
     }
 
     .weekend-icon {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
       display: grid;
       place-items: center;
       border-radius: 50%;
-      font-size: 1.1rem;
+      font-size: .98rem;
       background: #e2fbff;
       border: 3px solid #fff;
       box-shadow: 0 7px 16px rgba(31, 54, 71, .12);
@@ -217,12 +217,12 @@
 
     .weekend-edit-button {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      min-height: 30px;
+      top: 8px;
+      right: 8px;
+      min-height: 27px;
       border: 1px solid #cfe1e9;
       border-radius: 8px;
-      padding: 0 9px;
+      padding: 0 8px;
       background: rgba(255, 255, 255, 0.88);
       color: #17435a;
       font-weight: 900;
@@ -237,8 +237,8 @@
 
     .weekend-score {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
-      gap: 6px;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 5px;
       grid-column: 1 / -1;
     }
 
@@ -246,16 +246,16 @@
       border-radius: 8px;
       background: rgba(255, 255, 255, .76);
       border: 1px solid rgba(187, 219, 229, .72);
-      padding: 6px 7px;
+      padding: 5px 6px;
       font-weight: 850;
       color: #234454;
       line-height: 1.15;
-      font-size: .82rem;
+      font-size: .76rem;
     }
 
     .weekend-picker {
       display: grid;
-      gap: 6px;
+      gap: 5px;
       grid-column: 1 / -1;
     }
 
@@ -265,7 +265,7 @@
 
     .weekend-picker select {
       min-width: 0;
-      min-height: 32px;
+      min-height: 28px;
       border: 2px solid #cfe1eb;
       border-radius: 8px;
       background: rgba(255,255,255,.94);
@@ -274,7 +274,7 @@
     }
 
     .weekend-button {
-      min-height: 34px;
+      min-height: 30px;
       border: 0;
       border-radius: 8px;
       cursor: pointer;
@@ -293,8 +293,8 @@
       display: grid;
       grid-template-columns: 300px minmax(0, 1fr);
       grid-template-rows: auto auto;
-      gap: 12px;
-      margin-top: 12px;
+      gap: 10px;
+      margin-top: 10px;
       align-items: stretch;
     }
 
@@ -1054,11 +1054,11 @@
 
     /* Child screen: keep daily actions visible, move admin controls away. */
     .child-page .hero {
-      grid-template-columns: minmax(0, 3fr) minmax(360px, 2fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
 
     .child-page .title-block {
-      min-height: 118px;
+      min-height: 96px;
     }
 
     .child-page .ocean-scene {
