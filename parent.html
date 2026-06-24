@@ -2866,20 +2866,25 @@
     }
 
     function undoLogItem(item) {
-      if (typeof item === "string" || item.undone || item.kind === "undoNotice") return;
+      if (typeof item === "string" || item.undone) return;
 
       const child = activeChild();
       child.shells = Math.max(0, child.shells - (item.delta || 0));
 
       if (item.taskId && item.kind === "complete") child.done[item.taskId] = false;
       if (item.taskId && item.kind === "toggleOff") child.done[item.taskId] = true;
+      if (item.kind === "dailyPrize") child.dailyTreasureAwarded = false;
+      if (item.kind === "halfwayNotice") child.halfwayTreasureNoticed = false;
+      if (item.kind === "bonusSurprise") child.surpriseUnlocked = false;
+      if (item.kind === "surprise") {
+        child.surpriseUnlocked = true;
+        child.lastSurprise = "";
+      }
+      if (item.kind === "weekendPrize") {
+        delete state.weekendPrizes[startOfWeek(state.selectedDate)];
+      }
 
       item.undone = true;
-      addLog(child, {
-        text: `${activeName()}: atšauktas istorijos įrašas`,
-        delta: 0,
-        kind: "undoNotice"
-      });
       save();
       render();
       showToast("Istorijos įrašas atšauktas.");
@@ -2888,8 +2893,7 @@
     function undoLastAction() {
       const child = activeChild();
       const item = child.log.find(logItem => typeof logItem !== "string"
-        && !logItem.undone
-        && !["undoNotice", "halfwayNotice", "dailyPrize"].includes(logItem.kind));
+        && !logItem.undone);
       if (!item) {
         showToast("Nėra ką grąžinti.");
         return;
@@ -3135,8 +3139,7 @@
       }
       child.log.forEach(item => {
         const reversible = typeof item !== "string"
-          && !item.undone
-          && !["undoNotice", "halfwayNotice", "dailyPrize"].includes(item.kind);
+          && !item.undone;
         const row = document.createElement(reversible ? "button" : "div");
         row.className = `log-item${reversible ? " clickable" : ""}${typeof item !== "string" && item.undone ? " undone" : ""}`;
         row.textContent = logText(item);
