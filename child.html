@@ -405,77 +405,74 @@
 
     .treasure-shell {
       position: absolute;
-      right: -76px;
+      right: -92px;
       top: 50%;
-      width: 68px;
-      height: 58px;
-      transform: translateY(-50%);
+      width: 92px;
+      height: 76px;
+      transform: translateY(-50%) scale(1);
+      transform-origin: 50% 64%;
+      background: url("assets/pearl-shell-cutout.png") center / contain no-repeat;
+      filter: drop-shadow(0 10px 14px rgba(20, 73, 93, 0.28));
     }
 
     .treasure-shell::before,
     .treasure-shell::after {
       content: "";
-      position: absolute;
-      left: 6px;
-      width: 56px;
-      height: 30px;
-      border-radius: 50% 50% 10px 10px;
-      background:
-        radial-gradient(circle at 24% 28%, rgba(255,255,255,0.9), transparent 18%),
-        linear-gradient(135deg, #fff6c9, #ffb2c8 54%, #bd72dd);
-      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.52), 0 9px 16px rgba(20, 73, 93, 0.3);
+      display: none;
     }
 
-    .treasure-shell::before {
-      top: 1px;
-      transform: rotate(-8deg);
-      transform-origin: 50% 100%;
-    }
-
-    .treasure-shell::after {
-      bottom: 1px;
-      border-radius: 10px 10px 50% 50%;
-      transform: rotate(8deg);
-      transform-origin: 50% 0;
-    }
-
-    .treasure-shell.collecting::before {
-      animation: shellTopOpen 760ms ease-in-out;
-    }
-
-    .treasure-shell.collecting::after {
-      animation: shellBottomOpen 760ms ease-in-out;
+    .treasure-shell.collecting {
+      animation: shellOpenGlow 880ms ease-in-out;
     }
 
     .treasure-shell.collecting .pearl {
-      animation: pearlGlow 760ms ease-in-out;
+      animation: pearlGlow 880ms ease-in-out;
     }
 
     .pearl {
       position: absolute;
-      left: 23px;
-      top: 20px;
+      left: 38px;
+      top: 35px;
       z-index: 1;
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 25%, #ffffff, #e5fbff 42%, #8bd4f2 78%);
-      box-shadow: 0 0 18px rgba(255, 255, 255, 0.95), 0 0 8px rgba(105, 205, 240, 0.75);
+      opacity: .86;
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.95), 0 0 10px rgba(105, 205, 240, 0.8);
     }
 
-    @keyframes shellTopOpen {
-      0%, 100% { transform: rotate(-8deg) translateY(0); }
-      42%, 62% { transform: rotate(-28deg) translateY(-7px); }
-    }
-
-    @keyframes shellBottomOpen {
-      0%, 100% { transform: rotate(8deg) translateY(0); }
-      42%, 62% { transform: rotate(20deg) translateY(5px); }
+    @keyframes shellOpenGlow {
+      0%, 100% {
+        transform: translateY(-50%) scale(1);
+        filter: drop-shadow(0 10px 14px rgba(20, 73, 93, 0.28)) brightness(1);
+      }
+      42%, 62% {
+        transform: translateY(-50%) scale(1.12);
+        filter:
+          drop-shadow(0 0 12px rgba(255, 255, 255, 0.96))
+          drop-shadow(0 0 22px rgba(255, 219, 132, 0.86))
+          drop-shadow(0 10px 16px rgba(20, 73, 93, 0.3))
+          brightness(1.2);
+      }
     }
 
     @keyframes pearlGlow {
-      0%, 100% { transform: scale(1); filter: brightness(1); }
-      45%, 62% { transform: scale(1.22); filter: brightness(1.22); }
+      0%, 100% {
+        transform: scale(1);
+        opacity: .86;
+        filter: brightness(1);
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.95), 0 0 10px rgba(105, 205, 240, 0.8);
+      }
+      42%, 62% {
+        transform: scale(1.72);
+        opacity: 1;
+        filter: brightness(1.55);
+        box-shadow:
+          0 0 14px rgba(255, 255, 255, 1),
+          0 0 28px rgba(255, 245, 170, .95),
+          0 0 46px rgba(137, 222, 255, .88);
+      }
     }
 
     .race-score {
@@ -1696,22 +1693,16 @@
       }
 
       .treasure-shell {
-        right: -70px;
-        width: 62px;
-        height: 52px;
-      }
-
-      .treasure-shell::before,
-      .treasure-shell::after {
-        width: 50px;
-        height: 27px;
+        right: -74px;
+        width: 76px;
+        height: 62px;
       }
 
       .pearl {
-        left: 21px;
-        top: 18px;
-        width: 19px;
-        height: 19px;
+        left: 31px;
+        top: 28px;
+        width: 15px;
+        height: 15px;
       }
     }
 
