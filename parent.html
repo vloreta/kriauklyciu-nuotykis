@@ -987,13 +987,21 @@
       background: var(--reef);
     }
 
-    .task-edit-actions .move-task-end {
-      background: #536879;
-    }
-
     .task.done {
       border-color: var(--leaf);
       background: #ecfff4;
+    }
+
+    .task-end-drop-zone {
+      min-height: 44px;
+      border: 2px dashed transparent;
+      border-radius: 8px;
+      transition: border-color .15s ease, background .15s ease;
+    }
+
+    .task-end-drop-zone.drag-over {
+      border-color: var(--sea);
+      background: rgba(14, 149, 171, .08);
     }
 
     .task-grid.pink .task.done,
@@ -3062,7 +3070,6 @@
           ${state.editMode ? `
             <span class="task-edit-actions">
               <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
-              <button class="move-task-end" type="button" data-move-task-end="${safeTaskId}" aria-label="Perkelti užduotį į sąrašo galą ${escapeHtml(title)}">Į galą</button>
               <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
             </span>
           ` : ""}
@@ -3094,16 +3101,28 @@
           event.stopPropagation();
           editTask(task.id);
         });
-        button.querySelector("[data-move-task-end]")?.addEventListener("click", event => {
-          event.stopPropagation();
-          moveTaskToEnd(task.id);
-        });
         button.querySelector("[data-delete-task]")?.addEventListener("click", event => {
           event.stopPropagation();
           deleteTask(task.id);
         });
         contentArea.appendChild(button);
       });
+      if (state.editMode) {
+        const endDropZone = document.createElement("div");
+        endDropZone.className = "task-end-drop-zone";
+        endDropZone.setAttribute("aria-hidden", "true");
+        endDropZone.addEventListener("dragover", event => {
+          event.preventDefault();
+          endDropZone.classList.add("drag-over");
+        });
+        endDropZone.addEventListener("dragleave", () => endDropZone.classList.remove("drag-over"));
+        endDropZone.addEventListener("drop", event => {
+          event.preventDefault();
+          endDropZone.classList.remove("drag-over");
+          moveTaskToEnd(readDraggedTaskId(event));
+        });
+        contentArea.appendChild(endDropZone);
+      }
     }
 
     function renderLog() {
