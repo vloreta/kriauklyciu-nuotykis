@@ -137,6 +137,20 @@
       box-shadow: 0 8px 18px rgba(31, 54, 71, .1);
     }
 
+    .hero-undo-button {
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .9);
+      color: #0c718a;
+      cursor: pointer;
+      font-weight: 900;
+      display: inline-grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 1px rgba(12, 113, 138, .18);
+    }
+
     .parent-actions {
       display: flex;
       gap: 10px;
@@ -973,6 +987,10 @@
       background: var(--reef);
     }
 
+    .task-edit-actions .move-task-end {
+      background: #536879;
+    }
+
     .task.done {
       border-color: var(--leaf);
       background: #ecfff4;
@@ -1755,7 +1773,10 @@
   <main class="app">
     <section class="hero" aria-label="Krabukų nuotykių pradžia">
       <div class="title-block">
-        <div class="hero-badge">⚙️ Tėvų valdymas</div>
+        <div class="hero-badge">
+          <span>⚙️ Tėvų valdymas</span>
+          <button class="hero-undo-button" id="undoLastActionButton" type="button" title="Grąžinti paskutinį veiksmą" aria-label="Grąžinti paskutinį veiksmą">↩</button>
+        </div>
         <h1 id="appTitle">Kraiklyčių nuotykiai</h1>
         <p class="subtitle" id="appSubtitle">Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio.</p>
         <div class="parent-actions">
@@ -2856,6 +2877,18 @@
       showToast("Istorijos įrašas atšauktas.");
     }
 
+    function undoLastAction() {
+      const child = activeChild();
+      const item = child.log.find(logItem => typeof logItem !== "string"
+        && !logItem.undone
+        && !["undoNotice", "halfwayNotice", "dailyPrize"].includes(logItem.kind));
+      if (!item) {
+        showToast("Nėra ką grąžinti.");
+        return;
+      }
+      undoLogItem(item);
+    }
+
     function completeTask(task) {
       if (state.editMode) return;
       const child = activeChild();
@@ -2970,6 +3003,18 @@
       showToast("Užduočių eiliškumas pakeistas.");
     }
 
+    function moveTaskToEnd(taskId) {
+      if (!state.editMode) return;
+      const tasks = tasksForChild();
+      const fromIndex = tasks.findIndex(task => task.id === taskId);
+      if (fromIndex < 0 || fromIndex === tasks.length - 1) return;
+      const [movedTask] = tasks.splice(fromIndex, 1);
+      tasks.push(movedTask);
+      save();
+      render();
+      showToast("Užduotis perkelta į sąrašo galą.");
+    }
+
     function readDraggedTaskId(event) {
       return event.dataTransfer?.getData("text/plain") || "";
     }
@@ -3017,6 +3062,7 @@
           ${state.editMode ? `
             <span class="task-edit-actions">
               <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
+              <button class="move-task-end" type="button" data-move-task-end="${safeTaskId}" aria-label="Perkelti užduotį į sąrašo galą ${escapeHtml(title)}">Į galą</button>
               <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
             </span>
           ` : ""}
@@ -3047,6 +3093,10 @@
         button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
           event.stopPropagation();
           editTask(task.id);
+        });
+        button.querySelector("[data-move-task-end]")?.addEventListener("click", event => {
+          event.stopPropagation();
+          moveTaskToEnd(task.id);
         });
         button.querySelector("[data-delete-task]")?.addEventListener("click", event => {
           event.stopPropagation();
@@ -3682,6 +3732,7 @@
 
     document.getElementById("addTaskButton").addEventListener("click", addTask);
     document.getElementById("settingsButton").addEventListener("click", openSettings);
+    document.getElementById("undoLastActionButton").addEventListener("click", undoLastAction);
     document.querySelectorAll("[data-open-settings]").forEach(button => {
       button.addEventListener("click", openSettings);
     });
