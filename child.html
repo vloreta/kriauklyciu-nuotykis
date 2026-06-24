@@ -74,8 +74,8 @@
     /* Hero and weekend prize */
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(290px, 340px);
-      gap: 12px;
+      grid-template-columns: minmax(0, 3fr) minmax(360px, 2fr);
+      gap: 10px;
       align-items: stretch;
       min-height: 118px;
     }
@@ -83,7 +83,7 @@
     .title-block {
       position: relative;
       overflow: hidden;
-      padding: 16px 118px 16px 22px;
+      padding: 14px 104px 14px 20px;
       border-radius: 8px;
       background:
         linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(229, 250, 255, .78)),
@@ -168,15 +168,17 @@
         linear-gradient(180deg, rgba(255,255,255,.95), rgba(239, 252, 255, .88));
       box-shadow: var(--shadow);
       display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
       gap: 6px;
       align-content: start;
+      align-items: start;
       border: 1px solid rgba(255,255,255,.78);
     }
 
     .weekend-title {
       display: grid;
       gap: 3px;
-      padding: 32px 66px 0 0;
+      padding: 0 58px 0 0;
     }
 
     .weekend-title strong {
@@ -192,11 +194,8 @@
     }
 
     .weekend-icons {
-      position: absolute;
-      top: 10px;
-      left: 12px;
       display: flex;
-      gap: 8px;
+      gap: 5px;
       align-items: center;
     }
 
@@ -240,6 +239,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
       gap: 6px;
+      grid-column: 1 / -1;
     }
 
     .weekend-score span {
@@ -256,6 +256,11 @@
     .weekend-picker {
       display: grid;
       gap: 6px;
+      grid-column: 1 / -1;
+    }
+
+    .weekend-status {
+      grid-column: 1 / -1;
     }
 
     .weekend-picker select {
@@ -1049,7 +1054,7 @@
 
     /* Child screen: keep daily actions visible, move admin controls away. */
     .child-page .hero {
-      grid-template-columns: minmax(0, 1fr) minmax(290px, 340px);
+      grid-template-columns: minmax(0, 3fr) minmax(360px, 2fr);
     }
 
     .child-page .title-block {
