@@ -967,23 +967,55 @@
       position: absolute;
       right: 8px;
       top: 8px;
+      z-index: 4;
+    }
+
+    .task-menu-toggle {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 850;
+      background: rgba(255, 255, 255, .92);
+      box-shadow: 0 2px 10px rgba(31, 54, 71, .14);
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .task-action-menu {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      min-width: 132px;
+      padding: 6px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 12px 28px rgba(31, 54, 71, .18);
       display: grid;
       gap: 5px;
     }
 
-    .task-edit-actions button {
-      min-width: 58px;
-      min-height: 28px;
+    .task-action-menu[hidden] {
+      display: none;
+    }
+
+    .task-action-menu button {
+      min-height: 32px;
       border: 0;
       border-radius: 8px;
       cursor: pointer;
       color: #fff;
       font-weight: 850;
       background: var(--sea);
-      font-size: .78rem;
+      font-size: .82rem;
+      text-align: left;
+      padding: 0 10px;
     }
 
-    .task-edit-actions .delete-task {
+    .task-action-menu .delete-task {
       background: var(--reef);
     }
 
@@ -3481,6 +3513,25 @@
       return event.dataTransfer?.getData("text/plain") || "";
     }
 
+    function closeTaskActionMenus() {
+      document.querySelectorAll("[data-task-menu-panel]").forEach(panel => {
+        panel.hidden = true;
+      });
+      document.querySelectorAll("[data-task-menu]").forEach(button => {
+        button.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    function toggleTaskActionMenu(taskId) {
+      const panel = document.querySelector(`[data-task-menu-panel="${CSS.escape(taskId)}"]`);
+      const button = document.querySelector(`[data-task-menu="${CSS.escape(taskId)}"]`);
+      if (!panel || !button) return;
+      const shouldOpen = panel.hidden;
+      closeTaskActionMenus();
+      panel.hidden = !shouldOpen;
+      button.setAttribute("aria-expanded", String(shouldOpen));
+    }
+
     function addTask() {
       openNewTaskEditor();
     }
@@ -3536,9 +3587,12 @@
           </span>
           ${state.editMode ? `
             <span class="task-edit-actions">
-              <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
-              <button type="button" data-archive-task="${safeTaskId}" aria-label="Perkelti užduotį į įpročių archyvą ${escapeHtml(title)}">Į archyvą</button>
-              <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
+              <button class="task-menu-toggle" type="button" data-task-menu="${safeTaskId}" aria-expanded="false" aria-label="Užduoties veiksmai ${escapeHtml(title)}">⋮</button>
+              <span class="task-action-menu" data-task-menu-panel="${safeTaskId}" hidden>
+                <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
+                <button type="button" data-archive-task="${safeTaskId}" aria-label="Perkelti užduotį į įpročių archyvą ${escapeHtml(title)}">Į archyvą</button>
+                <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
+              </span>
             </span>
           ` : ""}
         `;
@@ -3567,15 +3621,22 @@
         }
         button.querySelector("[data-edit-task]")?.addEventListener("click", event => {
           event.stopPropagation();
+          closeTaskActionMenus();
           editTask(task.id);
         });
         button.querySelector("[data-archive-task]")?.addEventListener("click", event => {
           event.stopPropagation();
+          closeTaskActionMenus();
           archiveTask(task.id);
         });
         button.querySelector("[data-delete-task]")?.addEventListener("click", event => {
           event.stopPropagation();
+          closeTaskActionMenus();
           deleteTask(task.id);
+        });
+        button.querySelector("[data-task-menu]")?.addEventListener("click", event => {
+          event.stopPropagation();
+          toggleTaskActionMenu(task.id);
         });
         contentArea.appendChild(button);
       });
@@ -4360,6 +4421,10 @@
     document.querySelectorAll(".edit-dialog").forEach(makeDialogDraggable);
 
     document.getElementById("taskEditCancel").addEventListener("click", closeTaskEditor);
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".task-edit-actions")) closeTaskActionMenus();
+    });
 
     taskEditDialog.addEventListener("click", event => {
       if (event.target === taskEditDialog) closeTaskEditor();
