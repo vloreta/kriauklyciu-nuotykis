@@ -2479,6 +2479,7 @@
         childGuides: { ...(raw.childGuides || {}) },
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
+        archivedTasks: raw.archivedTasks || {},
         weekendPrizeSettings: {
           title: raw.weekendPrizeSettings?.title || defaultWeekendPrizeSettings.title,
           description: raw.weekendPrizeSettings?.description || defaultWeekendPrizeSettings.description,
@@ -2510,6 +2511,10 @@
       if (!next.childProfiles[next.active]) {
         next.active = Object.keys(next.childProfiles)[0] || "olivia";
       }
+
+      Object.keys(next.childProfiles).forEach(childId => {
+        if (!next.archivedTasks[childId]) next.archivedTasks[childId] = {};
+      });
 
       if (next.lastCalendarDate !== currentDay) {
         next.selectedDate = currentDay;
@@ -2747,8 +2752,24 @@
     }
 
     function tasksForChild(childId = state.active) {
+      return tasksForChildOnDate(childId, state.selectedDate);
+    }
+
+    function allTasksForChild(childId = state.active) {
       const customTasks = ensureCustomTasks();
       return customTasks[childId] || customTasks.olivia;
+    }
+
+    function taskArchivedAt(childId, taskId) {
+      const archiveEntry = state.archivedTasks?.[childId]?.[taskId];
+      return typeof archiveEntry === "string" ? archiveEntry : archiveEntry?.archivedAt || "";
+    }
+
+    function tasksForChildOnDate(childId = state.active, date = state.selectedDate) {
+      return allTasksForChild(childId).filter(task => {
+        const archivedAt = taskArchivedAt(childId, task.id);
+        return !archivedAt || date < archivedAt;
+      });
     }
 
     function maxDailyShells(childId = state.active) {
@@ -3025,7 +3046,7 @@
     }
 
     function editTask(taskId) {
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
       editingTaskId = taskId;
@@ -3041,7 +3062,7 @@
 
     function saveEditedTask() {
       if (!editingTaskId) return;
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       const task = tasks.find(item => item.id === editingTaskId);
       if (!task) return;
       const cleanTitle = taskEditTitle.value.trim().slice(0, 160);
@@ -3062,7 +3083,7 @@
     }
 
     function deleteTask(taskId) {
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
       const ok = confirm(`Ištrinti užduotį „${taskTitle(task)}“?`);
@@ -3085,7 +3106,7 @@
       if (!cleanTitle) return;
       const shells = Number(prompt("Kiek kriauklyčių?", "1"));
       if (!Number.isFinite(shells) || shells < 0 || shells > 99) return;
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       tasks.push({
         id: `${state.active}Custom${Date.now()}`,
         icon: "✨",

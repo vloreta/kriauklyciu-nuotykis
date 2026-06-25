@@ -1283,6 +1283,41 @@
       font-weight: 800;
     }
 
+    .habit-archive-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .habit-archive-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 9px;
+      border-radius: 8px;
+      background: #f4f8fa;
+      border: 1px solid #dceaf1;
+      font-weight: 800;
+    }
+
+    .habit-archive-item small {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .habit-archive-item button {
+      min-height: 32px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--sea);
+      color: white;
+      cursor: pointer;
+      font-weight: 850;
+      padding: 0 10px;
+    }
+
     .penalty-controls {
       display: grid;
       grid-template-columns: 1fr;
@@ -1883,6 +1918,15 @@
               <button class="action warning" id="penaltyButton" type="button">Atimti</button>
             </div>
           </div>
+          <div class="parent-control-card" id="habitArchiveManagement">
+            <div class="parent-section-title">
+              <div>
+                <h3>Įpročių archyvas</h3>
+                <p>Čia laikomos užduotys, kurios jau tapo įpročiu.</p>
+              </div>
+            </div>
+            <div class="habit-archive-list" id="habitArchiveList"></div>
+          </div>
           <div class="parent-control-card" id="dataManagement">
             <div class="parent-section-title">
               <div>
@@ -2453,6 +2497,7 @@
         childGuides: { ...(raw.childGuides || {}) },
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
+        archivedTasks: raw.archivedTasks || {},
         weekendPrizeSettings: {
           title: raw.weekendPrizeSettings?.title || defaultWeekendPrizeSettings.title,
           description: raw.weekendPrizeSettings?.description || defaultWeekendPrizeSettings.description,
@@ -2484,6 +2529,10 @@
       if (!next.childProfiles[next.active]) {
         next.active = Object.keys(next.childProfiles)[0] || "olivia";
       }
+
+      Object.keys(next.childProfiles).forEach(childId => {
+        if (!next.archivedTasks[childId]) next.archivedTasks[childId] = {};
+      });
 
       if (next.lastCalendarDate !== currentDay) {
         next.selectedDate = currentDay;
@@ -2712,8 +2761,24 @@
     }
 
     function tasksForChild(childId = state.active) {
+      return tasksForChildOnDate(childId, state.selectedDate);
+    }
+
+    function allTasksForChild(childId = state.active) {
       const customTasks = ensureCustomTasks();
       return customTasks[childId] || customTasks.olivia;
+    }
+
+    function taskArchivedAt(childId, taskId) {
+      const archiveEntry = state.archivedTasks?.[childId]?.[taskId];
+      return typeof archiveEntry === "string" ? archiveEntry : archiveEntry?.archivedAt || "";
+    }
+
+    function tasksForChildOnDate(childId = state.active, date = state.selectedDate) {
+      return allTasksForChild(childId).filter(task => {
+        const archivedAt = taskArchivedAt(childId, task.id);
+        return !archivedAt || date < archivedAt;
+      });
     }
 
     function maxDailyShells(childId = state.active) {
@@ -3028,7 +3093,7 @@
 
     function saveEditedTask() {
       if (!editingTaskId) return;
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       const task = tasks.find(item => item.id === editingTaskId);
       if (!task) return;
       const cleanTitle = taskEditTitle.value.trim().slice(0, 160);
@@ -3049,7 +3114,7 @@
     }
 
     function deleteTask(taskId) {
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
       const ok = confirm(`Ištrinti užduotį „${taskTitle(task)}“?`);
@@ -3067,7 +3132,7 @@
 
     function moveTask(beforeTaskId, movedTaskId) {
       if (!state.editMode || beforeTaskId === movedTaskId) return;
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       const fromIndex = tasks.findIndex(task => task.id === movedTaskId);
       const toIndex = tasks.findIndex(task => task.id === beforeTaskId);
       if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
@@ -3080,7 +3145,7 @@
 
     function moveTaskToEnd(taskId) {
       if (!state.editMode) return;
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       const fromIndex = tasks.findIndex(task => task.id === taskId);
       if (fromIndex < 0 || fromIndex === tasks.length - 1) return;
       const [movedTask] = tasks.splice(fromIndex, 1);
@@ -3101,7 +3166,7 @@
       if (!cleanTitle) return;
       const shells = Number(prompt("Kiek kriauklyčių?", "1"));
       if (!Number.isFinite(shells) || shells < 0 || shells > 99) return;
-      const tasks = tasksForChild();
+      const tasks = allTasksForChild();
       tasks.push({
         id: `${state.active}Custom${Date.now()}`,
         icon: "✨",
@@ -3111,6 +3176,32 @@
       save();
       render();
       showToast("Nauja užduotis pridėta.");
+    }
+
+    function archiveTask(taskId) {
+      const task = allTasksForChild().find(item => item.id === taskId);
+      if (!task) return;
+      const childId = state.active;
+      if (!state.archivedTasks[childId]) state.archivedTasks[childId] = {};
+      state.archivedTasks[childId][taskId] = {
+        archivedAt: state.selectedDate,
+        title: taskTitle(task),
+        shells: task.shells,
+        icon: task.icon
+      };
+      save();
+      render();
+      showToast("Užduotis perkelta į įpročių archyvą.");
+    }
+
+    function restoreArchivedTask(taskId) {
+      const childId = state.active;
+      if (state.archivedTasks?.[childId]) {
+        delete state.archivedTasks[childId][taskId];
+      }
+      save();
+      render();
+      showToast("Užduotis grąžinta į aktyvų sąrašą.");
     }
 
     // UI renderers
@@ -3137,6 +3228,7 @@
           ${state.editMode ? `
             <span class="task-edit-actions">
               <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
+              <button type="button" data-archive-task="${safeTaskId}" aria-label="Perkelti užduotį į įpročių archyvą ${escapeHtml(title)}">Į archyvą</button>
               <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
             </span>
           ` : ""}
@@ -3168,6 +3260,10 @@
           event.stopPropagation();
           editTask(task.id);
         });
+        button.querySelector("[data-archive-task]")?.addEventListener("click", event => {
+          event.stopPropagation();
+          archiveTask(task.id);
+        });
         button.querySelector("[data-delete-task]")?.addEventListener("click", event => {
           event.stopPropagation();
           deleteTask(task.id);
@@ -3190,6 +3286,33 @@
         });
         contentArea.appendChild(endDropZone);
       }
+    }
+
+    function renderHabitArchive() {
+      const list = document.getElementById("habitArchiveList");
+      if (!list) return;
+      const childId = state.active;
+      const archive = state.archivedTasks?.[childId] || {};
+      const tasksById = Object.fromEntries(allTasksForChild(childId).map(task => [task.id, task]));
+      const entries = Object.entries(archive);
+      list.innerHTML = "";
+      if (!entries.length) {
+        list.innerHTML = `<div class="empty">Archyve dar nėra užduočių.</div>`;
+        return;
+      }
+      entries.forEach(([taskId, archived]) => {
+        const task = tasksById[taskId];
+        const title = archived.title || (task ? taskTitle(task) : "Archyvuota užduotis");
+        const archivedAt = typeof archived === "string" ? archived : archived.archivedAt;
+        const row = document.createElement("div");
+        row.className = "habit-archive-item";
+        row.innerHTML = `
+          <span>${escapeHtml(title)}<small>Nuo ${formatDate(archivedAt)}</small></span>
+          <button type="button" data-restore-archive="${escapeHtml(taskId)}">Grąžinti</button>
+        `;
+        row.querySelector("[data-restore-archive]")?.addEventListener("click", () => restoreArchivedTask(taskId));
+        list.appendChild(row);
+      });
     }
 
     function renderLog() {
@@ -3563,6 +3686,7 @@
       }
       delete state.childProfiles[childId];
       if (state.customTasks) delete state.customTasks[childId];
+      if (state.archivedTasks) delete state.archivedTasks[childId];
       if (state.childGuides) delete state.childGuides[childId];
       Object.values(state.records || {}).forEach(day => {
         delete day[childId];
@@ -3786,6 +3910,7 @@
       renderWeekendPrize(weekTotals);
       renderSurprises();
       renderPenaltyOptions();
+      renderHabitArchive();
       renderRace(todayTotals);
       childIds().forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
     }
