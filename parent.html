@@ -2844,9 +2844,6 @@
         if (dateKeyValue > archiveLimit) return summary;
         const childDay = day?.[childId];
         if (!childDay) return summary;
-        const done = childDay.done || {};
-        const hasDoneFlag = Object.prototype.hasOwnProperty.call(done, taskId);
-        const isDone = done[taskId] === true;
         const logNet = (childDay.log || []).reduce((sum, item) => {
           if (logEntryMatchesTask(item, taskId, title)) {
             const delta = shellDeltaFromLog(item);
@@ -2854,10 +2851,9 @@
           }
           return sum;
         }, 0);
-        const countsForDay = hasDoneFlag ? isDone : logNet > 0;
-        if (!countsForDay) return summary;
+        if (logNet <= 0) return summary;
         summary.count += 1;
-        summary.shells += logNet > 0 ? logNet : Number(task?.shells || 0);
+        summary.shells += logNet;
         return summary;
       }, { count: 0, shells: 0 });
     }
