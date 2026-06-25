@@ -1520,6 +1520,13 @@
     .edit-card h3 {
       margin: 0;
       font-size: 1.25rem;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .edit-card h3:active {
+      cursor: grabbing;
     }
 
     .edit-card label {
@@ -2787,11 +2794,17 @@
     }
 
     const taskIconLibrary = [
-      "🌙", "🌌", "🌅", "🌞", "🛏️", "🧸", "📚", "🖍️", "🎨", "🧩",
-      "🧱", "🏫", "🎒", "👟", "🧥", "🧢", "👚", "🪞", "🧼", "🫧",
-      "🍽️", "🍴", "🍲", "🍝", "🥣", "🧽", "🙏", "🙌", "👋", "💬",
-      "💌", "💗", "💙", "💐", "🤝", "🕊️", "🛡️", "🤫", "⭐", "🏅",
-      "🎤", "🎙️", "🚲", "🛴", "⚽", "🪁", "🌳", "🌤️", "🌈", "✨"
+      "🌙", "🌌", "🌅", "🌞", "⏰", "🛏️", "🧸", "🧺", "🧦", "👕",
+      "👚", "🧥", "🧢", "👟", "🎒", "🪞", "🪥", "🧼", "🫧", "🧽",
+      "🧹", "🪣", "🧴", "🧻", "🧼", "🧺", "🧸", "📚", "📖", "📕",
+      "✏️", "🖍️", "📝", "📒", "📐", "📏", "🔢", "🔤", "🧮", "🧠",
+      "🎨", "🖌️", "✂️", "🧩", "🧱", "🎲", "🧵", "🪡", "🏫", "🚌",
+      "🚶‍♀️", "🚶‍♂️", "🌤️", "🌳", "🛝", "🚲", "🛴", "⚽", "🏀", "🪁",
+      "🍽️", "🍴", "🥄", "🥣", "🍲", "🍝", "🍎", "🥕", "🥪", "🧃",
+      "🙏", "🙌", "👋", "💬", "💌", "💗", "💙", "💐", "🌷", "🤝",
+      "🫶", "🕊️", "🛡️", "🤫", "😊", "😇", "⭐", "🌟", "🏅", "🎁",
+      "🎤", "🎙️", "🎵", "🎶", "💃", "🕺", "🌈", "🦀", "🐚", "💎",
+      "🧜‍♀️", "🐉", "✨", "🎯", "🚀", "🏆", "🪄", "💡", "🧭", "🪴"
     ];
 
     function renderTaskIconPicker() {
@@ -3013,6 +3026,14 @@
 
     function openDialog(dialog, focusTarget) {
       dialogReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const card = dialog.querySelector(".edit-card");
+      if (card) {
+        card.style.position = "";
+        card.style.left = "";
+        card.style.top = "";
+        card.style.margin = "";
+        card.style.zIndex = "";
+      }
       dialog.classList.add("open");
       dialog.setAttribute("aria-hidden", "false");
       document.body.classList.add("dialog-open");
@@ -3025,6 +3046,50 @@
       if (!document.querySelector(".edit-dialog.open")) document.body.classList.remove("dialog-open");
       dialogReturnFocus?.focus();
       dialogReturnFocus = null;
+    }
+
+    function makeDialogDraggable(dialog) {
+      const card = dialog.querySelector(".edit-card");
+      const handle = dialog.querySelector("h3");
+      if (!card || !handle) return;
+
+      let drag = null;
+      handle.addEventListener("pointerdown", event => {
+        if (event.button !== 0) return;
+        const rect = card.getBoundingClientRect();
+        drag = {
+          dx: event.clientX - rect.left,
+          dy: event.clientY - rect.top
+        };
+        card.style.position = "fixed";
+        card.style.left = `${rect.left}px`;
+        card.style.top = `${rect.top}px`;
+        card.style.margin = "0";
+        card.style.zIndex = "80";
+        handle.setPointerCapture(event.pointerId);
+      });
+
+      handle.addEventListener("pointermove", event => {
+        if (!drag) return;
+        const width = card.offsetWidth;
+        const height = card.offsetHeight;
+        const left = Math.min(Math.max(8, event.clientX - drag.dx), window.innerWidth - width - 8);
+        const top = Math.min(Math.max(8, event.clientY - drag.dy), window.innerHeight - height - 8);
+        card.style.left = `${left}px`;
+        card.style.top = `${top}px`;
+      });
+
+      const stopDragging = event => {
+        if (!drag) return;
+        drag = null;
+        try {
+          handle.releasePointerCapture(event.pointerId);
+        } catch {
+          // Pointer capture may already be released.
+        }
+      };
+      handle.addEventListener("pointerup", stopDragging);
+      handle.addEventListener("pointercancel", stopDragging);
     }
 
     function oliviaDefaultGuide(shells) {
@@ -4291,6 +4356,8 @@
       if (!button) return;
       setSelectedTaskIcon(button.dataset.taskIcon);
     });
+
+    document.querySelectorAll(".edit-dialog").forEach(makeDialogDraggable);
 
     document.getElementById("taskEditCancel").addEventListener("click", closeTaskEditor);
 
