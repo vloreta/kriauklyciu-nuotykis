@@ -852,6 +852,32 @@
       font-weight: 600;
     }
 
+    .log-emotions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .log-emotion {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(235, 252, 250, .88);
+      border: 1px solid rgba(14, 149, 171, .16);
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .log-emotion img {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      object-fit: cover;
+    }
+
     .date-nav {
       display: flex;
       gap: 8px;
@@ -2192,6 +2218,14 @@
 
   <script>
     // Default content and application state
+    const emotionOptions = [
+      { id: "happy", label: "Linksmas", image: "assets/emotion-happy.png" },
+      { id: "calm", label: "Ramus", image: "assets/emotion-calm.png" },
+      { id: "sad", label: "Liūdnas", image: "assets/emotion-sad.png" },
+      { id: "angry", label: "Piktas", image: "assets/emotion-angry.png" },
+      { id: "scared", label: "Išsigandęs", image: "assets/emotion-scared.png" }
+    ];
+
     const defaultChildTasks = {
       olivia: [
         { id: "oliSleepAlone", icon: "🌙", title: "Pati užmigau be kitų", shells: 3 },
@@ -2788,8 +2822,11 @@
       if (!targetState.records[key]) targetState.records[key] = {};
       childIds(targetState).forEach(childId => {
         if (!targetState.records[key][childId]) {
-          targetState.records[key][childId] = { shells: 0, done: {}, log: [] };
+          targetState.records[key][childId] = { shells: 0, done: {}, log: [], emotions: [], emotionLog: [] };
         }
+        const child = targetState.records[key][childId];
+        if (!Array.isArray(child.emotions)) child.emotions = [];
+        if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
       });
       return targetState.records[key];
     }
@@ -3302,6 +3339,26 @@
       return typeof item === "string" ? item : item.text;
     }
 
+    function emotionById(emotionId) {
+      return emotionOptions.find(emotion => emotion.id === emotionId);
+    }
+
+    function renderEmotionSummary(child) {
+      const selected = Array.isArray(child.emotions) ? child.emotions : [];
+      const items = selected.map(emotionById).filter(Boolean);
+      if (!items.length) return "";
+      return `
+        <div class="log-emotions" aria-label="Šios dienos emocijos">
+          ${items.map(emotion => `
+            <span class="log-emotion">
+              <img src="${escapeHtml(emotion.image)}" alt="">
+              ${escapeHtml(emotion.label)}
+            </span>
+          `).join("")}
+        </div>
+      `;
+    }
+
     function undoLogItem(item) {
       if (typeof item === "string" || item.undone) return;
 
@@ -3715,8 +3772,9 @@
       const child = activeChild();
       log.innerHTML = "";
       document.getElementById("logTitle").textContent = formatDate(state.selectedDate);
+      log.insertAdjacentHTML("beforeend", renderEmotionSummary(child));
       if (!child.log.length) {
-        log.innerHTML = `<div class="empty">Dar nėra pažymėtų darbelių.</div>`;
+        log.insertAdjacentHTML("beforeend", `<div class="empty">Dar nėra pažymėtų darbelių.</div>`);
         return;
       }
       child.log.forEach(item => {

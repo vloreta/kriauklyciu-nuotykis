@@ -784,6 +784,105 @@
       font-weight: 600;
     }
 
+    .emotion-island {
+      margin: 12px 0 14px;
+      padding: 12px;
+      border: 1px solid rgba(14, 149, 171, .18);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(240, 253, 255, .92), rgba(255, 249, 232, .72));
+      box-shadow: 0 8px 22px rgba(31, 54, 71, .06);
+    }
+
+    .emotion-island h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .emotion-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .emotion-button {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      gap: 4px;
+      min-width: 74px;
+      padding: 7px 8px;
+      border: 1px solid rgba(14, 149, 171, .16);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .82);
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 850;
+      box-shadow: 0 3px 10px rgba(31, 54, 71, .05);
+    }
+
+    .emotion-button img {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      object-fit: cover;
+      background: #fff;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.75);
+    }
+
+    .emotion-button span {
+      font-size: .78rem;
+      line-height: 1.1;
+    }
+
+    .emotion-button.selected {
+      border-color: var(--sea);
+      background: rgba(235, 252, 250, .95);
+      box-shadow: 0 0 0 3px rgba(14, 149, 171, .13);
+    }
+
+    .emotion-button.selected::after {
+      content: "✓";
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--sea);
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 900;
+    }
+
+    .log-emotions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .log-emotion {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(235, 252, 250, .88);
+      border: 1px solid rgba(14, 149, 171, .16);
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .log-emotion img {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      object-fit: cover;
+    }
+
     .date-nav {
       display: flex;
       gap: 8px;
@@ -2032,6 +2131,7 @@
           </div>
         </div>
         <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
+        <section class="emotion-island" id="emotionIsland" aria-label="Krabukų emocijų sala"></section>
         <div id="contentArea"></div>
       </section>
 
@@ -2119,6 +2219,14 @@
 
   <script>
     // Default content and application state
+    const emotionOptions = [
+      { id: "happy", label: "Linksmas", image: "assets/emotion-happy.png" },
+      { id: "calm", label: "Ramus", image: "assets/emotion-calm.png" },
+      { id: "sad", label: "Liūdnas", image: "assets/emotion-sad.png" },
+      { id: "angry", label: "Piktas", image: "assets/emotion-angry.png" },
+      { id: "scared", label: "Išsigandęs", image: "assets/emotion-scared.png" }
+    ];
+
     const defaultChildTasks = {
       olivia: [
         { id: "oliSleepAlone", icon: "🌙", title: "Pati užmigau be kitų", shells: 3 },
@@ -2641,8 +2749,11 @@
       if (!targetState.records[key]) targetState.records[key] = {};
       childIds(targetState).forEach(childId => {
         if (!targetState.records[key][childId]) {
-          targetState.records[key][childId] = { shells: 0, done: {}, log: [] };
+          targetState.records[key][childId] = { shells: 0, done: {}, log: [], emotions: [], emotionLog: [] };
         }
+        const child = targetState.records[key][childId];
+        if (!Array.isArray(child.emotions)) child.emotions = [];
+        if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
       });
       return targetState.records[key];
     }
@@ -3212,6 +3323,79 @@
       taskCard.classList.toggle("parent-tip-open", !isOpen);
     }
 
+    function emotionById(emotionId) {
+      return emotionOptions.find(emotion => emotion.id === emotionId);
+    }
+
+    function activeEmotions() {
+      const child = activeChild();
+      if (!Array.isArray(child.emotions)) child.emotions = [];
+      if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
+      return child.emotions;
+    }
+
+    function chooseEmotion(emotionId) {
+      const emotion = emotionById(emotionId);
+      if (!emotion) return;
+      const child = activeChild();
+      if (!Array.isArray(child.emotions)) child.emotions = [];
+      if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
+      if (child.emotions.includes(emotionId)) return;
+      child.emotions.push(emotionId);
+      child.emotionLog.push({
+        id: `${state.selectedDate}-${state.active}-${emotionId}-${Date.now()}`,
+        childId: state.active,
+        date: state.selectedDate,
+        emotionId,
+        label: emotion.label,
+        createdAt: new Date().toISOString()
+      });
+      save();
+      render();
+    }
+
+    function renderEmotionIsland() {
+      const island = document.getElementById("emotionIsland");
+      if (!island) return;
+      if (state.view !== "day") {
+        island.hidden = true;
+        return;
+      }
+      island.hidden = false;
+      const selected = activeEmotions();
+      island.innerHTML = `
+        <h3>Krabukų emocijų sala</h3>
+        <div class="today">Kaip šiandien jaučiuosi?</div>
+        <div class="emotion-options">
+          ${emotionOptions.map(emotion => `
+            <button class="emotion-button${selected.includes(emotion.id) ? " selected" : ""}" type="button" data-emotion="${escapeHtml(emotion.id)}" aria-pressed="${selected.includes(emotion.id)}">
+              <img src="${escapeHtml(emotion.image)}" alt="">
+              <span>${escapeHtml(emotion.label)}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+      island.querySelectorAll("[data-emotion]").forEach(button => {
+        button.addEventListener("click", () => chooseEmotion(button.dataset.emotion));
+      });
+    }
+
+    function renderEmotionSummary(child) {
+      const selected = Array.isArray(child.emotions) ? child.emotions : [];
+      const items = selected.map(emotionById).filter(Boolean);
+      if (!items.length) return "";
+      return `
+        <div class="log-emotions" aria-label="Šios dienos emocijos">
+          ${items.map(emotion => `
+            <span class="log-emotion">
+              <img src="${escapeHtml(emotion.image)}" alt="">
+              ${escapeHtml(emotion.label)}
+            </span>
+          `).join("")}
+        </div>
+      `;
+    }
+
     function renderTasks() {
       const child = activeChild();
       contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
@@ -3277,8 +3461,9 @@
       const child = activeChild();
       log.innerHTML = "";
       document.getElementById("logTitle").textContent = formatDate(state.selectedDate);
+      log.insertAdjacentHTML("beforeend", renderEmotionSummary(child));
       if (!child.log.length) {
-        log.innerHTML = `<div class="empty">Dar nėra pažymėtų darbelių.</div>`;
+        log.insertAdjacentHTML("beforeend", `<div class="empty">Dar nėra pažymėtų darbelių.</div>`);
         return;
       }
       child.log.forEach(item => {
@@ -3888,6 +4073,7 @@
         : formatDate(state.selectedDate);
       document.getElementById("activeName").textContent = activeName();
       document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
+      renderEmotionIsland();
 
       if (state.view === "day") renderTasks();
       if (state.view === "month") renderMonth();
