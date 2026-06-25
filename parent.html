@@ -2824,16 +2824,16 @@
       return typeof item === "string" ? item : item?.text || "";
     }
 
-    function positiveShellsFromLog(item) {
-      if (typeof item !== "string" && Number(item?.delta) > 0) return Number(item.delta);
-      const match = logEntryText(item).match(/\(\+(\d+)\)/);
+    function shellDeltaFromLog(item) {
+      if (typeof item !== "string" && Number.isFinite(Number(item?.delta))) return Number(item.delta);
+      const match = logEntryText(item).match(/\(([+-]\d+)\)/);
       return match ? Number(match[1]) : 0;
     }
 
     function logEntryMatchesTask(item, taskId, title) {
       if (typeof item !== "string" && item?.taskId === taskId) return true;
       const text = logEntryText(item);
-      return Boolean(title && text.includes(`: ${title} (+`));
+      return Boolean(title && (text.includes(`: ${title} (+`) || text.includes(` - ${title} (-`)));
     }
 
     function archivedTaskHistory(childId, taskId, archivedAt, createdAt, title) {
@@ -2845,10 +2845,15 @@
         const logs = day?.[childId]?.log || [];
         logs.forEach(item => {
           if (logEntryMatchesTask(item, taskId, title)) {
-            const shells = positiveShellsFromLog(item);
-            if (!shells) return;
-            summary.count += 1;
-            summary.shells += shells;
+            const delta = shellDeltaFromLog(item);
+            if (!delta) return;
+            if (delta > 0) {
+              summary.count += 1;
+              summary.shells += delta;
+            } else {
+              summary.count = Math.max(0, summary.count - 1);
+              summary.shells = Math.max(0, summary.shells + delta);
+            }
           }
         });
         return summary;
