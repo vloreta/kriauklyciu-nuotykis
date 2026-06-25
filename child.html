@@ -786,11 +786,12 @@
 
     .emotion-island {
       display: grid;
-      grid-template-columns: minmax(190px, 24%) 1fr;
+      grid-template-columns: minmax(170px, 18%) minmax(0, max-content);
       align-items: center;
-      column-gap: 18px;
-      margin: 12px 0 14px;
-      padding: 14px 16px;
+      justify-content: start;
+      column-gap: 10px;
+      margin: 8px 0 10px;
+      padding: 8px 10px;
       border: 1px solid rgba(14, 149, 171, .18);
       border-radius: 12px;
       background: linear-gradient(135deg, rgba(240, 253, 255, .92), rgba(255, 249, 232, .72));
@@ -798,7 +799,7 @@
     }
 
     .emotion-island h3 {
-      margin: 0 0 7px;
+      margin: 0 0 4px;
       font-size: 1.21rem;
       line-height: 1.1;
       text-align: left;
@@ -817,9 +818,10 @@
     .emotion-options {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: clamp(10px, 1.8vw, 22px);
+      gap: clamp(3px, .7vw, 10px);
       margin-top: 0;
       align-items: start;
+      justify-items: center;
     }
 
     .emotion-button {
@@ -827,9 +829,9 @@
       display: grid;
       justify-items: center;
       align-content: start;
-      gap: 6px;
+      gap: 1px;
       min-width: 0;
-      padding: 8px 4px 7px;
+      padding: 2px 2px 3px;
       border: 0;
       border-radius: 18px;
       background: transparent;
@@ -851,6 +853,7 @@
       font-size: .7rem;
       line-height: 1.1;
       color: var(--muted);
+      margin-top: -2px;
     }
 
     .emotion-button.selected {
@@ -877,12 +880,12 @@
     @media (max-width: 760px) {
       .emotion-island {
         grid-template-columns: 1fr;
-        row-gap: 10px;
+        row-gap: 6px;
       }
 
       .emotion-options {
         grid-template-columns: repeat(5, minmax(54px, 1fr));
-        gap: 6px;
+        gap: 2px;
       }
 
       .emotion-button img {
