@@ -852,6 +852,97 @@
       font-weight: 600;
     }
 
+    .emotion-island {
+      position: relative;
+      margin: 12px 0 14px;
+      padding: 14px;
+      border: 1px solid rgba(14, 149, 171, .18);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(240, 253, 255, .92), rgba(255, 249, 232, .72));
+      box-shadow: 0 8px 22px rgba(31, 54, 71, .06);
+    }
+
+    .emotion-island h3 {
+      margin: 0 42px 8px 0;
+      font-size: 1.05rem;
+    }
+
+    .emotion-menu-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .92);
+      box-shadow: 0 2px 10px rgba(31, 54, 71, .14);
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 1.25rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .emotion-options {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .emotion-button {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      align-content: start;
+      gap: 6px;
+      min-width: 0;
+      padding: 8px 4px 7px;
+      border: 0;
+      border-radius: 18px;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 850;
+    }
+
+    .emotion-button img {
+      width: clamp(64px, 12vw, 112px);
+      height: clamp(64px, 12vw, 112px);
+      border-radius: 999px;
+      object-fit: cover;
+      background: transparent;
+    }
+
+    .emotion-button span {
+      font-size: .7rem;
+      line-height: 1.1;
+      color: var(--muted);
+    }
+
+    .emotion-button.selected {
+      background: rgba(235, 252, 250, .9);
+      box-shadow: 0 0 0 2px rgba(14, 149, 171, .16);
+    }
+
+    .emotion-button.selected::after {
+      content: "✓";
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--sea);
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 900;
+    }
+
     .log-emotions {
       display: flex;
       flex-wrap: wrap;
@@ -2126,6 +2217,7 @@
           </div>
         </div>
         <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
+        <section class="emotion-island" id="emotionIsland" aria-label="Krabukų emocijų sala"></section>
         <div id="contentArea"></div>
       </section>
 
@@ -2212,6 +2304,24 @@
       <div class="edit-actions">
         <button class="action" type="submit">Išsaugoti</button>
         <button class="action secondary" id="surpriseEditCancel" type="button">Atšaukti</button>
+      </div>
+    </form>
+  </div>
+  <div class="edit-dialog" id="emotionEditDialog" role="dialog" aria-modal="true" aria-labelledby="emotionEditHeading" aria-hidden="true">
+    <form class="edit-card" id="emotionEditForm">
+      <h3 id="emotionEditHeading">Emocijų salos nustatymai</h3>
+      <label>
+        Antraštė
+        <input id="emotionTitleInput" type="text" maxlength="80" autocomplete="off">
+      </label>
+      <label>
+        Klausimas
+        <input id="emotionQuestionInput" type="text" maxlength="120" autocomplete="off">
+      </label>
+      <div class="prize-editor-list" id="emotionLabelEditorList"></div>
+      <div class="edit-actions">
+        <button class="action" type="submit">Išsaugoti</button>
+        <button class="action secondary" id="emotionEditCancel" type="button">Atšaukti</button>
       </div>
     </form>
   </div>
@@ -2708,6 +2818,11 @@
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
         archivedTasks: raw.archivedTasks || {},
+        emotionSettings: {
+          title: raw.emotionSettings?.title || "Krabukų emocijų sala",
+          question: raw.emotionSettings?.question || "Kaip šiandien jaučiuosi?",
+          labels: { ...(raw.emotionSettings?.labels || {}) }
+        },
         weekendPrizeSettings: {
           title: raw.weekendPrizeSettings?.title || defaultWeekendPrizeSettings.title,
           description: raw.weekendPrizeSettings?.description || defaultWeekendPrizeSettings.description,
@@ -3339,8 +3454,24 @@
       return typeof item === "string" ? item : item.text;
     }
 
+    function emotionSettings() {
+      return {
+        title: state.emotionSettings?.title || "Krabukų emocijų sala",
+        question: state.emotionSettings?.question || "Kaip šiandien jaučiuosi?",
+        labels: { ...(state.emotionSettings?.labels || {}) }
+      };
+    }
+
+    function emotionsForUi() {
+      const settings = emotionSettings();
+      return emotionOptions.map(emotion => ({
+        ...emotion,
+        label: settings.labels[emotion.id] || emotion.label
+      }));
+    }
+
     function emotionById(emotionId) {
-      return emotionOptions.find(emotion => emotion.id === emotionId);
+      return emotionsForUi().find(emotion => emotion.id === emotionId);
     }
 
     function renderEmotionSummary(child) {
@@ -3357,6 +3488,65 @@
           `).join("")}
         </div>
       `;
+    }
+
+    function activeEmotions() {
+      const child = activeChild();
+      if (!Array.isArray(child.emotions)) child.emotions = [];
+      if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
+      return child.emotions;
+    }
+
+    function chooseEmotion(emotionId) {
+      const emotion = emotionById(emotionId);
+      if (!emotion) return;
+      const child = activeChild();
+      if (!Array.isArray(child.emotions)) child.emotions = [];
+      if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
+      const selected = child.emotions.includes(emotionId);
+      child.emotions = selected
+        ? child.emotions.filter(id => id !== emotionId)
+        : [...child.emotions, emotionId];
+      child.emotionLog.push({
+        id: `${state.selectedDate}-${state.active}-${emotionId}-${Date.now()}`,
+        childId: state.active,
+        date: state.selectedDate,
+        emotionId,
+        label: emotion.label,
+        action: selected ? "unselect" : "select",
+        createdAt: new Date().toISOString()
+      });
+      save();
+      render();
+    }
+
+    function renderEmotionIsland() {
+      const island = document.getElementById("emotionIsland");
+      if (!island) return;
+      if (state.view !== "day") {
+        island.hidden = true;
+        return;
+      }
+      island.hidden = false;
+      const selected = activeEmotions();
+      const settings = emotionSettings();
+      island.innerHTML = `
+        <button class="emotion-menu-button" id="emotionMenuButton" type="button" aria-label="Keisti emocijų salą">⋮</button>
+        <h3>${escapeHtml(settings.title)}</h3>
+        <div class="today">${escapeHtml(settings.question)}</div>
+        <div class="emotion-options">
+          ${emotionsForUi().map(emotion => `
+            <button class="emotion-button${selected.includes(emotion.id) ? " selected" : ""}" type="button" data-emotion="${escapeHtml(emotion.id)}" aria-pressed="${selected.includes(emotion.id)}">
+              <img src="${escapeHtml(emotion.image)}" alt="">
+              <span>${escapeHtml(emotion.label)}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+      island.querySelectorAll("[data-emotion]").forEach(button => {
+        button.addEventListener("click", () => chooseEmotion(button.dataset.emotion));
+      });
+      island.querySelector("#emotionMenuButton")?.addEventListener("click", openEmotionEditor);
     }
 
     function undoLogItem(item) {
@@ -4088,6 +4278,29 @@
       closeDialog(document.getElementById("surpriseEditDialog"));
     }
 
+    function renderEmotionLabelEditor() {
+      const settings = emotionSettings();
+      const list = document.getElementById("emotionLabelEditorList");
+      list.innerHTML = emotionsForUi().map(emotion => `
+        <label>
+          ${escapeHtml(emotion.label)}
+          <input data-emotion-label="${escapeHtml(emotion.id)}" type="text" maxlength="40" value="${escapeHtml(settings.labels[emotion.id] || emotion.label)}">
+        </label>
+      `).join("");
+    }
+
+    function openEmotionEditor() {
+      const settings = emotionSettings();
+      document.getElementById("emotionTitleInput").value = settings.title;
+      document.getElementById("emotionQuestionInput").value = settings.question;
+      renderEmotionLabelEditor();
+      openDialog(document.getElementById("emotionEditDialog"), document.getElementById("emotionTitleInput"));
+    }
+
+    function closeEmotionEditor() {
+      closeDialog(document.getElementById("emotionEditDialog"));
+    }
+
     function saveSurpriseSettings() {
       const items = [...new Set(surpriseEditorValues())];
       if (!items.length) {
@@ -4355,6 +4568,7 @@
         : formatDate(state.selectedDate);
       document.getElementById("activeName").textContent = activeName();
       document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
+      renderEmotionIsland();
 
       if (state.view === "day") renderTasks();
       if (state.view === "week") renderWeek();
@@ -4477,6 +4691,28 @@
       if (event.target.id === "surpriseEditDialog") closeSurpriseEditor();
     });
 
+    document.getElementById("emotionEditCancel").addEventListener("click", closeEmotionEditor);
+    document.getElementById("emotionEditForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const labels = {};
+      document.querySelectorAll("[data-emotion-label]").forEach(input => {
+        const value = input.value.trim();
+        if (value) labels[input.dataset.emotionLabel] = value;
+      });
+      state.emotionSettings = {
+        title: document.getElementById("emotionTitleInput").value.trim() || "Krabukų emocijų sala",
+        question: document.getElementById("emotionQuestionInput").value.trim() || "Kaip šiandien jaučiuosi?",
+        labels
+      };
+      save();
+      closeEmotionEditor();
+      render();
+      showToast("Emocijų sala atnaujinta.");
+    });
+    document.getElementById("emotionEditDialog").addEventListener("click", event => {
+      if (event.target.id === "emotionEditDialog") closeEmotionEditor();
+    });
+
     taskEditForm.addEventListener("submit", event => {
       event.preventDefault();
       saveEditedTask();
@@ -4510,6 +4746,7 @@
         if (dialog.id === "settingsDialog") closeSettings();
         if (dialog.id === "weekendPrizeEditDialog") closeWeekendPrizeEditor();
         if (dialog.id === "surpriseEditDialog") closeSurpriseEditor();
+        if (dialog.id === "emotionEditDialog") closeEmotionEditor();
         return;
       }
 

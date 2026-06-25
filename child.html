@@ -786,7 +786,7 @@
 
     .emotion-island {
       margin: 12px 0 14px;
-      padding: 12px;
+      padding: 14px;
       border: 1px solid rgba(14, 149, 171, .18);
       border-radius: 12px;
       background: linear-gradient(135deg, rgba(240, 253, 255, .92), rgba(255, 249, 232, .72));
@@ -795,50 +795,50 @@
 
     .emotion-island h3 {
       margin: 0 0 8px;
-      font-size: 1rem;
+      font-size: 1.05rem;
     }
 
     .emotion-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
     }
 
     .emotion-button {
       position: relative;
       display: grid;
       justify-items: center;
-      gap: 4px;
-      min-width: 74px;
-      padding: 7px 8px;
-      border: 1px solid rgba(14, 149, 171, .16);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, .82);
+      align-content: start;
+      gap: 6px;
+      min-width: 0;
+      padding: 8px 4px 7px;
+      border: 0;
+      border-radius: 18px;
+      background: transparent;
       color: var(--ink);
       cursor: pointer;
       font: inherit;
       font-weight: 850;
-      box-shadow: 0 3px 10px rgba(31, 54, 71, .05);
     }
 
     .emotion-button img {
-      width: 52px;
-      height: 52px;
+      width: clamp(64px, 12vw, 112px);
+      height: clamp(64px, 12vw, 112px);
       border-radius: 999px;
       object-fit: cover;
-      background: #fff;
-      box-shadow: inset 0 0 0 2px rgba(255,255,255,.75);
+      background: transparent;
     }
 
     .emotion-button span {
-      font-size: .78rem;
+      font-size: .7rem;
       line-height: 1.1;
+      color: var(--muted);
     }
 
     .emotion-button.selected {
-      border-color: var(--sea);
-      background: rgba(235, 252, 250, .95);
-      box-shadow: 0 0 0 3px rgba(14, 149, 171, .13);
+      background: rgba(235, 252, 250, .9);
+      box-shadow: 0 0 0 2px rgba(14, 149, 171, .16);
     }
 
     .emotion-button.selected::after {
@@ -846,8 +846,8 @@
       position: absolute;
       top: 5px;
       right: 7px;
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       display: grid;
       place-items: center;
       border-radius: 999px;
@@ -2635,6 +2635,11 @@
         records: raw.records || {},
         weekendPrizes: raw.weekendPrizes || {},
         archivedTasks: raw.archivedTasks || {},
+        emotionSettings: {
+          title: raw.emotionSettings?.title || "Krabukų emocijų sala",
+          question: raw.emotionSettings?.question || "Kaip šiandien jaučiuosi?",
+          labels: { ...(raw.emotionSettings?.labels || {}) }
+        },
         weekendPrizeSettings: {
           title: raw.weekendPrizeSettings?.title || defaultWeekendPrizeSettings.title,
           description: raw.weekendPrizeSettings?.description || defaultWeekendPrizeSettings.description,
@@ -2756,6 +2761,22 @@
         if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
       });
       return targetState.records[key];
+    }
+
+    function emotionSettings() {
+      return {
+        title: state.emotionSettings?.title || "Krabukų emocijų sala",
+        question: state.emotionSettings?.question || "Kaip šiandien jaučiuosi?",
+        labels: { ...(state.emotionSettings?.labels || {}) }
+      };
+    }
+
+    function emotionsForUi() {
+      const settings = emotionSettings();
+      return emotionOptions.map(emotion => ({
+        ...emotion,
+        label: settings.labels[emotion.id] || emotion.label
+      }));
     }
 
     function shellWord(count) {
@@ -3324,7 +3345,7 @@
     }
 
     function emotionById(emotionId) {
-      return emotionOptions.find(emotion => emotion.id === emotionId);
+      return emotionsForUi().find(emotion => emotion.id === emotionId);
     }
 
     function activeEmotions() {
@@ -3340,14 +3361,17 @@
       const child = activeChild();
       if (!Array.isArray(child.emotions)) child.emotions = [];
       if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
-      if (child.emotions.includes(emotionId)) return;
-      child.emotions.push(emotionId);
+      const selected = child.emotions.includes(emotionId);
+      child.emotions = selected
+        ? child.emotions.filter(id => id !== emotionId)
+        : [...child.emotions, emotionId];
       child.emotionLog.push({
         id: `${state.selectedDate}-${state.active}-${emotionId}-${Date.now()}`,
         childId: state.active,
         date: state.selectedDate,
         emotionId,
         label: emotion.label,
+        action: selected ? "unselect" : "select",
         createdAt: new Date().toISOString()
       });
       save();
@@ -3363,11 +3387,12 @@
       }
       island.hidden = false;
       const selected = activeEmotions();
+      const settings = emotionSettings();
       island.innerHTML = `
-        <h3>Krabukų emocijų sala</h3>
-        <div class="today">Kaip šiandien jaučiuosi?</div>
+        <h3>${escapeHtml(settings.title)}</h3>
+        <div class="today">${escapeHtml(settings.question)}</div>
         <div class="emotion-options">
-          ${emotionOptions.map(emotion => `
+          ${emotionsForUi().map(emotion => `
             <button class="emotion-button${selected.includes(emotion.id) ? " selected" : ""}" type="button" data-emotion="${escapeHtml(emotion.id)}" aria-pressed="${selected.includes(emotion.id)}">
               <img src="${escapeHtml(emotion.image)}" alt="">
               <span>${escapeHtml(emotion.label)}</span>
