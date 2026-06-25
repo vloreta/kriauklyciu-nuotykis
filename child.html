@@ -3496,6 +3496,22 @@
       return child.emotions;
     }
 
+    function speakEmotionDialog(emotion) {
+      if (!emotion?.dialog || !("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) return;
+      const text = emotion.dialog.filter(Boolean).join(" ");
+      if (!text) return;
+      window.speechSynthesis.cancel();
+      const voiceLine = new SpeechSynthesisUtterance(text);
+      voiceLine.lang = "lt-LT";
+      voiceLine.rate = 0.9;
+      voiceLine.pitch = 1.45;
+      voiceLine.volume = 1;
+      const voices = window.speechSynthesis.getVoices();
+      const lithuanianVoice = voices.find(voice => voice.lang && voice.lang.toLowerCase().startsWith("lt"));
+      if (lithuanianVoice) voiceLine.voice = lithuanianVoice;
+      window.speechSynthesis.speak(voiceLine);
+    }
+
     function chooseEmotion(emotionId) {
       const emotion = emotionById(emotionId);
       if (!emotion) return;
@@ -3509,6 +3525,7 @@
       child.activeEmotionDialog = selected
         ? (child.emotions[child.emotions.length - 1] || null)
         : emotionId;
+      if (!selected) speakEmotionDialog(emotion);
       child.emotionLog.push({
         id: `${state.selectedDate}-${state.active}-${emotionId}-${Date.now()}`,
         childId: state.active,
