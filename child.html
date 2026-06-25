@@ -887,6 +887,42 @@
       font-weight: 900;
     }
 
+    .emotion-dialog {
+      grid-column: 1 / -1;
+      justify-self: stretch;
+      margin-top: 8px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(14, 149, 171, .16);
+      background: linear-gradient(135deg, rgba(255, 250, 232, .96), rgba(238, 253, 255, .96));
+      box-shadow: 0 10px 24px rgba(31, 54, 71, .08);
+      color: var(--ink);
+      animation: emotionDialogIn .22s ease-out;
+    }
+
+    .emotion-dialog p {
+      margin: 0;
+      font-weight: 850;
+      line-height: 1.32;
+    }
+
+    .emotion-dialog p + p {
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    @keyframes emotionDialogIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .emotion-button.selected .emotion-visual::after {
       content: "";
       position: absolute;
@@ -2293,11 +2329,11 @@
   <script>
     // Default content and application state
     const emotionOptions = [
-      { id: "happy", label: "Linksmas", image: "assets/emotion-happy.png" },
-      { id: "calm", label: "Ramus", image: "assets/emotion-calm.png" },
-      { id: "sad", label: "Liūdnas", image: "assets/emotion-sad.png" },
-      { id: "angry", label: "Piktas", image: "assets/emotion-angry.png" },
-      { id: "scared", label: "Išsigandęs", image: "assets/emotion-scared.png" }
+      { id: "happy", label: "Linksmas", image: "assets/emotion-happy.png", dialog: ["Labas!", "Papasakok, kas šiandien tave pradžiugino?"] },
+      { id: "calm", label: "Ramus", image: "assets/emotion-calm.png", dialog: ["Šiandien tu atrodai labai ramus.", "Kas tau padėjo taip jaustis?"] },
+      { id: "sad", label: "Liūdnas", image: "assets/emotion-sad.png", dialog: ["Aš matau, kad šiandien truputį liūdna...", "Ar nori man papasakoti?"] },
+      { id: "angry", label: "Piktas", image: "assets/emotion-angry.png", dialog: ["Oho, matau, kad šiandien pyksti.", "Kas nutiko?"] },
+      { id: "scared", label: "Išsigandęs", image: "assets/emotion-scared.png", dialog: ["Aš irgi kartais išsigąstu.", "Kas šiandien tave išgąsdino?"] }
     ];
 
     const defaultChildTasks = {
@@ -2827,11 +2863,12 @@
       if (!targetState.records[key]) targetState.records[key] = {};
       childIds(targetState).forEach(childId => {
         if (!targetState.records[key][childId]) {
-          targetState.records[key][childId] = { shells: 0, done: {}, log: [], emotions: [], emotionLog: [] };
+          targetState.records[key][childId] = { shells: 0, done: {}, log: [], emotions: [], emotionLog: [], activeEmotionDialog: null };
         }
         const child = targetState.records[key][childId];
         if (!Array.isArray(child.emotions)) child.emotions = [];
         if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
+        if (child.activeEmotionDialog && !child.emotions.includes(child.activeEmotionDialog)) child.activeEmotionDialog = null;
       });
       return targetState.records[key];
     }
@@ -3438,6 +3475,9 @@
       child.emotions = selected
         ? child.emotions.filter(id => id !== emotionId)
         : [...child.emotions, emotionId];
+      child.activeEmotionDialog = selected
+        ? (child.emotions[child.emotions.length - 1] || null)
+        : emotionId;
       child.emotionLog.push({
         id: `${state.selectedDate}-${state.active}-${emotionId}-${Date.now()}`,
         childId: state.active,
@@ -3461,6 +3501,7 @@
       island.hidden = false;
       const selected = activeEmotions();
       const settings = emotionSettings();
+      const dialogEmotion = emotionById(activeChild().activeEmotionDialog);
       island.innerHTML = `
         <div class="emotion-copy">
           <h3>${escapeHtml(settings.title)}</h3>
@@ -3474,6 +3515,12 @@
             </button>
           `).join("")}
         </div>
+        ${dialogEmotion?.dialog ? `
+          <div class="emotion-dialog" role="status" aria-live="polite">
+            <p>${escapeHtml(dialogEmotion.dialog[0])}</p>
+            <p>${escapeHtml(dialogEmotion.dialog[1])}</p>
+          </div>
+        ` : ""}
       `;
       island.querySelectorAll("[data-emotion]").forEach(button => {
         button.addEventListener("click", () => chooseEmotion(button.dataset.emotion));
