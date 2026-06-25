@@ -1079,6 +1079,44 @@
       line-height: 1.25;
     }
 
+    .icon-picker {
+      display: grid;
+      gap: 10px;
+    }
+
+    .icon-picker-title {
+      font-weight: 850;
+      color: var(--ink);
+    }
+
+    .icon-picker-grid {
+      max-height: 210px;
+      overflow: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: #f7fbfc;
+    }
+
+    .icon-choice {
+      min-height: 44px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 1.55rem;
+      box-shadow: 0 2px 8px rgba(31, 54, 71, .04);
+    }
+
+    .icon-choice.selected {
+      border-color: var(--sea);
+      box-shadow: 0 0 0 3px rgba(14, 149, 171, .18);
+      background: #eefdff;
+    }
+
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -2035,6 +2073,10 @@
         Kriauklyčių skaičius
         <input id="taskEditShells" type="number" min="0" max="99" step="1">
       </label>
+      <div class="icon-picker">
+        <div class="icon-picker-title">Ikona</div>
+        <div class="icon-picker-grid" id="taskIconPicker" role="listbox" aria-label="Pasirinkti užduoties ikoną"></div>
+      </div>
       <div class="edit-actions">
         <button class="action" type="submit">Išsaugoti</button>
         <button class="action secondary" id="taskEditCancel" type="button">Atšaukti</button>
@@ -2460,8 +2502,11 @@
     const taskEditForm = document.getElementById("taskEditForm");
     const taskEditTitle = document.getElementById("taskEditTitle");
     const taskEditShells = document.getElementById("taskEditShells");
+    const taskEditHeading = document.getElementById("taskEditHeading");
+    const taskIconPicker = document.getElementById("taskIconPicker");
     const legacyTaskStartDate = "2026-06-11";
     let editingTaskId = null;
+    let selectedTaskIcon = "✨";
     let habitArchiveExpanded = false;
 
     function readUndoStack() {
@@ -2741,6 +2786,27 @@
       return childGender(childId) === "boy" ? defaultChildTasks.dominik : defaultChildTasks.olivia;
     }
 
+    const taskIconLibrary = [
+      "🌙", "🌌", "🌅", "🌞", "🛏️", "🧸", "📚", "🖍️", "🎨", "🧩",
+      "🧱", "🏫", "🎒", "👟", "🧥", "🧢", "👚", "🪞", "🧼", "🫧",
+      "🍽️", "🍴", "🍲", "🍝", "🥣", "🧽", "🙏", "🙌", "👋", "💬",
+      "💌", "💗", "💙", "💐", "🤝", "🕊️", "🛡️", "🤫", "⭐", "🏅",
+      "🎤", "🎙️", "🚲", "🛴", "⚽", "🪁", "🌳", "🌤️", "🌈", "✨"
+    ];
+
+    function renderTaskIconPicker() {
+      taskIconPicker.innerHTML = taskIconLibrary.map(icon => `
+        <button class="icon-choice ${icon === selectedTaskIcon ? "selected" : ""}" type="button" data-task-icon="${escapeHtml(icon)}" aria-label="Ikona ${escapeHtml(icon)}">
+          ${escapeHtml(icon)}
+        </button>
+      `).join("");
+    }
+
+    function setSelectedTaskIcon(icon) {
+      selectedTaskIcon = icon || "✨";
+      renderTaskIconPicker();
+    }
+
     function iconByOliviaTaskText(task, fallbackIcon) {
       const text = String(task?.title || "").toLowerCase();
       const has = (...words) => words.some(word => text.includes(word));
@@ -2811,6 +2877,7 @@
       const defaultTasks = defaultTasksForChild(childId);
       const iconsById = Object.fromEntries(defaultTasks.map(task => [task.id, task.icon]));
       (state.customTasks?.[childId] || []).forEach(task => {
+        if (task.customIcon) return;
         if (childGender(childId) === "girl") {
           task.icon = iconByOliviaTaskText(task, iconsById[task.id]);
         } else if (childGender(childId) === "boy") {
@@ -3242,8 +3309,19 @@
       const task = tasks.find(item => item.id === taskId);
       if (!task) return;
       editingTaskId = taskId;
+      taskEditHeading.textContent = "Keisti užduotį";
       taskEditTitle.value = taskTitle(task);
       taskEditShells.value = task.shells;
+      setSelectedTaskIcon(task.icon || "✨");
+      openDialog(taskEditDialog, taskEditTitle);
+    }
+
+    function openNewTaskEditor() {
+      editingTaskId = null;
+      taskEditHeading.textContent = "Nauja užduotis";
+      taskEditTitle.value = "";
+      taskEditShells.value = "1";
+      setSelectedTaskIcon(childGender(state.active) === "boy" ? "🚲" : "🌈");
       openDialog(taskEditDialog, taskEditTitle);
     }
 
@@ -3253,17 +3331,34 @@
     }
 
     function saveEditedTask() {
-      if (!editingTaskId) return;
       const tasks = allTasksForChild();
-      const task = tasks.find(item => item.id === editingTaskId);
-      if (!task) return;
       const cleanTitle = taskEditTitle.value.trim().slice(0, 160);
       if (!cleanTitle) return;
       const nextShells = Number(taskEditShells.value);
       if (!Number.isFinite(nextShells) || nextShells < 0 || nextShells > 99) return;
+      if (!editingTaskId) {
+        tasks.push({
+          id: `${state.active}Custom${Date.now()}`,
+          icon: selectedTaskIcon,
+          customIcon: true,
+          title: cleanTitle,
+          shells: Math.round(nextShells),
+          createdAt: todayKey()
+        });
+        closeTaskEditor();
+        save();
+        render();
+        showToast("Nauja užduotis pridėta.");
+        return;
+      }
+
+      const task = tasks.find(item => item.id === editingTaskId);
+      if (!task) return;
       const oldShells = task.shells;
       task.title = cleanTitle;
       task.shells = Math.round(nextShells);
+      task.icon = selectedTaskIcon;
+      task.customIcon = true;
       task.updatedAt = todayKey();
       const child = activeChild();
       if (child.done[task.id]) {
@@ -3322,23 +3417,7 @@
     }
 
     function addTask() {
-      const title = prompt("Naujos užduoties tekstas:");
-      if (title === null) return;
-      const cleanTitle = title.trim().slice(0, 160);
-      if (!cleanTitle) return;
-      const shells = Number(prompt("Kiek kriauklyčių?", "1"));
-      if (!Number.isFinite(shells) || shells < 0 || shells > 99) return;
-      const tasks = allTasksForChild();
-      tasks.push({
-        id: `${state.active}Custom${Date.now()}`,
-        icon: "✨",
-        title: cleanTitle,
-        shells: Math.round(shells),
-        createdAt: todayKey()
-      });
-      save();
-      render();
-      showToast("Nauja užduotis pridėta.");
+      openNewTaskEditor();
     }
 
     function archiveTask(taskId) {
@@ -4205,6 +4284,12 @@
     taskEditForm.addEventListener("submit", event => {
       event.preventDefault();
       saveEditedTask();
+    });
+
+    taskIconPicker.addEventListener("click", event => {
+      const button = event.target.closest("[data-task-icon]");
+      if (!button) return;
+      setSelectedTaskIcon(button.dataset.taskIcon);
     });
 
     document.getElementById("taskEditCancel").addEventListener("click", closeTaskEditor);

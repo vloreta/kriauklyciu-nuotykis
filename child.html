@@ -2762,7 +2762,9 @@
       const defaultTasks = defaultTasksForChild(childId);
       const iconsById = Object.fromEntries(defaultTasks.map(task => [task.id, task.icon]));
       (state.customTasks?.[childId] || []).forEach(task => {
-        if (childGender(childId) === "girl") {
+        if (task.customIcon) {
+          // Keep the icon chosen by parents.
+        } else if (childGender(childId) === "girl") {
           task.icon = iconByOliviaTaskText(task, iconsById[task.id]);
         } else if (childGender(childId) === "boy") {
           task.icon = iconByDominikTaskText(task, iconsById[task.id]);
