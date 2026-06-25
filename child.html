@@ -839,6 +839,11 @@
       cursor: pointer;
       font: inherit;
       font-weight: 850;
+      max-width: 260px;
+    }
+
+    .emotion-button.with-dialog {
+      padding-bottom: 8px;
     }
 
     .emotion-button img {
@@ -887,29 +892,46 @@
       font-weight: 900;
     }
 
-    .emotion-dialog {
-      grid-column: 1 / -1;
-      justify-self: stretch;
-      margin-top: 8px;
-      padding: 12px 14px;
+    .emotion-inline-dialog {
+      width: min(260px, 100%);
+      margin-top: 4px;
+      padding: 8px 10px;
       border-radius: 16px;
       border: 1px solid rgba(14, 149, 171, .16);
       background: linear-gradient(135deg, rgba(255, 250, 232, .96), rgba(238, 253, 255, .96));
-      box-shadow: 0 10px 24px rgba(31, 54, 71, .08);
+      box-shadow: 0 8px 18px rgba(31, 54, 71, .08);
       color: var(--ink);
-      animation: emotionDialogIn .22s ease-out;
+      animation: emotionDialogIn .2s ease-out;
     }
 
-    .emotion-dialog p {
+    .emotion-inline-dialog p {
+      position: relative;
+      overflow: hidden;
       margin: 0;
+      font-size: .78rem;
       font-weight: 850;
-      line-height: 1.32;
+      line-height: 1.22;
+      text-align: center;
     }
 
-    .emotion-dialog p + p {
-      margin-top: 4px;
+    .emotion-inline-dialog p + p {
+      margin-top: 3px;
       color: var(--muted);
       font-weight: 800;
+    }
+
+    .emotion-inline-dialog p::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .88), transparent);
+      transform: translateX(-120%);
+      animation: emotionTextWave .9s ease-out both;
+      pointer-events: none;
+    }
+
+    .emotion-inline-dialog p:nth-child(2)::after {
+      animation-delay: .32s;
     }
 
     @keyframes emotionDialogIn {
@@ -920,6 +942,15 @@
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    @keyframes emotionTextWave {
+      0% {
+        transform: translateX(-120%);
+      }
+      100% {
+        transform: translateX(120%);
       }
     }
 
@@ -3509,18 +3540,18 @@
         </div>
         <div class="emotion-options">
           ${emotionsForUi().map(emotion => `
-            <button class="emotion-button${selected.includes(emotion.id) ? " selected" : ""}" type="button" data-emotion="${escapeHtml(emotion.id)}" aria-pressed="${selected.includes(emotion.id)}">
+            <button class="emotion-button${selected.includes(emotion.id) ? " selected" : ""}${dialogEmotion?.id === emotion.id ? " with-dialog" : ""}" type="button" data-emotion="${escapeHtml(emotion.id)}" aria-pressed="${selected.includes(emotion.id)}">
               <span class="emotion-visual"><img src="${escapeHtml(emotion.image)}" alt=""></span>
               <span>${escapeHtml(emotion.label)}</span>
+              ${dialogEmotion?.id === emotion.id && emotion.dialog ? `
+                <span class="emotion-inline-dialog" role="status" aria-live="polite">
+                  <p>${escapeHtml(emotion.dialog[0])}</p>
+                  <p>${escapeHtml(emotion.dialog[1])}</p>
+                </span>
+              ` : ""}
             </button>
           `).join("")}
         </div>
-        ${dialogEmotion?.dialog ? `
-          <div class="emotion-dialog" role="status" aria-live="polite">
-            <p>${escapeHtml(dialogEmotion.dialog[0])}</p>
-            <p>${escapeHtml(dialogEmotion.dialog[1])}</p>
-          </div>
-        ` : ""}
       `;
       island.querySelectorAll("[data-emotion]").forEach(button => {
         button.addEventListener("click", () => chooseEmotion(button.dataset.emotion));
