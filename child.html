@@ -842,10 +842,22 @@
     }
 
     .emotion-button img {
-      width: clamp(118px, 13.5vw, 210px);
-      height: clamp(118px, 13.5vw, 210px);
+      width: 100%;
+      height: 100%;
       border-radius: 999px;
       object-fit: cover;
+      background: transparent;
+      transform: scale(1.24);
+      transform-origin: center;
+    }
+
+    .emotion-visual {
+      position: relative;
+      display: block;
+      width: clamp(118px, 13.5vw, 210px);
+      height: clamp(118px, 13.5vw, 210px);
+      overflow: hidden;
+      border-radius: 999px;
       background: transparent;
     }
 
@@ -857,8 +869,8 @@
     }
 
     .emotion-button.selected {
-      background: rgba(235, 252, 250, .9);
-      box-shadow: 0 0 0 2px rgba(14, 149, 171, .16);
+      background: transparent;
+      box-shadow: none;
     }
 
     .emotion-button.selected::after {
@@ -877,6 +889,27 @@
       font-weight: 900;
     }
 
+    .emotion-button.selected .emotion-visual::after {
+      content: "";
+      position: absolute;
+      inset: 8%;
+      border-radius: 999px;
+      border: 3px solid rgba(14, 149, 171, .42);
+      animation: emotionWave .72s ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes emotionWave {
+      0% {
+        opacity: .7;
+        transform: scale(.72);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.35);
+      }
+    }
+
     @media (max-width: 760px) {
       .emotion-island {
         grid-template-columns: 1fr;
@@ -889,6 +922,11 @@
       }
 
       .emotion-button img {
+        width: 100%;
+        height: 100%;
+      }
+
+      .emotion-visual {
         width: clamp(64px, 17vw, 96px);
         height: clamp(64px, 17vw, 96px);
       }
@@ -3433,7 +3471,7 @@
         <div class="emotion-options">
           ${emotionsForUi().map(emotion => `
             <button class="emotion-button${selected.includes(emotion.id) ? " selected" : ""}" type="button" data-emotion="${escapeHtml(emotion.id)}" aria-pressed="${selected.includes(emotion.id)}">
-              <img src="${escapeHtml(emotion.image)}" alt="">
+              <span class="emotion-visual"><img src="${escapeHtml(emotion.image)}" alt=""></span>
               <span>${escapeHtml(emotion.label)}</span>
             </button>
           `).join("")}
