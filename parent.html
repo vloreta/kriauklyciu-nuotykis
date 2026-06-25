@@ -2820,16 +2820,35 @@
       return legacyTaskStartDate;
     }
 
-    function archivedTaskHistory(childId, taskId, archivedAt) {
+    function logEntryText(item) {
+      return typeof item === "string" ? item : item?.text || "";
+    }
+
+    function positiveShellsFromLog(item) {
+      if (typeof item !== "string" && Number(item?.delta) > 0) return Number(item.delta);
+      const match = logEntryText(item).match(/\(\+(\d+)\)/);
+      return match ? Number(match[1]) : 0;
+    }
+
+    function logEntryMatchesTask(item, taskId, title) {
+      if (typeof item !== "string" && item?.taskId === taskId) return true;
+      const text = logEntryText(item);
+      return Boolean(title && text.includes(`: ${title} (+`));
+    }
+
+    function archivedTaskHistory(childId, taskId, archivedAt, createdAt, title) {
       const archiveLimit = archivedAt || todayKey();
+      const startDate = createdAt || legacyTaskStartDate;
       return Object.entries(state.records || {}).reduce((summary, [dateKeyValue, day]) => {
+        if (dateKeyValue < startDate) return summary;
         if (dateKeyValue > archiveLimit) return summary;
         const logs = day?.[childId]?.log || [];
         logs.forEach(item => {
-          if (typeof item === "string") return;
-          if (item.taskId === taskId && item.delta > 0) {
+          if (logEntryMatchesTask(item, taskId, title)) {
+            const shells = positiveShellsFromLog(item);
+            if (!shells) return;
             summary.count += 1;
-            summary.shells += item.delta;
+            summary.shells += shells;
           }
         });
         return summary;
@@ -3248,11 +3267,9 @@
       const childId = state.active;
       if (!state.archivedTasks[childId]) state.archivedTasks[childId] = {};
       const archivedAt = todayKey();
-      const history = archivedTaskHistory(childId, task.id, archivedAt);
       state.archivedTasks[childId][taskId] = {
         archivedAt,
         createdAt: taskCreatedAt(task),
-        history,
         title: taskTitle(task),
         shells: task.shells,
         icon: task.icon
@@ -3378,9 +3395,7 @@
         const title = archived.title || (task ? taskTitle(task) : "Archyvuota užduotis");
         const archivedAt = typeof archived === "string" ? archived : archived.archivedAt;
         const createdAt = taskCreatedAt(task, archived);
-        const history = typeof archived === "object" && archived.history
-          ? archived.history
-          : archivedTaskHistory(childId, taskId, archivedAt);
+        const history = archivedTaskHistory(childId, taskId, archivedAt, createdAt, title);
         const row = document.createElement("div");
         row.className = "habit-archive-item";
         row.innerHTML = `
