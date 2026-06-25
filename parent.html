@@ -2839,11 +2839,14 @@
     function archivedTaskHistory(childId, taskId, archivedAt, createdAt, title, task = null) {
       const archiveLimit = archivedAt || todayKey();
       const startDate = createdAt || legacyTaskStartDate;
+      const taskShells = Number(task?.shells || 0);
       return Object.entries(state.records || {}).reduce((summary, [dateKeyValue, day]) => {
         if (dateKeyValue < startDate) return summary;
         if (dateKeyValue > archiveLimit) return summary;
         const childDay = day?.[childId];
         if (!childDay) return summary;
+        const done = childDay.done || {};
+        const hasDoneFlag = Object.prototype.hasOwnProperty.call(done, taskId);
         const logNet = (childDay.log || []).reduce((sum, item) => {
           if (logEntryMatchesTask(item, taskId, title)) {
             const delta = shellDeltaFromLog(item);
@@ -2851,9 +2854,10 @@
           }
           return sum;
         }, 0);
-        if (logNet <= 0) return summary;
+        const countsForDay = hasDoneFlag ? done[taskId] === true : logNet > 0;
+        if (!countsForDay) return summary;
         summary.count += 1;
-        summary.shells += logNet;
+        summary.shells += taskShells;
         return summary;
       }, { count: 0, shells: 0 });
     }
