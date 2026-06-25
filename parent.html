@@ -2836,26 +2836,28 @@
       return Boolean(title && (text.includes(`: ${title} (+`) || text.includes(` - ${title} (-`)));
     }
 
-    function archivedTaskHistory(childId, taskId, archivedAt, createdAt, title) {
+    function archivedTaskHistory(childId, taskId, archivedAt, createdAt, title, task = null) {
       const archiveLimit = archivedAt || todayKey();
       const startDate = createdAt || legacyTaskStartDate;
       return Object.entries(state.records || {}).reduce((summary, [dateKeyValue, day]) => {
         if (dateKeyValue < startDate) return summary;
         if (dateKeyValue > archiveLimit) return summary;
-        const logs = day?.[childId]?.log || [];
-        logs.forEach(item => {
+        const childDay = day?.[childId];
+        if (!childDay) return summary;
+        const done = childDay.done || {};
+        const hasDoneFlag = Object.prototype.hasOwnProperty.call(done, taskId);
+        const isDone = done[taskId] === true;
+        const logNet = (childDay.log || []).reduce((sum, item) => {
           if (logEntryMatchesTask(item, taskId, title)) {
             const delta = shellDeltaFromLog(item);
-            if (!delta) return;
-            if (delta > 0) {
-              summary.count += 1;
-              summary.shells += delta;
-            } else {
-              summary.count = Math.max(0, summary.count - 1);
-              summary.shells = Math.max(0, summary.shells + delta);
-            }
+            return sum + delta;
           }
-        });
+          return sum;
+        }, 0);
+        const countsForDay = hasDoneFlag ? isDone : logNet > 0;
+        if (!countsForDay) return summary;
+        summary.count += 1;
+        summary.shells += logNet > 0 ? logNet : Number(task?.shells || 0);
         return summary;
       }, { count: 0, shells: 0 });
     }
@@ -3400,7 +3402,7 @@
         const title = archived.title || (task ? taskTitle(task) : "Archyvuota užduotis");
         const archivedAt = typeof archived === "string" ? archived : archived.archivedAt;
         const createdAt = taskCreatedAt(task, archived);
-        const history = archivedTaskHistory(childId, taskId, archivedAt, createdAt, title);
+        const history = archivedTaskHistory(childId, taskId, archivedAt, createdAt, title, task || archived);
         const row = document.createElement("div");
         row.className = "habit-archive-item";
         row.innerHTML = `
