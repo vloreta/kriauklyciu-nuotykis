@@ -1288,6 +1288,33 @@
       gap: 8px;
     }
 
+    .habit-archive-toggle {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 0;
+      text-align: left;
+    }
+
+    .habit-archive-toggle h3 {
+      margin: 0;
+    }
+
+    .habit-archive-toggle span {
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .habit-archive-list[hidden] {
+      display: none;
+    }
+
     .habit-archive-item {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -1301,10 +1328,19 @@
     }
 
     .habit-archive-item small {
-      display: block;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
       color: var(--muted);
       font-weight: 700;
       margin-top: 2px;
+    }
+
+    .habit-archive-date {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(31, 54, 71, .08);
     }
 
     .habit-archive-item button {
@@ -1919,13 +1955,11 @@
             </div>
           </div>
           <div class="parent-control-card" id="habitArchiveManagement">
-            <div class="parent-section-title">
-              <div>
-                <h3>Įpročių archyvas</h3>
-                <p>Čia laikomos užduotys, kurios jau tapo įpročiu.</p>
-              </div>
-            </div>
-            <div class="habit-archive-list" id="habitArchiveList"></div>
+            <button class="habit-archive-toggle" id="habitArchiveToggle" type="button" aria-expanded="false">
+              <h3>Įpročių archyvas</h3>
+              <span id="habitArchiveArrow">▾</span>
+            </button>
+            <div class="habit-archive-list" id="habitArchiveList" hidden></div>
           </div>
           <div class="parent-control-card" id="dataManagement">
             <div class="parent-section-title">
@@ -2381,6 +2415,7 @@
     const taskEditTitle = document.getElementById("taskEditTitle");
     const taskEditShells = document.getElementById("taskEditShells");
     let editingTaskId = null;
+    let habitArchiveExpanded = false;
 
     function readUndoStack() {
       try {
@@ -2471,6 +2506,10 @@
         ? { month: "long", year: "numeric" }
         : { month: "long", day: "numeric", weekday: "long" };
       return new Intl.DateTimeFormat("lt-LT", options).format(date);
+    }
+
+    function shortDate(key) {
+      return key ? key.slice(5) : "--";
     }
 
     function startOfWeek(key) {
@@ -2772,6 +2811,12 @@
     function taskArchivedAt(childId, taskId) {
       const archiveEntry = state.archivedTasks?.[childId]?.[taskId];
       return typeof archiveEntry === "string" ? archiveEntry : archiveEntry?.archivedAt || "";
+    }
+
+    function taskCreatedAt(task, archiveEntry = null) {
+      if (task?.createdAt) return task.createdAt;
+      if (typeof archiveEntry === "object" && archiveEntry?.createdAt) return archiveEntry.createdAt;
+      return "2026-06-10";
     }
 
     function tasksForChildOnDate(childId = state.active, date = state.selectedDate) {
@@ -3171,7 +3216,8 @@
         id: `${state.active}Custom${Date.now()}`,
         icon: "✨",
         title: cleanTitle,
-        shells: Math.round(shells)
+        shells: Math.round(shells),
+        createdAt: state.selectedDate || todayKey()
       });
       save();
       render();
@@ -3185,6 +3231,7 @@
       if (!state.archivedTasks[childId]) state.archivedTasks[childId] = {};
       state.archivedTasks[childId][taskId] = {
         archivedAt: state.selectedDate,
+        createdAt: taskCreatedAt(task),
         title: taskTitle(task),
         shells: task.shells,
         icon: task.icon
@@ -3291,6 +3338,11 @@
     function renderHabitArchive() {
       const list = document.getElementById("habitArchiveList");
       if (!list) return;
+      const toggle = document.getElementById("habitArchiveToggle");
+      const arrow = document.getElementById("habitArchiveArrow");
+      list.hidden = !habitArchiveExpanded;
+      toggle?.setAttribute("aria-expanded", String(habitArchiveExpanded));
+      if (arrow) arrow.textContent = habitArchiveExpanded ? "▴" : "▾";
       const childId = state.active;
       const archive = state.archivedTasks?.[childId] || {};
       const tasksById = Object.fromEntries(allTasksForChild(childId).map(task => [task.id, task]));
@@ -3304,10 +3356,17 @@
         const task = tasksById[taskId];
         const title = archived.title || (task ? taskTitle(task) : "Archyvuota užduotis");
         const archivedAt = typeof archived === "string" ? archived : archived.archivedAt;
+        const createdAt = taskCreatedAt(task, archived);
         const row = document.createElement("div");
         row.className = "habit-archive-item";
         row.innerHTML = `
-          <span>${escapeHtml(title)}<small>Nuo ${formatDate(archivedAt)}</small></span>
+          <span>
+            ${escapeHtml(title)}
+            <small>
+              <span class="habit-archive-date">Nuo: ${escapeHtml(shortDate(createdAt))}</span>
+              <span class="habit-archive-date">Arch.: ${escapeHtml(shortDate(archivedAt))}</span>
+            </small>
+          </span>
           <button type="button" data-restore-archive="${escapeHtml(taskId)}">Grąžinti</button>
         `;
         row.querySelector("[data-restore-archive]")?.addEventListener("click", () => restoreArchivedTask(taskId));
@@ -3941,6 +4000,10 @@
     });
 
     document.getElementById("addTaskButton").addEventListener("click", addTask);
+    document.getElementById("habitArchiveToggle")?.addEventListener("click", () => {
+      habitArchiveExpanded = !habitArchiveExpanded;
+      renderHabitArchive();
+    });
     document.getElementById("settingsButton").addEventListener("click", openSettings);
     document.getElementById("undoLastActionButton").addEventListener("click", undoLastAction);
     document.querySelectorAll("[data-open-settings]").forEach(button => {

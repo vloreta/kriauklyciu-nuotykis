@@ -3111,7 +3111,8 @@
         id: `${state.active}Custom${Date.now()}`,
         icon: "✨",
         title: cleanTitle,
-        shells: Math.round(shells)
+        shells: Math.round(shells),
+        createdAt: state.selectedDate || todayKey()
       });
       save();
       render();
