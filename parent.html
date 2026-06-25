@@ -947,6 +947,11 @@
     .task.editing {
       cursor: grab;
       padding-right: 78px;
+      overflow: visible;
+    }
+
+    .task.menu-open {
+      z-index: 30;
     }
 
     .task.editing:active {
@@ -967,7 +972,7 @@
       position: absolute;
       right: 8px;
       top: 8px;
-      z-index: 4;
+      z-index: 40;
     }
 
     .task-menu-toggle {
@@ -996,6 +1001,7 @@
       box-shadow: 0 12px 28px rgba(31, 54, 71, .18);
       display: grid;
       gap: 4px;
+      z-index: 50;
     }
 
     .task-action-menu[hidden] {
@@ -3520,6 +3526,9 @@
       document.querySelectorAll("[data-task-menu]").forEach(button => {
         button.setAttribute("aria-expanded", "false");
       });
+      document.querySelectorAll(".task.menu-open").forEach(card => {
+        card.classList.remove("menu-open");
+      });
     }
 
     function toggleTaskActionMenu(taskId) {
@@ -3530,6 +3539,9 @@
       closeTaskActionMenus();
       panel.hidden = !shouldOpen;
       button.setAttribute("aria-expanded", String(shouldOpen));
+      if (shouldOpen) {
+        button.closest(".task")?.classList.add("menu-open");
+      }
     }
 
     function addTask() {
