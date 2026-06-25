@@ -2382,6 +2382,52 @@
       return merged;
     }
 
+    function limitRecoveredRecords(recovered) {
+      const currentDay = todayKey();
+      const records = {};
+      Object.entries(recovered?.records || {}).forEach(([date, day]) => {
+        if (date > currentDay) return;
+        Object.entries(day || {}).forEach(([childId, childDay]) => {
+          const hasData = (childDay?.shells || 0) !== 0
+            || Object.keys(childDay?.done || {}).length > 0
+            || (Array.isArray(childDay?.log) && childDay.log.length > 0)
+            || (Array.isArray(childDay?.events) && childDay.events.length > 0);
+          if (!hasData) return;
+          if (!records[date]) records[date] = {};
+          records[date][childId] = childDay;
+        });
+      });
+      return { ...recovered, records };
+    }
+
+    async function restoreBundledRecovery() {
+      const appliedKey = "kriauklyciu-recovered-2026-06-22-applied";
+      if (localStorage.getItem(appliedKey)) return;
+
+      try {
+        const response = await fetch("assets/recovered-edge-data-2026-06-22.json", { cache: "no-store" });
+        if (!response.ok) return;
+        const envelope = await response.json();
+        const recovered = envelope?.format === backupFormat ? envelope.data : envelope;
+        if (!isRestorableState(recovered)) return;
+
+        const beforeRecords = JSON.stringify(state.records || {});
+        const beforeBackupKey = `${backupKeyPrefix}${todayKey()}-before-recovered-${Date.now()}`;
+        localStorage.setItem(beforeBackupKey, JSON.stringify(createBackupEnvelope(readSavedState(storageKey) || state, "before-bundled-recovery")));
+
+        const restored = mergeSavedRecords(state, limitRecoveredRecords(recovered));
+        state.records = restored.records || state.records;
+        localStorage.setItem(appliedKey, "true");
+
+        if (JSON.stringify(state.records || {}) !== beforeRecords) {
+          save();
+          render();
+        }
+      } catch {
+        // Restore is best-effort and must never block the app.
+      }
+    }
+
     const saved = mergeSavedRecords(readPrimaryStateWithRecovery(), readSavedState(legacyStorageKey));
     const state = normalizeState(saved);
     const isChildPage = document.body.classList.contains("child-page");
@@ -4111,6 +4157,7 @@
 
     render();
     save();
+    restoreBundledRecovery();
     setInterval(autoSave, 30000);
     setInterval(refreshCalendarDay, 60000);
     window.addEventListener("pagehide", autoSave);

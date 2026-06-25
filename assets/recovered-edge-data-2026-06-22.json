@@ -1,0 +1,4009 @@
+{
+  "format": "kriauklyciu-nuotykis-backup",
+  "version": 1,
+  "exportedAt": "2026-06-22T10:19:49.276Z",
+  "reason": "edge-recovery",
+  "storageKey": "kriauklyciu-nuotykis",
+  "data": {
+    "active": "dominik",
+    "view": "week",
+    "selectedDate": "2026-06-22",
+    "lastCalendarDate": "2026-06-22",
+    "oliviaGuide": {
+      "date": "2026-06-21",
+      "text": "Puiku, Olivia! Undinė įdėjo 5 kriauklytės į tavo lobį."
+    },
+    "dominikGuide": {
+      "date": "2026-06-21",
+      "text": "Nieko tokio, Dominik. Drakonas saugo kelią - galima pabandyti dar kartą."
+    },
+    "childGuides": {
+      "dominik": {
+        "date": "2026-06-21",
+        "text": "Nieko tokio, Dominik. Drakonas saugo kelią - galima pabandyti dar kartą."
+      },
+      "olivia": {
+        "date": "2026-06-21",
+        "text": "Puiku, Olivia! Undinė įdėjo 5 kriauklytės į tavo lobį."
+      }
+    },
+    "records": {
+      "2026-06-10": {
+        "olivia": {
+          "shells": 0,
+          "done": {
+            "toys": false,
+            "closet": false,
+            "help": false,
+            "sorry": false,
+            "bag": false,
+            "hands": false,
+            "meal": false,
+            "listen": false,
+            "read": false,
+            "newThing": false,
+            "teacher": false,
+            "sleepAlone": false,
+            "morning": false,
+            "table": false,
+            "peace": false,
+            "turn": false,
+            "dishes": false,
+            "books": false,
+            "clothes": false,
+            "garden": false,
+            "nap": false,
+            "creative": false,
+            "thanks": false,
+            "quiet": false,
+            "make": false,
+            "afterActivity": false
+          },
+          "log": [
+            {
+              "id": "1781178444329-76eb825ee05c88",
+              "undone": false,
+              "text": "Olivia: atšaukta - Susidėjau knygutes (-1)",
+              "delta": -1,
+              "taskId": "books",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178443923-c67fd2e59154c",
+              "undone": false,
+              "text": "Olivia: atšaukta - Susidėjau žaislus (-2)",
+              "delta": -2,
+              "taskId": "toys",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781175966654-aaf1228348964",
+              "undone": false,
+              "text": "Olivia: Susidėjau knygutes (+1)",
+              "delta": 1,
+              "taskId": "books",
+              "kind": "complete"
+            },
+            {
+              "id": "1781175961635-17841a068e98a",
+              "undone": false,
+              "text": "Olivia: atšaukta - Susidėjau knygutes (-1)",
+              "delta": -1,
+              "taskId": "books",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781175958644-2ae6c0e696b9c",
+              "undone": false,
+              "text": "Olivia: Susidėjau knygutes (+1)",
+              "delta": 1,
+              "taskId": "books",
+              "kind": "complete"
+            },
+            {
+              "id": "1781175729960-148a45b47bc61",
+              "undone": false,
+              "text": "Olivia: Susidėjau žaislus (+2)",
+              "delta": 2,
+              "taskId": "toys",
+              "kind": "complete"
+            },
+            {
+              "id": "1781175691933-578000380c9f",
+              "undone": false,
+              "text": "Olivia: atšaukta - Klausiau iš pirmo karto (-2)",
+              "delta": -2,
+              "taskId": "listen",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781175691111-19b7f8d6511b6",
+              "undone": false,
+              "text": "Olivia: atšaukta - Kantriai palaukiau savo eilės (-2)",
+              "delta": -2,
+              "taskId": "turn",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781175690229-de31665f9f9b68",
+              "undone": false,
+              "text": "Olivia: atšaukta - Atsiprašiau, kai reikėjo (-2)",
+              "delta": -2,
+              "taskId": "sorry",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781175689762-15a213c4090418",
+              "undone": false,
+              "text": "Olivia: atšaukta - Pasakiau „ačiū“, kai pavalgiau (-1)",
+              "delta": -1,
+              "taskId": "thanks",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781175689192-4761141dcf3828",
+              "undone": false,
+              "text": "Olivia: atšaukta - Nunešiau indus po valgio (-1)",
+              "delta": -1,
+              "taskId": "dishes",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781175688794-0fb865cbb5515",
+              "undone": false,
+              "text": "Olivia: atšaukta - Gražiai sėdėjau valgant (-1)",
+              "delta": -1,
+              "taskId": "meal",
+              "kind": "toggleOff"
+            }
+          ],
+          "halfwayTreasureNoticed": true,
+          "dailyTreasureAwarded": true
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {
+            "toys": false,
+            "garden": false,
+            "help": false,
+            "closet": false,
+            "creative": false,
+            "sleepAlone": false,
+            "morning": false,
+            "clothes": false,
+            "bag": false,
+            "meal": false,
+            "books": false,
+            "nap": false,
+            "hands": false,
+            "dishes": false,
+            "thanks": false,
+            "sorry": false,
+            "turn": false,
+            "listen": false,
+            "peace": false,
+            "quiet": false,
+            "make": false,
+            "read": false,
+            "table": false,
+            "afterActivity": false,
+            "teacher": false,
+            "newThing": false
+          },
+          "log": [
+            {
+              "id": "1781178434041-7e240627c39588",
+              "undone": false,
+              "text": "Dominik: atšaukta - Pats greitai atsikėliau ryte (-5)",
+              "delta": -5,
+              "taskId": "morning",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178433550-4a5b2ba52c92e8",
+              "undone": false,
+              "text": "Dominik: atšaukta - Pats užmigau be tėvų (-5)",
+              "delta": -5,
+              "taskId": "sleepAlone",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178432293-381cb69381993",
+              "undone": false,
+              "text": "Dominik: atšaukta - Drąsiai pabandžiau naują dalyką (-2)",
+              "delta": -2,
+              "taskId": "newThing",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178431880-ba577928406998",
+              "undone": false,
+              "text": "Dominik: atšaukta - Padėjau padengti stalą (-2)",
+              "delta": -2,
+              "taskId": "table",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178431349-3c79d112a80cb8",
+              "undone": false,
+              "text": "Dominik: atšaukta - Auklėtojos pagyrimas (-3)",
+              "delta": -3,
+              "taskId": "teacher",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178430562-66008137214118",
+              "undone": false,
+              "text": "Dominik: atšaukta - Padėjau sutvarkyti po veiklos (-2)",
+              "delta": -2,
+              "taskId": "afterActivity",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178424949-941b7c8e676f98",
+              "undone": false,
+              "text": "Dominik: atšaukta - Varčiau arba skaičiau knygelę (-1)",
+              "delta": -1,
+              "taskId": "read",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178424395-c98a3e8e9ce5a",
+              "undone": false,
+              "text": "Dominik: atšaukta - Piešiau / lipdžiau / konstravau (-1)",
+              "delta": -1,
+              "taskId": "make",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178423193-8d9a68286a3568",
+              "undone": false,
+              "text": "Dominik: atšaukta - Pats pasirinkau ramią veiklą (-1)",
+              "delta": -1,
+              "taskId": "quiet",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178422826-9c40a10a203c38",
+              "undone": false,
+              "text": "Dominik: atšaukta - Nesipykau su broliu / sese (-2)",
+              "delta": -2,
+              "taskId": "peace",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178422460-226f50f2acd61",
+              "undone": false,
+              "text": "Dominik: atšaukta - Klausiau iš pirmo karto (-2)",
+              "delta": -2,
+              "taskId": "listen",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781178422045-033e3e300ae4",
+              "undone": false,
+              "text": "Dominik: atšaukta - Kantriai palaukiau savo eilės (-2)",
+              "delta": -2,
+              "taskId": "turn",
+              "kind": "toggleOff"
+            }
+          ],
+          "halfwayTreasureNoticed": true,
+          "dailyTreasureAwarded": true
+        }
+      },
+      "2026-06-08": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-09": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-11": {
+        "olivia": {
+          "shells": 25,
+          "done": {
+            "toys": true,
+            "nap": true,
+            "dishes": true,
+            "hands": true,
+            "help": false,
+            "thanks": false,
+            "meal": true,
+            "quiet": false,
+            "listen": false,
+            "turn": false,
+            "peace": false,
+            "read": false,
+            "books": false,
+            "clothes": true,
+            "closet": true,
+            "creative": true,
+            "garden": true,
+            "sorry": false,
+            "bag": true,
+            "make": true,
+            "table": false,
+            "newThing": false,
+            "afterActivity": false,
+            "teacher": false,
+            "sleepAlone": true,
+            "morning": true
+          },
+          "log": [
+            {
+              "id": "1781201409665-ceca20801dd34",
+              "undone": false,
+              "text": "Olivia: Atlikau veiklą (+1)",
+              "delta": 1,
+              "taskId": "creative",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200923935-af83f24b5ba69",
+              "undone": false,
+              "text": "Olivia: atšaukta - Kantriai palaukiau savo eilės (-2)",
+              "delta": -2,
+              "taskId": "turn",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781200922938-01a018fa7dc248",
+              "undone": false,
+              "text": "Olivia: Kantriai palaukiau savo eilės (+2)",
+              "delta": 2,
+              "taskId": "turn",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200916524-27ee26c2d1b09",
+              "undone": false,
+              "text": "Olivia: atšaukta - Varčiau arba skaičiau knygelę (-1)",
+              "delta": -1,
+              "taskId": "read",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781200912744-a914dd6adf08e",
+              "undone": false,
+              "text": "Olivia: Varčiau arba skaičiau knygelę (+1)",
+              "delta": 1,
+              "taskId": "read",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200886467-1fdfa1938307f8",
+              "undone": false,
+              "text": "Olivia: Pats greitai atsikėliau ryte (+5)",
+              "delta": 5,
+              "taskId": "morning",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200880504-7bf9f914554988",
+              "undone": false,
+              "text": "Olivia: Pats užmigau be tėvų (+5)",
+              "delta": 5,
+              "taskId": "sleepAlone",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200846944-8a5cc3d22b8418",
+              "undone": false,
+              "text": "Olivia: Piešiau / lipdžiau / konstravau (+1)",
+              "delta": 1,
+              "taskId": "make",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200814389-9d3e2f289adb8",
+              "undone": false,
+              "text": "Olivia: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "dishes",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200805516-dbc712257638d8",
+              "undone": false,
+              "text": "Olivia: Gražiai sėdėjau valgant (+1)",
+              "delta": 1,
+              "taskId": "meal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200800557-62b7944076e6a",
+              "undone": false,
+              "text": "Olivia: Nusiploviau rankas be priminimo (+1)",
+              "delta": 1,
+              "taskId": "hands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200797650-39eb87e5916058",
+              "undone": false,
+              "text": "Olivia: Kuprinę / maišelį padėjau į vietą (+1)",
+              "delta": 1,
+              "taskId": "bag",
+              "kind": "complete"
+            }
+          ],
+          "dailyTreasureAwarded": true,
+          "halfwayTreasureNoticed": true
+        },
+        "dominik": {
+          "shells": 25,
+          "done": {
+            "toys": true,
+            "closet": true,
+            "nap": true,
+            "bag": true,
+            "hands": true,
+            "dishes": true,
+            "quiet": true,
+            "teacher": true,
+            "sleepAlone": true,
+            "morning": true,
+            "garden": true,
+            "sorry": true,
+            "creative": true
+          },
+          "log": [
+            {
+              "id": "1781201417245-dd28b1388fe4f8",
+              "undone": false,
+              "text": "Dominik: Atlikau veiklą (+1)",
+              "delta": 1,
+              "taskId": "creative",
+              "kind": "complete"
+            },
+            {
+              "id": "1781201181164-756959268a117",
+              "undone": false,
+              "text": "Dominik: Susidėjau žaislus (+2)",
+              "delta": 2,
+              "taskId": "toys",
+              "kind": "complete"
+            },
+            {
+              "id": "1781201175645-666c271c94ba98",
+              "undone": false,
+              "text": "Dominik: atšaukta - Susidėjau žaislus (-2)",
+              "delta": -2,
+              "taskId": "toys",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781200938191-83c5c5d42ba8e8",
+              "undone": false,
+              "text": "Dominik: Atsiprašiau, kai reikėjo (+2)",
+              "delta": 2,
+              "taskId": "sorry",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200733079-58328ec5bd1e5",
+              "undone": false,
+              "text": "Dominik: nekantriai laukė savo eilės (-2)",
+              "delta": -2,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781200664486-354a4d46ded578",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi lauke (+2)",
+              "delta": 2,
+              "taskId": "garden",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200661164-69b65539915898",
+              "undone": false,
+              "text": "Dominik: atšaukta - Gražiai elgiausi lauke (-2)",
+              "delta": -2,
+              "taskId": "garden",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781200653847-58fda4e6b62ae",
+              "undone": false,
+              "text": "Dominik: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781200653847-106f8ecb9f49c",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi lauke (+2)",
+              "delta": 2,
+              "taskId": "garden",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200603748-23ccedc34daf",
+              "undone": false,
+              "text": "Dominik: Pats greitai atsikėliau ryte (+5)",
+              "delta": 5,
+              "taskId": "morning",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200585561-6d2d5708a7ab5",
+              "undone": false,
+              "text": "Dominik: Pats užmigau be tėvų (+5)",
+              "delta": 5,
+              "taskId": "sleepAlone",
+              "kind": "complete"
+            },
+            {
+              "id": "1781200570005-2bf9832d8cd14",
+              "undone": false,
+              "text": "Dominik: Auklėtojos pagyrimas (+3)",
+              "delta": 3,
+              "taskId": "teacher",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        }
+      },
+      "2026-06-12": {
+        "olivia": {
+          "shells": 26,
+          "done": {
+            "toysBooks": false,
+            "fromKindergarten": true,
+            "toKindergarten": true,
+            "clothes": true,
+            "wakeUp": true,
+            "outside": true,
+            "sleepAlone": true,
+            "activity": true,
+            "bagShoesJacket": true,
+            "hands": true,
+            "dishes": true,
+            "thanks": true,
+            "thanksNeeded": true,
+            "sorry": true,
+            "chooseActivity": true,
+            "singDance": true
+          },
+          "log": [
+            {
+              "id": "1781287915268-19bfccbf3a744",
+              "undone": false,
+              "text": "Olivia: Dainavau, šokau (+1)",
+              "delta": 1,
+              "taskId": "singDance",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287902226-b493bde658db68",
+              "undone": false,
+              "text": "Olivia: Pati pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti (+1)",
+              "delta": 1,
+              "taskId": "chooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287895928-ba6e400461e348",
+              "undone": false,
+              "text": "Olivia: Atsiprašiau, kai reikėjo (+2)",
+              "delta": 2,
+              "taskId": "sorry",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287832900-098eddc8bede98",
+              "undone": false,
+              "text": "Olivia: Pasakiau „ačiū“, kai reikėjo (+1)",
+              "delta": 1,
+              "taskId": "thanksNeeded",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287811548-4fcd48893a86b",
+              "undone": false,
+              "text": "Olivia: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781287811548-e09da3d2ba5ca",
+              "undone": false,
+              "text": "Olivia: Pasakiau „ačiū“, kai pavalgiau (+1)",
+              "delta": 1,
+              "taskId": "thanks",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287797960-4d736125efd2c8",
+              "undone": false,
+              "text": "Olivia: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "dishes",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287679075-44308f9353af2",
+              "undone": false,
+              "text": "Olivia: Pati nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "hands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287674438-0bc4c021cd13e8",
+              "undone": false,
+              "text": "Olivia: Kuprinę, batus, striukę padėjau į vietą (+1)",
+              "delta": 1,
+              "taskId": "bagShoesJacket",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287668310-956e130959b5",
+              "undone": false,
+              "text": "Olivia: Atlikau veiklą (+1)",
+              "delta": 1,
+              "taskId": "activity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287640602-9b0de58b56d77",
+              "undone": false,
+              "text": "Olivia: Pati užmigau be kitų (+3)",
+              "delta": 3,
+              "taskId": "sleepAlone",
+              "kind": "complete"
+            },
+            {
+              "id": "1781287635458-7f0abf479fbc7",
+              "undone": false,
+              "text": "Olivia: Kai pažadino, tuoj atsikėliau (+5)",
+              "delta": 5,
+              "taskId": "wakeUp",
+              "kind": "complete"
+            }
+          ],
+          "surpriseUnlocked": true,
+          "halfwayTreasureNoticed": true
+        },
+        "dominik": {
+          "shells": 9,
+          "done": {
+            "toys": false,
+            "toysBooks": false,
+            "clothes": true,
+            "toKindergarten": true,
+            "fromKindergarten": true,
+            "wakeUp": true,
+            "sleepAlone": true,
+            "help": true,
+            "hands": true,
+            "dishes": true,
+            "thanksNeeded": true,
+            "sorry": true,
+            "chooseActivity": true,
+            "singDance": true
+          },
+          "log": [
+            {
+              "id": "1781288624442-886a71f324ee48",
+              "undone": false,
+              "text": "Dominik: erzino brolį / sesę (-2)",
+              "delta": -2,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781288609682-af2821679736d8",
+              "undone": false,
+              "text": "Dominik: sunku gražiai sėdėti valgant (-2)",
+              "delta": -2,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781288605492-0f5b292e38b858",
+              "undone": false,
+              "text": "Dominik: neužmigo pats / pati (-3)",
+              "delta": -3,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781288601734-ce2163f54255c",
+              "undone": false,
+              "text": "Dominik: sunku atsikelti pažadinus (-5)",
+              "delta": -5,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781288566779-27ea3ba590ab88",
+              "undone": false,
+              "text": "Dominik: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781288566779-5469db0f56953",
+              "undone": false,
+              "text": "Dominik: Dainavau, šokau (+1)",
+              "delta": 1,
+              "taskId": "singDance",
+              "kind": "complete"
+            },
+            {
+              "id": "1781288546545-8246be25118998",
+              "undone": false,
+              "text": "Dominik: Pats pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti (+1)",
+              "delta": 1,
+              "taskId": "chooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781288530020-b6b3502b2b0fc8",
+              "undone": false,
+              "text": "Dominik: Atsiprašiau, kai reikėjo (+2)",
+              "delta": 2,
+              "taskId": "sorry",
+              "kind": "complete"
+            },
+            {
+              "id": "1781288488257-bd03524ab1af38",
+              "undone": false,
+              "text": "Dominik: Pasakiau „ačiū“, kai reikėjo (+1)",
+              "delta": 1,
+              "taskId": "thanksNeeded",
+              "kind": "complete"
+            },
+            {
+              "id": "1781288442701-6cc191f152cf68",
+              "undone": false,
+              "text": "Dominik: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "dishes",
+              "kind": "complete"
+            },
+            {
+              "id": "1781288410042-a4e8b4130d22b8",
+              "undone": false,
+              "text": "Dominik: Pats nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "hands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781288287797-2f8c0dd8fa5d38",
+              "undone": false,
+              "text": "Dominik: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "help",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        }
+      },
+      "2026-06-13": {
+        "olivia": {
+          "shells": 22,
+          "done": {
+            "clothes": true,
+            "toysBooks": true,
+            "outside": true,
+            "sleepAlone": true,
+            "help": true,
+            "bagShoesJacket": true,
+            "meal": true,
+            "dishes": true,
+            "hands": true,
+            "thanksNeeded": true,
+            "teasing": true,
+            "chooseActivity": true,
+            "activity": true,
+            "teacher": true
+          },
+          "log": [
+            {
+              "id": "1781424875308-0907692f50fce8",
+              "undone": false,
+              "text": "Olivia: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781424875308-ef1b66b32e5f6",
+              "undone": false,
+              "text": "Olivia: Auklėtojos pagyrimas (+3)",
+              "delta": 3,
+              "taskId": "teacher",
+              "kind": "complete"
+            },
+            {
+              "id": "1781423867701-fb6b78cfbfe68",
+              "undone": false,
+              "text": "Olivia: Atlikau veiklą (+1)",
+              "delta": 1,
+              "taskId": "activity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781423722711-5bf8e69a9be36",
+              "undone": false,
+              "text": "Olivia: Pati pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti (+1)",
+              "delta": 1,
+              "taskId": "chooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781423685303-b69ab64c382fc8",
+              "undone": false,
+              "text": "Olivia: Neerzinau brolio (+2)",
+              "delta": 2,
+              "taskId": "teasing",
+              "kind": "complete"
+            },
+            {
+              "id": "1781423671259-880fd8b1d42408",
+              "undone": false,
+              "text": "Olivia: Pasakiau „ačiū“, kai reikėjo (+1)",
+              "delta": 1,
+              "taskId": "thanksNeeded",
+              "kind": "complete"
+            },
+            {
+              "id": "1781423626947-7b59045cfb20e8",
+              "undone": false,
+              "text": "Olivia: nepasakyta ačiū po valgio (-1)",
+              "delta": -1,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781423614635-8a73591c0cd938",
+              "undone": false,
+              "text": "Olivia: Pati nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "hands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781423607481-b9a406d223e998",
+              "undone": false,
+              "text": "Olivia: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "dishes",
+              "kind": "complete"
+            },
+            {
+              "id": "1781423594841-9d31cf8559c268",
+              "undone": false,
+              "text": "Olivia: indai nenunešti po valgio (-1)",
+              "delta": -1,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781423568481-289fe7dd316a8",
+              "undone": false,
+              "text": "Olivia: Gražiai sėdėjau valgant (+2)",
+              "delta": 2,
+              "taskId": "meal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781423548919-58012968360938",
+              "undone": false,
+              "text": "Olivia: Kuprinę, batus, striukę padėjau į vietą (+1)",
+              "delta": 1,
+              "taskId": "bagShoesJacket",
+              "kind": "complete"
+            }
+          ],
+          "surpriseUnlocked": true,
+          "halfwayTreasureNoticed": true
+        },
+        "dominik": {
+          "shells": 17,
+          "done": {
+            "toysBooks": true,
+            "activity": true,
+            "clothes": true,
+            "outside": true,
+            "sleepAlone": true,
+            "bagShoesJacket": true,
+            "hands": true,
+            "meal": true,
+            "sorry": true,
+            "chooseActivity": true,
+            "singDance": true,
+            "table": false,
+            "teacher": true
+          },
+          "log": [
+            {
+              "id": "1781424889703-2adc3de1dfa59",
+              "undone": false,
+              "text": "Dominik: Auklėtojos pagyrimas (+3)",
+              "delta": 3,
+              "taskId": "teacher",
+              "kind": "complete"
+            },
+            {
+              "id": "1781424690940-4e59a73f4aac1",
+              "undone": false,
+              "text": "Dominik: atšaukta - Padėjau padengti stalą (-2)",
+              "delta": -2,
+              "taskId": "table",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781424689501-c0d541dcc96828",
+              "undone": false,
+              "text": "Dominik: Padėjau padengti stalą (+2)",
+              "delta": 2,
+              "taskId": "table",
+              "kind": "complete"
+            },
+            {
+              "id": "1781424683099-5301798bfa43b8",
+              "undone": false,
+              "text": "Dominik: atšaukta - Padėjau padengti stalą (-2)",
+              "delta": -2,
+              "taskId": "table",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781424681647-7c115828103f38",
+              "undone": false,
+              "text": "Dominik: Padėjau padengti stalą (+2)",
+              "delta": 2,
+              "taskId": "table",
+              "kind": "complete"
+            },
+            {
+              "id": "1781424596581-5b0cab3bd4682",
+              "undone": false,
+              "text": "Dominik: Dainavau, šokau (+1)",
+              "delta": 1,
+              "taskId": "singDance",
+              "kind": "complete"
+            },
+            {
+              "id": "1781424564971-02f3897727b3b",
+              "undone": false,
+              "text": "Dominik: Pats pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti (+1)",
+              "delta": 1,
+              "taskId": "chooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781424529801-043bb160556058",
+              "undone": false,
+              "text": "Dominik: Atsiprašiau, kai reikėjo (+2)",
+              "delta": 2,
+              "taskId": "sorry",
+              "kind": "complete"
+            },
+            {
+              "id": "1781424429432-58bc2bcf70696",
+              "undone": false,
+              "text": "Dominik: erzino brolį / sesę (-2)",
+              "delta": -2,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781424356649-03ce03fbf94e18",
+              "undone": false,
+              "text": "Dominik: nepasakyta ačiū po valgio (-1)",
+              "delta": -1,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781424335366-c2ca3140eb1468",
+              "undone": false,
+              "text": "Dominik: indai nenunešti po valgio (-1)",
+              "delta": -1,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781424302188-c90398d876269",
+              "undone": false,
+              "text": "Dominik: Gražiai sėdėjau valgant (+2)",
+              "delta": 2,
+              "taskId": "meal",
+              "kind": "complete"
+            }
+          ],
+          "surpriseUnlocked": true,
+          "lastSurprise": "Muilo burbulai lauke"
+        }
+      },
+      "2026-06-14": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {
+            "domSleepAlone": false
+          },
+          "log": [
+            {
+              "id": "1781450300051-4c622ce032dac8",
+              "undone": false,
+              "text": "Dominik: atšaukta - Pats užmigau be kitų (-3)",
+              "delta": -3,
+              "taskId": "domSleepAlone",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781450272969-d98751771b68c",
+              "undone": false,
+              "text": "Dominik: Pats užmigau be kitų (+0)",
+              "delta": 0,
+              "taskId": "domSleepAlone",
+              "kind": "complete"
+            },
+            {
+              "id": "1781450253744-dd3e8ddd658788",
+              "undone": false,
+              "text": "Dominik: atšaukta - Kazkas (-3)",
+              "delta": -3,
+              "taskId": "dominikCustom1781450234542",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781450249951-48251d80927498",
+              "undone": false,
+              "text": "Dominik: Kazkas (+3)",
+              "delta": 3,
+              "taskId": "dominikCustom1781450234542",
+              "kind": "complete"
+            }
+          ]
+        }
+      },
+      "2026-06-01": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-02": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-03": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-04": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-05": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-06": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-07": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-15": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-16": {
+        "olivia": {
+          "shells": 22,
+          "done": {
+            "clothes": true,
+            "outside": true,
+            "toKindergarten": true,
+            "fromKindergarten": true,
+            "sleepAlone": true,
+            "help": true,
+            "activity": true,
+            "bagShoesJacket": true,
+            "hands": true,
+            "meal": true,
+            "teasing": true,
+            "chooseActivity": true,
+            "singDance": true
+          },
+          "log": [
+            {
+              "id": "1781633005274-85fe2e76aa33c8",
+              "undone": false,
+              "text": "Olivia: Dainavau, šokau (+1)",
+              "delta": 1,
+              "taskId": "singDance",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632997889-1bfe171c7ca388",
+              "undone": false,
+              "text": "Olivia: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781632997889-52d30a2dd73b58",
+              "undone": false,
+              "text": "Olivia: Pati pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti (+1)",
+              "delta": 1,
+              "taskId": "chooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632977696-09166943f66958",
+              "undone": false,
+              "text": "Olivia: Neerzinau brolio (+2)",
+              "delta": 2,
+              "taskId": "teasing",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632934205-ad571a79f3e4",
+              "undone": false,
+              "text": "Olivia: Gražiai sėdėjau valgant (+2)",
+              "delta": 2,
+              "taskId": "meal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632927077-c643922376158",
+              "undone": false,
+              "text": "Olivia: Pati nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "hands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632924945-63ea98c1a898f8",
+              "undone": false,
+              "text": "Olivia: Kuprinę, batus, striukę padėjau į vietą (+1)",
+              "delta": 1,
+              "taskId": "bagShoesJacket",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632920043-d3e84989618168",
+              "undone": false,
+              "text": "Olivia: Atlikau veiklą (+1)",
+              "delta": 1,
+              "taskId": "activity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632904568-9739b6d17dbd18",
+              "undone": false,
+              "text": "Olivia: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "help",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632886167-06c1e32e90a39",
+              "undone": false,
+              "text": "Olivia: Pati užmigau be kitų (+3)",
+              "delta": 3,
+              "taskId": "sleepAlone",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632810006-0845360160423",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi iš darželio (+2)",
+              "delta": 2,
+              "taskId": "fromKindergarten",
+              "kind": "complete"
+            },
+            {
+              "id": "1781632805279-9acbf9e68457e8",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi į darželį (+2)",
+              "delta": 2,
+              "taskId": "toKindergarten",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        },
+        "dominik": {
+          "shells": 28,
+          "done": {
+            "domSleepAlone": true,
+            "domBed": true,
+            "domToKindergarten": true,
+            "domKindergarten": true,
+            "domFromKindergarten": true,
+            "domHands": true,
+            "domMeal": true,
+            "domNoHurtSister": true,
+            "domQuietVoice": true,
+            "domOutsidePlay": true,
+            "domSpeech": true
+          },
+          "log": [
+            {
+              "id": "1781633512868-6347ce7b48397",
+              "undone": false,
+              "text": "Dominik: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781633512868-315435866474e",
+              "undone": false,
+              "text": "Dominik: Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus (+3)",
+              "delta": 3,
+              "taskId": "domSpeech",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633404480-0bbeed8a0d4b1",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais (+2)",
+              "delta": 2,
+              "taskId": "domOutsidePlay",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633369898-16b5f4c94ca6c8",
+              "undone": false,
+              "text": "Dominik: Stengiausi tyliau ir ramiau kalbėti (+5)",
+              "delta": 5,
+              "taskId": "domQuietVoice",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633267927-48005436dde9c",
+              "undone": false,
+              "text": "Dominik: Neerzinau, nemušiau, nestumdžiau, neužgavau sesės (+5)",
+              "delta": 5,
+              "taskId": "domNoHurtSister",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633205249-4ca4a92497bf88",
+              "undone": false,
+              "text": "Dominik: Gražiai sėdėjau valgant (+5)",
+              "delta": 5,
+              "taskId": "domMeal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633195535-300cfa50b64438",
+              "undone": false,
+              "text": "Dominik: Pats nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "domHands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633152255-311c70d7e6541",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi grįžtant iš darželio (+1)",
+              "delta": 1,
+              "taskId": "domFromKindergarten",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633145536-d672ba4497cfe8",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi darželyje (+1)",
+              "delta": 1,
+              "taskId": "domKindergarten",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633097874-79692cee657e4",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi einant į darželį (+1)",
+              "delta": 1,
+              "taskId": "domToKindergarten",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633072444-653a948fdc01f8",
+              "undone": false,
+              "text": "Dominik: Pats pasiklojau lovą, susilanksčiau ryte pižamą (+1)",
+              "delta": 1,
+              "taskId": "domBed",
+              "kind": "complete"
+            },
+            {
+              "id": "1781633041663-6322b3f5439f98",
+              "undone": false,
+              "text": "Dominik: Pats užmigau be kitų (+3)",
+              "delta": 3,
+              "taskId": "domSleepAlone",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        }
+      },
+      "2026-06-17": {
+        "olivia": {
+          "shells": 26,
+          "done": {
+            "clothes": true,
+            "outside": true,
+            "fromKindergarten": true,
+            "wakeUp": true,
+            "sleepAlone": true,
+            "help": true,
+            "activity": true,
+            "bagShoesJacket": true,
+            "hands": true,
+            "meal": true,
+            "dishes": true,
+            "teasing": true,
+            "table": true
+          },
+          "log": [
+            {
+              "id": "1781718792801-0d5686bcd5f078",
+              "undone": false,
+              "text": "Olivia: Padėjau padengti stalą (+2)",
+              "delta": 2,
+              "taskId": "table",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718766731-c4b1e932652578",
+              "undone": false,
+              "text": "Olivia: Neerzinau brolio (+2)",
+              "delta": 2,
+              "taskId": "teasing",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718750581-e5b45a8ffe07d",
+              "undone": false,
+              "text": "Olivia: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "dishes",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718704989-8854a776b19278",
+              "undone": false,
+              "text": "Olivia: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781718704989-6a9f3fda1013",
+              "undone": false,
+              "text": "Olivia: Gražiai sėdėjau valgant (+2)",
+              "delta": 2,
+              "taskId": "meal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718701647-0f6fa185c8877",
+              "undone": false,
+              "text": "Olivia: Pati nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "hands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718698017-91c859d726be2",
+              "undone": false,
+              "text": "Olivia: Kuprinę, batus, striukę padėjau į vietą (+1)",
+              "delta": 1,
+              "taskId": "bagShoesJacket",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718692120-5744db1dec3f5",
+              "undone": false,
+              "text": "Olivia: Atlikau veiklą (+1)",
+              "delta": 1,
+              "taskId": "activity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718677957-badfd38344ed",
+              "undone": false,
+              "text": "Olivia: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "help",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718665392-b0e4dcc3b3d0e",
+              "undone": false,
+              "text": "Olivia: Pati užmigau be kitų (+3)",
+              "delta": 3,
+              "taskId": "sleepAlone",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718662528-b666f5fce9aeb8",
+              "undone": false,
+              "text": "Olivia: Kai pažadino, tuoj atsikėliau (+5)",
+              "delta": 5,
+              "taskId": "wakeUp",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718653853-a7985753a4ef",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi iš darželio (+2)",
+              "delta": 2,
+              "taskId": "fromKindergarten",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        },
+        "dominik": {
+          "shells": 23,
+          "done": {
+            "domSleepAlone": true,
+            "domWakeUp": true,
+            "domBed": true,
+            "domToKindergarten": true,
+            "domFromKindergarten": true,
+            "domHands": true,
+            "domMeal": true,
+            "domNiceWordsSister": true,
+            "domQuietVoice": true,
+            "domOutsidePlay": true,
+            "domHelp": true,
+            "domNoHurtSister": false
+          },
+          "log": [
+            {
+              "id": "1781719178091-03130f6d36b138",
+              "undone": false,
+              "text": "Dominik: atšaukta - Neerzinau, nemušiau, nestumdžiau, neužgavau sesės (-5)",
+              "delta": -5,
+              "taskId": "domNoHurtSister",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781719173588-b80fd741dd03f8",
+              "undone": false,
+              "text": "Dominik: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781719173588-7e620ba5494d58",
+              "undone": false,
+              "text": "Dominik: Neerzinau, nemušiau, nestumdžiau, neužgavau sesės (+5)",
+              "delta": 5,
+              "taskId": "domNoHurtSister",
+              "kind": "complete"
+            },
+            {
+              "id": "1781719084420-256369fb2925b",
+              "undone": false,
+              "text": "Dominik: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "domHelp",
+              "kind": "complete"
+            },
+            {
+              "id": "1781719076296-811dadf19647f",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais (+2)",
+              "delta": 2,
+              "taskId": "domOutsidePlay",
+              "kind": "complete"
+            },
+            {
+              "id": "1781719036970-5931c08fb242",
+              "undone": false,
+              "text": "Dominik: Stengiausi tyliau ir ramiau kalbėti (+5)",
+              "delta": 5,
+              "taskId": "domQuietVoice",
+              "kind": "complete"
+            },
+            {
+              "id": "1781719013074-30e892dae6d098",
+              "undone": false,
+              "text": "Dominik: Pasakiau sesei kažką malonaus (+2)",
+              "delta": 2,
+              "taskId": "domNiceWordsSister",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718954540-0f9c0e1770612",
+              "undone": false,
+              "text": "Dominik: Gražiai sėdėjau valgant (+3)",
+              "delta": 3,
+              "taskId": "domMeal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718922338-5227c8ab4c66c",
+              "undone": false,
+              "text": "Dominik: Pats nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "domHands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718893293-56642e4864f1d8",
+              "undone": false,
+              "text": "Dominik: pasitaisyti - Kuprinę, batus, striukę padėjau į vietą (-1)",
+              "delta": -1,
+              "kind": "penalty"
+            },
+            {
+              "id": "1781718851947-4a660cc6bc3e7",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi grįžtant iš darželio (+1)",
+              "delta": 1,
+              "taskId": "domFromKindergarten",
+              "kind": "complete"
+            },
+            {
+              "id": "1781718843564-20932b45901e7",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi einant į darželį (+1)",
+              "delta": 1,
+              "taskId": "domToKindergarten",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        }
+      },
+      "2026-06-18": {
+        "olivia": {
+          "shells": 34,
+          "done": {
+            "toysBooks": true,
+            "clothes": true,
+            "outside": true,
+            "toKindergarten": true,
+            "fromKindergarten": true,
+            "wakeUp": true,
+            "sleepAlone": true,
+            "help": true,
+            "activity": true,
+            "bagShoesJacket": true,
+            "hands": true,
+            "meal": true,
+            "teasing": true,
+            "chooseActivity": true,
+            "singDance": true,
+            "teacher": true,
+            "sorry": true
+          },
+          "log": [
+            {
+              "id": "1781804934352-09b8456c313aa",
+              "undone": false,
+              "text": "Olivia: Atsiprašiau, kai reikėjo (+2)",
+              "delta": 2,
+              "taskId": "sorry",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804484371-176f2f15c2336",
+              "undone": false,
+              "text": "Olivia: Auklėtojos pagyrimas (+3)",
+              "delta": 3,
+              "taskId": "teacher",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804436643-f2bdec97fa893",
+              "undone": false,
+              "text": "Olivia: Dainavau, šokau (+1)",
+              "delta": 1,
+              "taskId": "singDance",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804430376-4e69649462778",
+              "undone": false,
+              "text": "Olivia: Pati pasirinkau piešti, skaityti, rašyti, žaisti, lipdyti (+1)",
+              "delta": 1,
+              "taskId": "chooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804419603-97a9e8bf178da",
+              "undone": false,
+              "text": "Olivia: Neerzinau brolio (+2)",
+              "delta": 2,
+              "taskId": "teasing",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804403374-8f823cf280e2c8",
+              "undone": false,
+              "text": "Olivia: Gražiai sėdėjau valgant (+2)",
+              "delta": 2,
+              "taskId": "meal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804396085-5744b1a7f98c9",
+              "undone": false,
+              "text": "Olivia: Pati nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "hands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804393241-3d035ea26c6868",
+              "undone": false,
+              "text": "Olivia: Kuprinę, batus, striukę padėjau į vietą (+1)",
+              "delta": 1,
+              "taskId": "bagShoesJacket",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804364659-91c39077d0b748",
+              "undone": false,
+              "text": "Olivia: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781804364659-038ea6ae00556",
+              "undone": false,
+              "text": "Olivia: Atlikau veiklą (+1)",
+              "delta": 1,
+              "taskId": "activity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804337148-2da4a70137905",
+              "undone": false,
+              "text": "Olivia: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "help",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804332555-b3160d580439a",
+              "undone": false,
+              "text": "Olivia: Pati užmigau be kitų (+3)",
+              "delta": 3,
+              "taskId": "sleepAlone",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        },
+        "dominik": {
+          "shells": 36,
+          "done": {
+            "domSleepAlone": true,
+            "domBed": true,
+            "domToKindergarten": true,
+            "domFromKindergarten": true,
+            "domBagShoesJacket": true,
+            "domHands": true,
+            "domMeal": true,
+            "domThanksMeal": true,
+            "domDishes": true,
+            "domPlaySister": true,
+            "domNiceWordsSister": true,
+            "domMom": true,
+            "domQuietVoice": true,
+            "domHelp": true,
+            "domOutsidePlay": true,
+            "domChooseActivity": true,
+            "domPraise": true,
+            "domToysBooks": true
+          },
+          "log": [
+            {
+              "id": "1781804908906-4ee63dba2592f8",
+              "undone": false,
+              "text": "Dominik: Pats susidėjau savo žaislus ir knygutes (+2)",
+              "delta": 2,
+              "taskId": "domToysBooks",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804823059-6f16ad17279b58",
+              "undone": false,
+              "text": "Dominik: Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas (+5)",
+              "delta": 5,
+              "taskId": "domPraise",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804784928-4142c4bea288a8",
+              "undone": false,
+              "text": "Dominik: Pats ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t. (+1)",
+              "delta": 1,
+              "taskId": "domChooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804752549-3e196b764b5a",
+              "undone": false,
+              "text": "Dominik: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781804752549-9973d438446cb8",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais (+2)",
+              "delta": 2,
+              "taskId": "domOutsidePlay",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804742365-9495191b27df1",
+              "undone": false,
+              "text": "Dominik: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "domHelp",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804731035-1f034dab1fb628",
+              "undone": false,
+              "text": "Dominik: Stengiausi tyliau ir ramiau kalbėti (+5)",
+              "delta": 5,
+              "taskId": "domQuietVoice",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804718045-3ae2622159769",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi, neerzinau mamytės (+2)",
+              "delta": 2,
+              "taskId": "domMom",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804706451-6c8f14a5612ad8",
+              "undone": false,
+              "text": "Dominik: Pasakiau sesei kažką malonaus (+2)",
+              "delta": 2,
+              "taskId": "domNiceWordsSister",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804693968-41e06094c18438",
+              "undone": false,
+              "text": "Dominik: Gražiai žaidžiau su sese (+2)",
+              "delta": 2,
+              "taskId": "domPlaySister",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804608039-26a1c805844c7",
+              "undone": false,
+              "text": "Dominik: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "domDishes",
+              "kind": "complete"
+            },
+            {
+              "id": "1781804604688-261c296e80289",
+              "undone": false,
+              "text": "Dominik: Pasakiau „ačiū“, kai pavalgiau (+1)",
+              "delta": 1,
+              "taskId": "domThanksMeal",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        }
+      },
+      "2026-06-19": {
+        "olivia": {
+          "shells": 41,
+          "done": {
+            "oliBed": true,
+            "oliSleepAlone": true,
+            "oliWakeUp": true,
+            "oliGettingReady": true,
+            "oliToKindergarten": true,
+            "oliKindergarten": false,
+            "oliFromKindergarten": true,
+            "oliBagShoesJacket": true,
+            "oliHands": true,
+            "oliMeal": true,
+            "oliNoHurtBrother": true,
+            "oliNiceWordsBrother": true,
+            "oliMom": true,
+            "oliQuietVoice": true,
+            "oliOutsidePlay": true,
+            "oliHelp": true,
+            "oliThanksNeeded": true,
+            "oliPraise": true
+          },
+          "log": [
+            {
+              "id": "1781896206858-fb92fca5544f9",
+              "undone": false,
+              "text": "Olivia: Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas (+5)",
+              "delta": 5,
+              "taskId": "oliPraise",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896113541-b721c430cb9cb8",
+              "undone": false,
+              "text": "Olivia: Pasakiau „ačiū“, kai reikėjo (+1)",
+              "delta": 1,
+              "taskId": "oliThanksNeeded",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896091511-ef28fbbc0698c8",
+              "undone": false,
+              "text": "Olivia: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "oliHelp",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896048706-41e55d019d7018",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais (+2)",
+              "delta": 2,
+              "taskId": "oliOutsidePlay",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896025992-f4beae740d1de",
+              "undone": false,
+              "text": "Olivia: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781896025991-3388b9fccf886",
+              "undone": false,
+              "text": "Olivia: Stengiausi greitai pasirinkti tinkamus rūbus ir greitai apsirengti (+5)",
+              "delta": 5,
+              "taskId": "oliQuietVoice",
+              "kind": "complete"
+            },
+            {
+              "id": "1781895850982-64d0ff49ce3e5",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi, neerzinau mamytės (+2)",
+              "delta": 2,
+              "taskId": "oliMom",
+              "kind": "complete"
+            },
+            {
+              "id": "1781895815441-30a057f7cd13e8",
+              "undone": false,
+              "text": "Olivia: Pasakiau broliui kažką malonaus (+2)",
+              "delta": 2,
+              "taskId": "oliNiceWordsBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1781895786040-90a868f793fed8",
+              "undone": false,
+              "text": "Olivia: Neerzinau, nemušiau, nestumdžiau, neužgavau brolio (+5)",
+              "delta": 5,
+              "taskId": "oliNoHurtBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1781895759346-5bf242780ed3f8",
+              "undone": false,
+              "text": "Olivia: Gražiai sėdėjau valgant (+5)",
+              "delta": 5,
+              "taskId": "oliMeal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781895683830-4783e3bc676a98",
+              "undone": false,
+              "text": "Olivia: Pati nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "oliHands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781895680759-278a0f5432eca",
+              "undone": false,
+              "text": "Olivia: Kuprinę, batus, striukę padėjau į vietą (+1)",
+              "delta": 1,
+              "taskId": "oliBagShoesJacket",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        },
+        "dominik": {
+          "shells": 33,
+          "done": {
+            "oliSleepAlone": true,
+            "oliBed": true,
+            "oliGettingReady": true,
+            "oliToKindergarten": true,
+            "oliKindergarten": true,
+            "oliFromKindergarten": false,
+            "oliBagShoesJacket": true,
+            "oliHands": true,
+            "oliMeal": true,
+            "oliNoHurtBrother": true,
+            "oliNiceWordsBrother": true,
+            "oliQuietVoice": true,
+            "oliOutsidePlay": true,
+            "oliPraise": true,
+            "oliMom": false,
+            "oliHelp": false
+          },
+          "log": [
+            {
+              "id": "1781899285796-13f687bee6a22",
+              "undone": false,
+              "text": "Dominik: ypatingas pagyrimas - galima rinktis staigmeną",
+              "delta": 0,
+              "kind": "bonusSurprise"
+            },
+            {
+              "id": "1781896764926-987188f0685718",
+              "undone": false,
+              "text": "Dominik: atšaukta - Padėjau kitam (-2)",
+              "delta": -2,
+              "taskId": "oliHelp",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781896763376-c3e8081ca6ca48",
+              "undone": false,
+              "text": "Dominik: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "oliHelp",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896758802-b342a1167893c8",
+              "undone": false,
+              "text": "Dominik: atšaukta - Gražiai elgiausi, neerzinau mamytės (-2)",
+              "delta": -2,
+              "taskId": "oliMom",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781896756042-fd8de90f789e98",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi, neerzinau mamytės (+2)",
+              "delta": 2,
+              "taskId": "oliMom",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896721286-c90adfe88d6ca8",
+              "undone": false,
+              "text": "Dominik: Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas (+5)",
+              "delta": 5,
+              "taskId": "oliPraise",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896661829-33ba7b8b8fb8e8",
+              "undone": false,
+              "text": "Dominik: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1781896661829-6ed863f4839678",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais (+2)",
+              "delta": 2,
+              "taskId": "oliOutsidePlay",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896633225-5785f022762fc",
+              "undone": false,
+              "text": "Dominik: Stengiausi greitai pasirinkti tinkamus rūbus ir greitai apsirengti (+5)",
+              "delta": 5,
+              "taskId": "oliQuietVoice",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896534444-de700a43778858",
+              "undone": false,
+              "text": "Dominik: Pasakiau broliui kažką malonaus (+2)",
+              "delta": 2,
+              "taskId": "oliNiceWordsBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896504731-780f2d387cbec8",
+              "undone": false,
+              "text": "Dominik: Neerzinau, nemušiau, nestumdžiau, neužgavau brolio (+5)",
+              "delta": 5,
+              "taskId": "oliNoHurtBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1781896453199-7802e6b0284298",
+              "undone": false,
+              "text": "Dominik: Gražiai sėdėjau valgant (+5)",
+              "delta": 5,
+              "taskId": "oliMeal",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true,
+          "surpriseUnlocked": true
+        }
+      },
+      "2026-06-20": {
+        "olivia": {
+          "shells": 43,
+          "done": {
+            "oliSleepAlone": true,
+            "oliWakeUp": true,
+            "oliBed": true,
+            "oliGettingReady": false,
+            "oliToKindergarten": false,
+            "oliKindergarten": false,
+            "oliFromKindergarten": false,
+            "oliBagShoesJacket": true,
+            "oliHands": true,
+            "oliTable": false,
+            "oliMeal": true,
+            "oliThanksMeal": true,
+            "oliDishes": true,
+            "oliNoHurtBrother": true,
+            "oliPlayBrother": true,
+            "oliNiceWordsBrother": true,
+            "oliMom": true,
+            "oliQuietVoice": true,
+            "oliOutsidePlay": true,
+            "oliHelp": true,
+            "oliThanksNeeded": true,
+            "oliSorry": false,
+            "oliChooseActivity": true,
+            "oliPraise": true,
+            "oliSpeech": false,
+            "oliToysBooks": false,
+            "sharedCustom1781899267819": false
+          },
+          "log": [
+            {
+              "id": "1781986683271-af5362f8a6ccf8",
+              "undone": false,
+              "text": "Olivia: Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas (+5)",
+              "delta": 5,
+              "taskId": "oliPraise",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986647893-1481ed6e6f5f5",
+              "undone": false,
+              "text": "Olivia: Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t. (+1)",
+              "delta": 1,
+              "taskId": "oliChooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986638301-b8db3a503c745",
+              "undone": false,
+              "text": "Olivia: Pasakiau „ačiū“, kai reikėjo (+1)",
+              "delta": 1,
+              "taskId": "oliThanksNeeded",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986629615-eb0fc41607e0e",
+              "undone": false,
+              "text": "Olivia: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "oliHelp",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986619767-0a567c300cbd98",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais (+2)",
+              "delta": 2,
+              "taskId": "oliOutsidePlay",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986599033-2042cde45bbde8",
+              "undone": false,
+              "text": "Olivia: Stengiausi tyliau ir ramiau kalbėti (+5)",
+              "delta": 5,
+              "taskId": "oliQuietVoice",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986542467-fdee022fe6f1e8",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi, neerzinau mamytės (+2)",
+              "delta": 2,
+              "taskId": "oliMom",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986527231-efc10c765975e8",
+              "undone": false,
+              "text": "Olivia: Pasakiau broliui kažką malonaus (+2)",
+              "delta": 2,
+              "taskId": "oliNiceWordsBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986509773-d9df9078afaa08",
+              "undone": false,
+              "text": "Olivia: Gražiai žaidžiau su broliu (+2)",
+              "delta": 2,
+              "taskId": "oliPlayBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986474481-aefb635e841868",
+              "undone": false,
+              "text": "Olivia: Neerzinau, nemušiau, nestumdžiau, neužgavau brolio (+5)",
+              "delta": 5,
+              "taskId": "oliNoHurtBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986466907-107406be37573",
+              "undone": false,
+              "text": "Olivia: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "oliDishes",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986460937-944f05304481",
+              "undone": false,
+              "text": "Olivia: Pasakiau „ačiū“, kai pavalgiau (+1)",
+              "delta": 1,
+              "taskId": "oliThanksMeal",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true,
+          "dailyTreasureAwarded": true,
+          "surpriseUnlocked": true
+        },
+        "dominik": {
+          "shells": 25,
+          "done": {
+            "oliSleepAlone": false,
+            "domBed": true,
+            "domSleepAlone": true,
+            "domWakeUp": true,
+            "domBagShoesJacket": true,
+            "domHands": true,
+            "domMeal": true,
+            "domThanksMeal": true,
+            "domDishes": true,
+            "domOutsidePlay": true,
+            "domHelp": true,
+            "domSorry": true,
+            "domSpeech": true
+          },
+          "log": [
+            {
+              "id": "1781987184965-ce8364fb259c48",
+              "undone": false,
+              "text": "Dominik: Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus (+3)",
+              "delta": 3,
+              "taskId": "domSpeech",
+              "kind": "complete"
+            },
+            {
+              "id": "1781987183547-3aa58e35f7f0e",
+              "undone": false,
+              "text": "Dominik: atšaukta - Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus (-3)",
+              "delta": -3,
+              "taskId": "domSpeech",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1781987181585-ed9900cdee50a",
+              "undone": false,
+              "text": "Dominik: Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus (+3)",
+              "delta": 3,
+              "taskId": "domSpeech",
+              "kind": "complete"
+            },
+            {
+              "id": "1781987058835-8be7805703b11",
+              "undone": false,
+              "text": "Dominik: Atsiprašiau, kai reikėjo (+2)",
+              "delta": 2,
+              "taskId": "domSorry",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986970365-1727909a37bec8",
+              "undone": false,
+              "text": "Dominik: Padėjau kitam (+2)",
+              "delta": 2,
+              "taskId": "domHelp",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986954191-aecdbf2ab0c06",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais (+2)",
+              "delta": 2,
+              "taskId": "domOutsidePlay",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986865759-a88250443ee03",
+              "undone": false,
+              "text": "Dominik: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "domDishes",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986859559-4e5ec02cb2443",
+              "undone": false,
+              "text": "Dominik: Pasakiau „ačiū“, kai pavalgiau (+1)",
+              "delta": 1,
+              "taskId": "domThanksMeal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986855227-c3fcc64b602358",
+              "undone": false,
+              "text": "Dominik: Gražiai sėdėjau valgant (+5)",
+              "delta": 5,
+              "taskId": "domMeal",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986831841-5746f0d4eb8e9",
+              "undone": false,
+              "text": "Dominik: Pats nusiploviau rankas (+1)",
+              "delta": 1,
+              "taskId": "domHands",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986813055-c0f9ce2ac44d8",
+              "undone": false,
+              "text": "Dominik: Kuprinę, batus, striukę padėjau į vietą (+1)",
+              "delta": 1,
+              "taskId": "domBagShoesJacket",
+              "kind": "complete"
+            },
+            {
+              "id": "1781986792667-0129241e8bde",
+              "undone": false,
+              "text": "Dominik: Pats pasiklojau lovą, susilanksčiau ryte pižamą (+1)",
+              "delta": 1,
+              "taskId": "domBed",
+              "kind": "complete"
+            }
+          ]
+        }
+      },
+      "2026-06-21": {
+        "olivia": {
+          "shells": 36,
+          "done": {
+            "oliSleepAlone": true,
+            "oliWakeUp": true,
+            "oliBed": true,
+            "oliBagShoesJacket": true,
+            "oliHands": true,
+            "oliTable": true,
+            "oliMeal": true,
+            "oliThanksMeal": true,
+            "oliNoHurtBrother": true,
+            "oliPlayBrother": true,
+            "oliNiceWordsBrother": true,
+            "oliMom": true,
+            "oliOutsidePlay": true,
+            "oliThanksNeeded": true,
+            "oliChooseActivity": true,
+            "oliPraise": true
+          },
+          "log": [
+            {
+              "id": "1782066545321-e54d478eb0448",
+              "undone": false,
+              "text": "Olivia: Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas (+5)",
+              "delta": 5,
+              "taskId": "oliPraise",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066488404-2b90f7013a8e98",
+              "undone": false,
+              "text": "Olivia: Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t. (+1)",
+              "delta": 1,
+              "taskId": "oliChooseActivity",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066470775-efdbe3cf97159",
+              "undone": false,
+              "text": "Olivia: Pasakiau „ačiū“, kai reikėjo (+1)",
+              "delta": 1,
+              "taskId": "oliThanksNeeded",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066440535-43e62a3a9b5408",
+              "undone": false,
+              "text": "Olivia: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1782066440535-3c56d480d48bc8",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais (+2)",
+              "delta": 2,
+              "taskId": "oliOutsidePlay",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066431593-599e0bbb6805a8",
+              "undone": false,
+              "text": "Olivia: Gražiai elgiausi, neerzinau mamytės (+2)",
+              "delta": 2,
+              "taskId": "oliMom",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066397707-5d217f7e3dc528",
+              "undone": false,
+              "text": "Olivia: Pasakiau broliui kažką malonaus (+2)",
+              "delta": 2,
+              "taskId": "oliNiceWordsBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066378411-9fcfc508eed62",
+              "undone": false,
+              "text": "Olivia: Gražiai žaidžiau su broliu (+2)",
+              "delta": 2,
+              "taskId": "oliPlayBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066286055-040f25dc9df798",
+              "undone": false,
+              "text": "Olivia: Neerzinau, nemušiau, nestumdžiau, neužgavau brolio (+5)",
+              "delta": 5,
+              "taskId": "oliNoHurtBrother",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066255835-e7ea1e0fc96f08",
+              "undone": false,
+              "text": "Olivia: Pasakiau „ačiū“, kai pavalgiau (+1)",
+              "delta": 1,
+              "taskId": "oliThanksMeal",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066239352-c627e540d74ac8",
+              "undone": false,
+              "text": "Olivia: Gražiai sėdėjau valgant (+5)",
+              "delta": 5,
+              "taskId": "oliMeal",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066210827-e6a96edcbfcbe8",
+              "undone": false,
+              "text": "Olivia: Padėjau padengti stalą (+1)",
+              "delta": 1,
+              "taskId": "oliTable",
+              "kind": "complete"
+            }
+          ],
+          "halfwayTreasureNoticed": true
+        },
+        "dominik": {
+          "shells": 28,
+          "done": {
+            "domFromKindergarten": false,
+            "domBagShoesJacket": true,
+            "domWakeUp": true,
+            "domSleepAlone": true,
+            "domBed": true,
+            "domHands": true,
+            "domMeal": true,
+            "domDishes": true,
+            "domNiceWordsSister": true,
+            "domMom": true,
+            "domQuietVoice": true,
+            "domSorry": true,
+            "domThanksMeal": true,
+            "domThanksNeeded": true,
+            "domNoHurtSister": false
+          },
+          "log": [
+            {
+              "id": "1782067170875-f936d2095509b8",
+              "undone": false,
+              "text": "Dominik: atšaukta - Neerzinau, nemušiau, nestumdžiau, neužgavau sesės (-5)",
+              "delta": -5,
+              "taskId": "domNoHurtSister",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1782067166177-c1676a8cdd07d",
+              "undone": false,
+              "text": "Dominik: Neerzinau, nemušiau, nestumdžiau, neužgavau sesės (+5)",
+              "delta": 5,
+              "taskId": "domNoHurtSister",
+              "kind": "complete"
+            },
+            {
+              "id": "1782067162883-3f56d63f5f5d58",
+              "undone": false,
+              "text": "Dominik: atšaukta - Neerzinau, nemušiau, nestumdžiau, neužgavau sesės (-5)",
+              "delta": -5,
+              "taskId": "domNoHurtSister",
+              "kind": "toggleOff"
+            },
+            {
+              "id": "1782067160679-366499c4ab94f8",
+              "undone": false,
+              "text": "Dominik: Neerzinau, nemušiau, nestumdžiau, neužgavau sesės (+5)",
+              "delta": 5,
+              "taskId": "domNoHurtSister",
+              "kind": "complete"
+            },
+            {
+              "id": "1782067117787-961864dac28ba",
+              "undone": false,
+              "text": "Dominik: pusė kelio iki perlo jau nueita",
+              "delta": 0,
+              "kind": "halfwayNotice"
+            },
+            {
+              "id": "1782067117787-89f0ffa018ccd8",
+              "undone": false,
+              "text": "Dominik: Pasakiau „ačiū“, kai reikėjo (+1)",
+              "delta": 1,
+              "taskId": "domThanksNeeded",
+              "kind": "complete"
+            },
+            {
+              "id": "1782067113365-82795f3c92d7f",
+              "undone": false,
+              "text": "Dominik: Pasakiau „ačiū“, kai pavalgiau (+1)",
+              "delta": 1,
+              "taskId": "domThanksMeal",
+              "kind": "complete"
+            },
+            {
+              "id": "1782067013529-284c9af3b7bba",
+              "undone": false,
+              "text": "Dominik: Atsiprašiau, kai reikėjo (+2)",
+              "delta": 2,
+              "taskId": "domSorry",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066938597-48b227b59054e",
+              "undone": false,
+              "text": "Dominik: Stengiausi tyliau ir ramiau kalbėti (+5)",
+              "delta": 5,
+              "taskId": "domQuietVoice",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066930691-9609d951b67fd",
+              "undone": false,
+              "text": "Dominik: Gražiai elgiausi, neerzinau mamytės (+2)",
+              "delta": 2,
+              "taskId": "domMom",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066920169-267fcf015e3158",
+              "undone": false,
+              "text": "Dominik: Pasakiau sesei kažką malonaus (+2)",
+              "delta": 2,
+              "taskId": "domNiceWordsSister",
+              "kind": "complete"
+            },
+            {
+              "id": "1782066728694-799b1d62ad197",
+              "undone": false,
+              "text": "Dominik: Nunešiau indus po valgio (+1)",
+              "delta": 1,
+              "taskId": "domDishes",
+              "kind": "complete"
+            }
+          ],
+          "surpriseUnlocked": true,
+          "halfwayTreasureNoticed": true
+        }
+      },
+      "2026-06-22": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-23": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-24": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-25": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-26": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-27": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-28": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-29": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-06-30": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-01": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-02": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-03": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-04": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-05": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-06": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-07": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-08": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-09": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-10": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-11": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-12": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-13": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-14": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-15": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-16": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-17": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-18": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-19": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-20": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-21": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-22": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-23": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-24": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-25": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-26": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-27": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-28": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-29": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-30": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-07-31": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-01": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-02": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-03": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-04": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-05": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-06": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-07": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-08": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-08-09": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-12": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-11": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-13": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-14": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-15": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-16": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-17": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-04-27": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-04-28": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-04-29": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-04-30": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-01": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-02": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-03": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-04": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-05": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-06": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-07": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-08": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-09": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-10": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-18": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-19": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-20": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-21": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-22": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-23": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-24": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-25": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-26": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-27": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-28": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-29": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-30": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      },
+      "2026-05-31": {
+        "olivia": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        },
+        "dominik": {
+          "shells": 0,
+          "done": {},
+          "log": []
+        }
+      }
+    },
+    "weekendPrizes": {
+      "2026-06-15": {
+        "winner": "Olivia",
+        "prize": "Kinas"
+      }
+    },
+    "weekendPrizeSettings": {
+      "title": "Didysis savaitgalio prizas",
+      "description": "Čia rodoma visų pasirinktos savaitės dienų suma. Daugiausiai kriauklyčių surinkęs vaikas pasirenka prizą.",
+      "prizes": [
+        "Kinas",
+        "Zoologijos sodas",
+        "Pramogų parkas",
+        "Batutų parkas",
+        "Žaidimų kambarys",
+        "Išvyka į parką su pikniku",
+        "Ledainė / desertas kavinėje",
+        "Baseinas / vandens pramogos",
+        "Lėlių teatras",
+        "Boulingas"
+      ]
+    },
+    "surpriseSettings": {
+      "title": "Staigmena už ypatingą pagyrimą",
+      "description": "Kai vaikas gauna ypatingą pagyrimą, atrakinkite vieną mažą staigmeną.",
+      "surprises": [
+        "1 pasirinktas filmukas",
+        "Pasaka prieš miegą",
+        "Mažas skanėstas",
+        "Kakava arba arbata",
+        "Kartu nupiešti piešinį",
+        "Pasirinkti vakarienės desertą",
+        "Mažas lobio akmenukas / perliukas į stiklainį",
+        "Pasirinkti dainelę šokiui",
+        "Mini piknikas namuose ant pledo",
+        "Pasivaikščiojimas iki mėgstamos vietos",
+        "Muilo burbulai lauke",
+        "Išsirinkti knygelę skaitymui",
+        "5 minutės kutuliukų / linksmo žaidimo",
+        "Pasirinkti stalo žaidimą"
+      ]
+    },
+    "customTasks": {
+      "olivia": [
+        {
+          "id": "oliSleepAlone",
+          "icon": "🛏️",
+          "title": "Pati užmigau be kitų",
+          "shells": 3
+        },
+        {
+          "id": "oliWakeUp",
+          "icon": "🌞",
+          "title": "Kai pažadino, tuoj pat pati atsikėliau",
+          "shells": 3
+        },
+        {
+          "id": "oliBed",
+          "icon": "🛌",
+          "title": "Pati pasiklojau lovą, susilanksčiau ryte pižamą",
+          "shells": 1
+        },
+        {
+          "id": "oliGettingReady",
+          "icon": "🎒",
+          "title": "Gražiai elgiausi ruošiantis į darželį",
+          "shells": 1
+        },
+        {
+          "id": "oliToKindergarten",
+          "icon": "🏫",
+          "title": "Gražiai elgiausi einant į darželį",
+          "shells": 1
+        },
+        {
+          "id": "oliKindergarten",
+          "icon": "🌈",
+          "title": "Gražiai elgiausi darželyje",
+          "shells": 1
+        },
+        {
+          "id": "oliFromKindergarten",
+          "icon": "🌤️",
+          "title": "Gražiai elgiausi grįžtant iš darželio",
+          "shells": 1
+        },
+        {
+          "id": "oliBagShoesJacket",
+          "icon": "🧥",
+          "title": "Kuprinę, batus, striukę padėjau į vietą",
+          "shells": 1
+        },
+        {
+          "id": "oliHands",
+          "icon": "🧼",
+          "title": "Pati nusiploviau rankas",
+          "shells": 1
+        },
+        {
+          "id": "oliTable",
+          "icon": "🍴",
+          "title": "Padėjau padengti stalą",
+          "shells": 1
+        },
+        {
+          "id": "oliMeal",
+          "icon": "🍽️",
+          "title": "Gražiai sėdėjau valgant",
+          "shells": 5
+        },
+        {
+          "id": "oliThanksMeal",
+          "icon": "🙏",
+          "title": "Pasakiau „ačiū“, kai pavalgiau",
+          "shells": 1
+        },
+        {
+          "id": "oliDishes",
+          "icon": "🥣",
+          "title": "Nunešiau indus po valgio",
+          "shells": 1
+        },
+        {
+          "id": "oliNoHurtBrother",
+          "icon": "🕊️",
+          "title": "Neerzinau, nemušiau, nestumdžiau, neužgavau brolio",
+          "shells": 5
+        },
+        {
+          "id": "oliPlayBrother",
+          "icon": "🧩",
+          "title": "Gražiai žaidžiau su broliu",
+          "shells": 2
+        },
+        {
+          "id": "oliNiceWordsBrother",
+          "icon": "💛",
+          "title": "Pasakiau broliui kažką malonaus",
+          "shells": 2
+        },
+        {
+          "id": "oliMom",
+          "icon": "🌷",
+          "title": "Gražiai elgiausi, neerzinau mamytės",
+          "shells": 2
+        },
+        {
+          "id": "oliQuietVoice",
+          "icon": "🤫",
+          "title": "Stengiausi tyliau ir ramiau kalbėti",
+          "shells": 5
+        },
+        {
+          "id": "oliOutsidePlay",
+          "icon": "🚲",
+          "title": "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais",
+          "shells": 2
+        },
+        {
+          "id": "oliHelp",
+          "icon": "🤝",
+          "title": "Padėjau kitam",
+          "shells": 2
+        },
+        {
+          "id": "oliThanksNeeded",
+          "icon": "💬",
+          "title": "Pasakiau „ačiū“, kai reikėjo",
+          "shells": 1
+        },
+        {
+          "id": "oliSorry",
+          "icon": "🤍",
+          "title": "Atsiprašiau, kai reikėjo",
+          "shells": 2
+        },
+        {
+          "id": "oliChooseActivity",
+          "icon": "🖍️",
+          "title": "Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.",
+          "shells": 1
+        },
+        {
+          "id": "oliPraise",
+          "icon": "🏅",
+          "title": "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas",
+          "shells": 5
+        },
+        {
+          "id": "oliSpeech",
+          "icon": "🗣️",
+          "title": "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus",
+          "shells": 3
+        },
+        {
+          "id": "oliToysBooks",
+          "icon": "🧸",
+          "title": "Pati susidėjau savo žaislus ir knygutes",
+          "shells": 2
+        }
+      ],
+      "dominik": [
+        {
+          "id": "domSleepAlone",
+          "icon": "🛏️",
+          "title": "Pats užmigau be kitų",
+          "shells": 3
+        },
+        {
+          "id": "domWakeUp",
+          "icon": "🌞",
+          "title": "Kai pažadino, tuoj pat pats atsikėliau",
+          "shells": 3
+        },
+        {
+          "id": "domBed",
+          "icon": "🛌",
+          "title": "Pats pasiklojau lovą, susilanksčiau ryte pižamą",
+          "shells": 1
+        },
+        {
+          "id": "domGettingReady",
+          "icon": "🎒",
+          "title": "Gražiai elgiausi ruošiantis į darželį",
+          "shells": 1
+        },
+        {
+          "id": "domToKindergarten",
+          "icon": "🏫",
+          "title": "Gražiai elgiausi einant į darželį",
+          "shells": 1
+        },
+        {
+          "id": "domKindergarten",
+          "icon": "🌈",
+          "title": "Gražiai elgiausi darželyje",
+          "shells": 1
+        },
+        {
+          "id": "domFromKindergarten",
+          "icon": "🌤️",
+          "title": "Gražiai elgiausi grįžtant iš darželio",
+          "shells": 1
+        },
+        {
+          "id": "domBagShoesJacket",
+          "icon": "🧥",
+          "title": "Kuprinę, batus, striukę padėjau į vietą",
+          "shells": 1
+        },
+        {
+          "id": "domHands",
+          "icon": "🧼",
+          "title": "Pats nusiploviau rankas",
+          "shells": 1
+        },
+        {
+          "id": "domTable",
+          "icon": "🍴",
+          "title": "Padėjau padengti stalą",
+          "shells": 1
+        },
+        {
+          "id": "domMeal",
+          "icon": "🍽️",
+          "title": "Gražiai sėdėjau valgant",
+          "shells": 5
+        },
+        {
+          "id": "domThanksMeal",
+          "icon": "🙏",
+          "title": "Pasakiau „ačiū“, kai pavalgiau",
+          "shells": 1
+        },
+        {
+          "id": "domDishes",
+          "icon": "🥣",
+          "title": "Nunešiau indus po valgio",
+          "shells": 1
+        },
+        {
+          "id": "domNoHurtSister",
+          "icon": "🕊️",
+          "title": "Neerzinau, nemušiau, nestumdžiau, neužgavau sesės",
+          "shells": 5
+        },
+        {
+          "id": "domPlaySister",
+          "icon": "🧩",
+          "title": "Gražiai žaidžiau su sese",
+          "shells": 2
+        },
+        {
+          "id": "domNiceWordsSister",
+          "icon": "💛",
+          "title": "Pasakiau sesei kažką malonaus",
+          "shells": 2
+        },
+        {
+          "id": "domMom",
+          "icon": "🌷",
+          "title": "Gražiai elgiausi, neerzinau mamytės",
+          "shells": 2
+        },
+        {
+          "id": "domQuietVoice",
+          "icon": "🤫",
+          "title": "Stengiausi tyliau ir ramiau kalbėti",
+          "shells": 5
+        },
+        {
+          "id": "domOutsidePlay",
+          "icon": "🚲",
+          "title": "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais",
+          "shells": 2
+        },
+        {
+          "id": "domHelp",
+          "icon": "🤝",
+          "title": "Padėjau kitam",
+          "shells": 2
+        },
+        {
+          "id": "domThanksNeeded",
+          "icon": "💬",
+          "title": "Pasakiau „ačiū“, kai reikėjo",
+          "shells": 1
+        },
+        {
+          "id": "domSorry",
+          "icon": "🤍",
+          "title": "Atsiprašiau, kai reikėjo",
+          "shells": 2
+        },
+        {
+          "id": "domChooseActivity",
+          "icon": "🖍️",
+          "title": "Pats ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.",
+          "shells": 1
+        },
+        {
+          "id": "domPraise",
+          "icon": "🏅",
+          "title": "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas",
+          "shells": 5
+        },
+        {
+          "id": "domSpeech",
+          "icon": "🗣️",
+          "title": "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus",
+          "shells": 3
+        },
+        {
+          "id": "domToysBooks",
+          "icon": "🧸",
+          "title": "Pats susidėjau savo žaislus ir knygutes",
+          "shells": 2
+        }
+      ]
+    },
+    "taskSchemaVersion": 4,
+    "childProfiles": {
+      "olivia": {
+        "name": "Olivia",
+        "gender": "girl",
+        "color": "pink",
+        "avatar": "👧"
+      },
+      "dominik": {
+        "name": "Dominik",
+        "gender": "boy",
+        "color": "blue",
+        "avatar": "👦"
+      }
+    },
+    "appSettings": {
+      "title": "Kriauklyčių nuotykis",
+      "subtitle": "Olivia ir Dominik keliauja vandenyno keliu, renka Jūros kriauklytes ir artėja prie perlo lobio."
+    },
+    "editMode": false,
+    "legacyBonusPointsRemoved": true
+  }
+}
