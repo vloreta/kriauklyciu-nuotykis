@@ -2414,6 +2414,7 @@
     const taskEditForm = document.getElementById("taskEditForm");
     const taskEditTitle = document.getElementById("taskEditTitle");
     const taskEditShells = document.getElementById("taskEditShells");
+    const legacyTaskStartDate = "2026-06-11";
     let editingTaskId = null;
     let habitArchiveExpanded = false;
 
@@ -2816,7 +2817,23 @@
     function taskCreatedAt(task, archiveEntry = null) {
       if (task?.createdAt) return task.createdAt;
       if (typeof archiveEntry === "object" && archiveEntry?.createdAt) return archiveEntry.createdAt;
-      return "2026-06-10";
+      return legacyTaskStartDate;
+    }
+
+    function archivedTaskHistory(childId, taskId, archivedAt) {
+      const archiveLimit = archivedAt || todayKey();
+      return Object.entries(state.records || {}).reduce((summary, [dateKeyValue, day]) => {
+        if (dateKeyValue > archiveLimit) return summary;
+        const logs = day?.[childId]?.log || [];
+        logs.forEach(item => {
+          if (typeof item === "string") return;
+          if (item.taskId === taskId && item.delta > 0) {
+            summary.count += 1;
+            summary.shells += item.delta;
+          }
+        });
+        return summary;
+      }, { count: 0, shells: 0 });
     }
 
     function tasksForChildOnDate(childId = state.active, date = state.selectedDate) {
@@ -3148,6 +3165,7 @@
       const oldShells = task.shells;
       task.title = cleanTitle;
       task.shells = Math.round(nextShells);
+      task.updatedAt = todayKey();
       const child = activeChild();
       if (child.done[task.id]) {
         child.shells = Math.max(0, child.shells + task.shells - oldShells);
@@ -3217,7 +3235,7 @@
         icon: "✨",
         title: cleanTitle,
         shells: Math.round(shells),
-        createdAt: state.selectedDate || todayKey()
+        createdAt: todayKey()
       });
       save();
       render();
@@ -3229,9 +3247,12 @@
       if (!task) return;
       const childId = state.active;
       if (!state.archivedTasks[childId]) state.archivedTasks[childId] = {};
+      const archivedAt = todayKey();
+      const history = archivedTaskHistory(childId, task.id, archivedAt);
       state.archivedTasks[childId][taskId] = {
-        archivedAt: state.selectedDate,
+        archivedAt,
         createdAt: taskCreatedAt(task),
+        history,
         title: taskTitle(task),
         shells: task.shells,
         icon: task.icon
@@ -3357,6 +3378,9 @@
         const title = archived.title || (task ? taskTitle(task) : "Archyvuota užduotis");
         const archivedAt = typeof archived === "string" ? archived : archived.archivedAt;
         const createdAt = taskCreatedAt(task, archived);
+        const history = typeof archived === "object" && archived.history
+          ? archived.history
+          : archivedTaskHistory(childId, taskId, archivedAt);
         const row = document.createElement("div");
         row.className = "habit-archive-item";
         row.innerHTML = `
@@ -3365,6 +3389,7 @@
             <small>
               <span class="habit-archive-date">Nuo: ${escapeHtml(shortDate(createdAt))}</span>
               <span class="habit-archive-date">Arch.: ${escapeHtml(shortDate(archivedAt))}</span>
+              <span class="habit-archive-date">Ist.: ${history.count} k. / ${history.shells} kr.</span>
             </small>
           </span>
           <button type="button" data-restore-archive="${escapeHtml(taskId)}">Grąžinti</button>

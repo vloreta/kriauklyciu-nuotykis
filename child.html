@@ -2401,6 +2401,7 @@
     const taskEditForm = document.getElementById("taskEditForm");
     const taskEditTitle = document.getElementById("taskEditTitle");
     const taskEditShells = document.getElementById("taskEditShells");
+    const legacyTaskStartDate = "2026-06-11";
     let editingTaskId = null;
 
     function save() {
@@ -3072,6 +3073,7 @@
       const oldShells = task.shells;
       task.title = cleanTitle;
       task.shells = Math.round(nextShells);
+      task.updatedAt = todayKey();
       const child = activeChild();
       if (child.done[task.id]) {
         child.shells = Math.max(0, child.shells + task.shells - oldShells);
@@ -3112,7 +3114,7 @@
         icon: "✨",
         title: cleanTitle,
         shells: Math.round(shells),
-        createdAt: state.selectedDate || todayKey()
+        createdAt: todayKey()
       });
       save();
       render();
