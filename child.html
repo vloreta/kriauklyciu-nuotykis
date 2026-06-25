@@ -2961,6 +2961,19 @@
       child.log = child.log.slice(0, 12);
     }
 
+    function addTaskEvent(child, task, action, delta) {
+      if (!child.events) child.events = [];
+      child.events.push({
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        date: state.selectedDate,
+        action,
+        taskId: task.id,
+        taskTitleAtTime: taskTitle(task),
+        taskShellsAtTime: task.shells,
+        delta
+      });
+    }
+
     function logText(item) {
       return typeof item === "string" ? item : item.text;
     }
@@ -3011,6 +3024,7 @@
           taskId: task.id,
           kind: "toggleOff"
         });
+        addTaskEvent(child, task, "cancelled", -task.shells);
         save();
         render();
         const retryMessage = state.active === "olivia"
@@ -3031,6 +3045,7 @@
         taskId: task.id,
         kind: "complete"
       });
+      addTaskEvent(child, task, "completed", task.shells);
       const milestone = checkChildMilestones(state.active);
       if (!milestone) {
         const successMessage = state.active === "olivia"
