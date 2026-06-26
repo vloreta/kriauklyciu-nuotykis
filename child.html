@@ -2514,6 +2514,8 @@
     const automaticBackupPrefix = "kriauklyciu-nuotykis-backup-";
     const latestBackupKey = "kriauklyciu-nuotykis-backup-latest";
     const familyKeyStorageKey = "kriauklyciu-nuotykis-family-key";
+    const cloudUrlStorageKey = "kriauklyciu-nuotykis-supabase-url";
+    const cloudAnonKeyStorageKey = "kriauklyciu-nuotykis-supabase-anon-key";
     const backupFormat = "kriauklyciu-nuotykis-backup";
     const backupVersion = 1;
     const retainedAutomaticBackups = 20;
@@ -2635,13 +2637,23 @@
     }
 
     function cloudConfigured() {
-      return Boolean(cloudConfig.supabaseUrl && cloudConfig.supabaseAnonKey);
+      const config = currentCloudConfig();
+      return Boolean(config.supabaseUrl && config.supabaseAnonKey);
+    }
+
+    function currentCloudConfig() {
+      return {
+        supabaseUrl: localStorage.getItem(cloudUrlStorageKey) || cloudConfig.supabaseUrl,
+        supabaseAnonKey: localStorage.getItem(cloudAnonKeyStorageKey) || cloudConfig.supabaseAnonKey,
+        tableName: cloudConfig.tableName
+      };
     }
 
     function cloudHeaders() {
+      const config = currentCloudConfig();
       return {
-        apikey: cloudConfig.supabaseAnonKey,
-        Authorization: `Bearer ${cloudConfig.supabaseAnonKey}`,
+        apikey: config.supabaseAnonKey,
+        Authorization: `Bearer ${config.supabaseAnonKey}`,
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates"
       };
@@ -2650,12 +2662,13 @@
     async function writeCloudCopy(data) {
       if (!cloudConfigured() || !isRestorableState(data)) return;
       try {
+        const config = currentCloudConfig();
         const payload = {
           familyKey: familyKey(),
           dataJson: data,
           updatedAt: new Date().toISOString()
         };
-        const url = `${cloudConfig.supabaseUrl.replace(/\/$/, "")}/rest/v1/${cloudConfig.tableName}?on_conflict=familyKey`;
+        const url = `${config.supabaseUrl.replace(/\/$/, "")}/rest/v1/${config.tableName}?on_conflict=familyKey`;
         const response = await fetch(url, {
           method: "POST",
           headers: cloudHeaders(),
@@ -2677,7 +2690,8 @@
     async function checkCloudCopyForRestore() {
       if (!cloudConfigured()) return;
       try {
-        const url = `${cloudConfig.supabaseUrl.replace(/\/$/, "")}/rest/v1/${cloudConfig.tableName}?familyKey=eq.${encodeURIComponent(familyKey())}&select=dataJson,updatedAt&limit=1`;
+        const config = currentCloudConfig();
+        const url = `${config.supabaseUrl.replace(/\/$/, "")}/rest/v1/${config.tableName}?familyKey=eq.${encodeURIComponent(familyKey())}&select=dataJson,updatedAt&limit=1`;
         const response = await fetch(url, { headers: cloudHeaders() });
         if (!response.ok) return;
         const rows = await response.json();

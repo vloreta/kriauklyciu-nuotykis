@@ -2334,6 +2334,14 @@
         Aprašymas
         <textarea id="settingsSubtitle" rows="3" maxlength="240"></textarea>
       </label>
+      <label>
+        Supabase Project URL
+        <input id="settingsSupabaseUrl" type="url" maxlength="220" autocomplete="off" placeholder="https://xxxx.supabase.co">
+      </label>
+      <label>
+        Supabase anon public key
+        <input id="settingsSupabaseAnonKey" type="password" maxlength="400" autocomplete="off" placeholder="eyJ...">
+      </label>
       <div class="settings-grid" id="childSettingsList"></div>
       <button class="tool-button" id="addChildButton" type="button">+ Pridėti vaiką</button>
       <button class="tool-button" id="exportDataButton" type="button">Eksportuoti duomenis</button>
@@ -2558,6 +2566,8 @@
     const automaticBackupPrefix = "kriauklyciu-nuotykis-backup-";
     const latestBackupKey = "kriauklyciu-nuotykis-backup-latest";
     const familyKeyStorageKey = "kriauklyciu-nuotykis-family-key";
+    const cloudUrlStorageKey = "kriauklyciu-nuotykis-supabase-url";
+    const cloudAnonKeyStorageKey = "kriauklyciu-nuotykis-supabase-anon-key";
     const backupFormat = "kriauklyciu-nuotykis-backup";
     const backupVersion = 1;
     const retainedAutomaticBackups = 20;
@@ -2679,13 +2689,23 @@
     }
 
     function cloudConfigured() {
-      return Boolean(cloudConfig.supabaseUrl && cloudConfig.supabaseAnonKey);
+      const config = currentCloudConfig();
+      return Boolean(config.supabaseUrl && config.supabaseAnonKey);
+    }
+
+    function currentCloudConfig() {
+      return {
+        supabaseUrl: localStorage.getItem(cloudUrlStorageKey) || cloudConfig.supabaseUrl,
+        supabaseAnonKey: localStorage.getItem(cloudAnonKeyStorageKey) || cloudConfig.supabaseAnonKey,
+        tableName: cloudConfig.tableName
+      };
     }
 
     function cloudHeaders() {
+      const config = currentCloudConfig();
       return {
-        apikey: cloudConfig.supabaseAnonKey,
-        Authorization: `Bearer ${cloudConfig.supabaseAnonKey}`,
+        apikey: config.supabaseAnonKey,
+        Authorization: `Bearer ${config.supabaseAnonKey}`,
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates"
       };
@@ -2694,12 +2714,13 @@
     async function writeCloudCopy(data) {
       if (!cloudConfigured() || !isRestorableState(data)) return;
       try {
+        const config = currentCloudConfig();
         const payload = {
           familyKey: familyKey(),
           dataJson: data,
           updatedAt: new Date().toISOString()
         };
-        const url = `${cloudConfig.supabaseUrl.replace(/\/$/, "")}/rest/v1/${cloudConfig.tableName}?on_conflict=familyKey`;
+        const url = `${config.supabaseUrl.replace(/\/$/, "")}/rest/v1/${config.tableName}?on_conflict=familyKey`;
         const response = await fetch(url, {
           method: "POST",
           headers: cloudHeaders(),
@@ -2721,7 +2742,8 @@
     async function checkCloudCopyForRestore() {
       if (!cloudConfigured()) return;
       try {
-        const url = `${cloudConfig.supabaseUrl.replace(/\/$/, "")}/rest/v1/${cloudConfig.tableName}?familyKey=eq.${encodeURIComponent(familyKey())}&select=dataJson,updatedAt&limit=1`;
+        const config = currentCloudConfig();
+        const url = `${config.supabaseUrl.replace(/\/$/, "")}/rest/v1/${config.tableName}?familyKey=eq.${encodeURIComponent(familyKey())}&select=dataJson,updatedAt&limit=1`;
         const response = await fetch(url, { headers: cloudHeaders() });
         if (!response.ok) return;
         const rows = await response.json();
@@ -4541,6 +4563,8 @@
     function openSettings() {
       document.getElementById("settingsTitle").value = state.appSettings.title;
       document.getElementById("settingsSubtitle").value = state.appSettings.subtitle;
+      document.getElementById("settingsSupabaseUrl").value = localStorage.getItem(cloudUrlStorageKey) || cloudConfig.supabaseUrl;
+      document.getElementById("settingsSupabaseAnonKey").value = localStorage.getItem(cloudAnonKeyStorageKey) || cloudConfig.supabaseAnonKey;
       renderChildSettings();
       openDialog(document.getElementById("settingsDialog"), document.getElementById("settingsTitle"));
     }
@@ -4740,6 +4764,12 @@
     function saveSettings() {
       state.appSettings.title = document.getElementById("settingsTitle").value.trim() || defaultAppSettings.title;
       state.appSettings.subtitle = document.getElementById("settingsSubtitle").value.trim() || defaultAppSettings.subtitle;
+      const supabaseUrl = document.getElementById("settingsSupabaseUrl").value.trim();
+      const supabaseAnonKey = document.getElementById("settingsSupabaseAnonKey").value.trim();
+      if (supabaseUrl) localStorage.setItem(cloudUrlStorageKey, supabaseUrl);
+      else localStorage.removeItem(cloudUrlStorageKey);
+      if (supabaseAnonKey) localStorage.setItem(cloudAnonKeyStorageKey, supabaseAnonKey);
+      else localStorage.removeItem(cloudAnonKeyStorageKey);
       childIds().forEach(childId => {
         const name = document.querySelector(`[data-child-name="${childId}"]`).value.trim().slice(0, 40) || childName(childId);
         const gender = document.querySelector(`[data-child-gender="${childId}"]`).value;
@@ -4755,7 +4785,7 @@
       closeSettings();
       save();
       render();
-      showToast("Nustatymai išsaugoti.");
+      showToast(cloudConfigured() ? "Nustatymai išsaugoti. Debesis prijungtas." : "Nustatymai išsaugoti.");
     }
 
     function addChildFromSettings() {
