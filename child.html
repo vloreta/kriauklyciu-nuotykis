@@ -1124,17 +1124,18 @@
       position: absolute;
       right: 8px;
       bottom: 8px;
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       border: 1px solid rgba(12, 113, 138, .14);
       border-radius: 999px;
-      background: rgba(255, 248, 224, .86);
+      background: linear-gradient(145deg, rgba(255, 251, 238, .96), rgba(245, 222, 180, .82));
       display: grid;
       place-items: center;
-      font-size: .78rem;
+      font-size: .95rem;
       line-height: 1;
       opacity: .66;
       cursor: help;
+      box-shadow: 0 5px 12px rgba(31, 54, 71, .12);
     }
 
     .parent-tip-trigger:hover,
@@ -1149,15 +1150,15 @@
       right: 8px;
       bottom: 38px;
       z-index: 8;
-      width: min(280px, calc(100vw - 32px));
-      padding: 12px;
+      width: min(270px, calc(100vw - 36px));
+      padding: 10px 11px;
       border: 1px solid rgba(236, 199, 127, .55);
       border-radius: 12px;
       background: #fff8e8;
       box-shadow: 0 14px 30px rgba(31, 54, 71, .16);
       color: var(--ink);
-      font-size: .78rem;
-      line-height: 1.35;
+      font-size: .76rem;
+      line-height: 1.32;
       display: none;
       text-align: left;
     }
@@ -1170,11 +1171,11 @@
     .parent-tip-popover strong {
       display: block;
       margin-bottom: 4px;
-      font-size: .84rem;
+      font-size: .82rem;
     }
 
     .parent-tip-popover p {
-      margin: 6px 0 0;
+      margin: 5px 0 0;
     }
 
     .parent-tip-sheet,
@@ -3709,7 +3710,7 @@
     function parentTipMarkup(task) {
       if (!hasParentTip(task)) return "";
       return `
-        <span class="parent-tip-trigger" role="button" tabindex="0" data-parent-tip="${escapeHtml(task.id)}" aria-label="Patarimas tėvams">💡</span>
+        <span class="parent-tip-trigger" role="button" tabindex="0" data-parent-tip="${escapeHtml(task.id)}" aria-label="Patarimas tėvams">🐚</span>
         <span class="parent-tip-popover" role="tooltip">
           <strong>${escapeHtml(task.parentTipTitle)}</strong>
           <p>${escapeHtml(task.parentTipText)}</p>

@@ -2448,7 +2448,16 @@
         { id: "domDishes", icon: "🧽", title: "Nunešiau indus po valgio", shells: 1 },
         { id: "domNoHurtSister", icon: "🛡️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau sesės", shells: 5 },
         { id: "domPlaySister", icon: "🎲", title: "Gražiai žaidžiau su sese", shells: 2 },
-        { id: "domNiceWordsSister", icon: "💬", title: "Pasakiau sesei kažką malonaus", shells: 2 },
+        {
+          id: "domNiceWordsSister",
+          icon: "💬",
+          title: "Pasakiau sesei kažką malonaus",
+          shells: 2,
+          parentTipTitle: "Patarimas tėvams",
+          parentTipText: "Man labai patinka, kad moki pasakyti gerų žodžių.",
+          parentTipWhy: "Vaikas mokosi pastebėti kitą žmogų, kurti draugišką ryšį ir stiprinti empatiją.",
+          parentTipAvoid: "Neapsiribokite vien žodžiu „šaunuolis“, nes jis nepasako, ką tiksliai vaikas padarė gerai."
+        },
         { id: "domMom", icon: "👩‍👦", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
         { id: "domQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
         { id: "domOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
@@ -3389,18 +3398,28 @@
       return fallbackIcon || "🚲";
     }
 
+    function applyParentTipTemplates(task) {
+      if (task.id !== "domNiceWordsSister") return;
+      task.parentTipTitle = "Patarimas tėvams";
+      task.parentTipText = "Man labai patinka, kad moki pasakyti gerų žodžių.";
+      task.parentTipWhy = "Vaikas mokosi pastebėti kitą žmogų, kurti draugišką ryšį ir stiprinti empatiją.";
+      task.parentTipAvoid = "Neapsiribokite vien žodžiu „šaunuolis“, nes jis nepasako, ką tiksliai vaikas padarė gerai.";
+    }
+
     function syncTaskIcons(childId) {
       const defaultTasks = defaultTasksForChild(childId);
       const iconsById = Object.fromEntries(defaultTasks.map(task => [task.id, task.icon]));
       (state.customTasks?.[childId] || []).forEach(task => {
-        if (task.customIcon) return;
-        if (childGender(childId) === "girl") {
+        if (task.customIcon) {
+          // Keep the icon chosen by parents.
+        } else if (childGender(childId) === "girl") {
           task.icon = iconByOliviaTaskText(task, iconsById[task.id]);
         } else if (childGender(childId) === "boy") {
           task.icon = iconByDominikTaskText(task, iconsById[task.id]);
         } else if (iconsById[task.id]) {
           task.icon = iconsById[task.id];
         }
+        applyParentTipTemplates(task);
       });
     }
 
