@@ -2403,6 +2403,7 @@
     </form>
   </div>
 
+  <script src="cloud-config.js"></script>
   <script>
     // Default content and application state
     const emotionOptions = [
@@ -2556,9 +2557,16 @@
     const backupKeyPrefix = "kriauklyciu-nuotykis-backup_";
     const automaticBackupPrefix = "kriauklyciu-nuotykis-backup-";
     const latestBackupKey = "kriauklyciu-nuotykis-backup-latest";
+    const familyKeyStorageKey = "kriauklyciu-nuotykis-family-key";
     const backupFormat = "kriauklyciu-nuotykis-backup";
     const backupVersion = 1;
     const retainedAutomaticBackups = 20;
+    const cloudConfig = {
+      supabaseUrl: window.KRIAUKLYCIU_CLOUD_CONFIG?.supabaseUrl || "",
+      supabaseAnonKey: window.KRIAUKLYCIU_CLOUD_CONFIG?.supabaseAnonKey || "",
+      tableName: window.KRIAUKLYCIU_CLOUD_CONFIG?.tableName || "family_data"
+    };
+    let cloudSaveTimer = null;
 
     // Persistence and date helpers
     function readSavedState(key) {
@@ -2659,6 +2667,77 @@
         return true;
       } catch {
         return false;
+      }
+    }
+
+    function familyKey() {
+      let key = localStorage.getItem(familyKeyStorageKey);
+      if (key) return key;
+      key = crypto?.randomUUID ? crypto.randomUUID() : `family-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      localStorage.setItem(familyKeyStorageKey, key);
+      return key;
+    }
+
+    function cloudConfigured() {
+      return Boolean(cloudConfig.supabaseUrl && cloudConfig.supabaseAnonKey);
+    }
+
+    function cloudHeaders() {
+      return {
+        apikey: cloudConfig.supabaseAnonKey,
+        Authorization: `Bearer ${cloudConfig.supabaseAnonKey}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates"
+      };
+    }
+
+    async function writeCloudCopy(data) {
+      if (!cloudConfigured() || !isRestorableState(data)) return;
+      try {
+        const payload = {
+          familyKey: familyKey(),
+          dataJson: data,
+          updatedAt: new Date().toISOString()
+        };
+        const url = `${cloudConfig.supabaseUrl.replace(/\/$/, "")}/rest/v1/${cloudConfig.tableName}?on_conflict=familyKey`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: cloudHeaders(),
+          body: JSON.stringify(payload)
+        });
+        showToast(response.ok ? "Debesies kopija išsaugota" : "Debesies kopija dar neišsaugota");
+      } catch {
+        showToast("Debesies kopija dar neišsaugota");
+      }
+    }
+
+    function saveCloudCopy(data) {
+      if (!cloudConfigured()) return;
+      clearTimeout(cloudSaveTimer);
+      const snapshot = JSON.parse(JSON.stringify(data));
+      cloudSaveTimer = setTimeout(() => writeCloudCopy(snapshot), 700);
+    }
+
+    async function checkCloudCopyForRestore() {
+      if (!cloudConfigured()) return;
+      try {
+        const url = `${cloudConfig.supabaseUrl.replace(/\/$/, "")}/rest/v1/${cloudConfig.tableName}?familyKey=eq.${encodeURIComponent(familyKey())}&select=dataJson,updatedAt&limit=1`;
+        const response = await fetch(url, { headers: cloudHeaders() });
+        if (!response.ok) return;
+        const rows = await response.json();
+        const cloudState = rows?.[0]?.dataJson;
+        if (!isRestorableState(cloudState)) return;
+        const cloudIsFuller = stateCompleteness(cloudState) > stateCompleteness(state);
+        const cloudIsNewer = rows[0].updatedAt && state.updatedAt && new Date(rows[0].updatedAt) > new Date(state.updatedAt);
+        if ((cloudIsFuller || cloudIsNewer) && confirm("Debesyje rasta naujesnė arba pilnesnė kopija. Atkurti ją?")) {
+          Object.keys(state).forEach(key => delete state[key]);
+          Object.assign(state, normalizeState(cloudState));
+          if (document.body.classList.contains("parent-page")) state.editMode = true;
+          save();
+          render();
+        }
+      } catch {
+        // Debesis yra papildoma kopija; localStorage turi veikti ir be jo.
       }
     }
 
@@ -2970,11 +3049,13 @@
       try {
         protectStateBeforeSave();
         ensureDailyBackup(readSavedState(storageKey) || state);
+        state.updatedAt = new Date().toISOString();
         const serializedState = JSON.stringify(state);
         const previousSnapshot = localStorage.getItem(storageKey) || lastSavedSnapshot;
         if (previousSnapshot !== serializedState) rememberUndoSnapshot(previousSnapshot);
         localStorage.setItem(storageKey, serializedState);
         ensureAllBackups(state);
+        saveCloudCopy(state);
         lastSavedSnapshot = serializedState;
         return true;
       } catch {
@@ -5153,20 +5234,20 @@
     });
 
     document.getElementById("resetButton").addEventListener("click", () => {
-      const ok = confirm("Pradėti naują savaitę? Šios savaitės įrašai bus išvalyti.");
+      const ok = confirm("Pradėti naują savaitę? Visa istorija liks išsaugota.");
       if (!ok) return;
-      getWeekKeys(state.selectedDate).forEach(key => {
-        delete state.records[key];
-      });
-      ensureDay(state.selectedDate);
+      state.selectedDate = todayKey();
+      state.lastCalendarDate = todayKey();
+      ensureDay(todayKey());
       save();
       render();
-      showToast("Pradėta nauja savaitė.");
+      showToast("Pradėta nauja savaitė. Istorija išsaugota.");
     });
 
     render();
     save();
     restoreBundledRecovery();
+    checkCloudCopyForRestore();
     setInterval(autoSave, 30000);
     setInterval(refreshCalendarDay, 60000);
     window.addEventListener("pagehide", autoSave);
