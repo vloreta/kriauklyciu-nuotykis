@@ -2669,6 +2669,30 @@
       return recovered;
     }
 
+    function mergeRicherRecords(target, source) {
+      if (!isRestorableState(target) || !isRestorableState(source)) return target;
+      const merged = { ...target, records: { ...(target.records || {}) } };
+      Object.entries(source.records || {}).forEach(([date, day]) => {
+        if (!merged.records[date]) merged.records[date] = {};
+        Object.entries(day || {}).forEach(([childId, sourceChild]) => {
+          const currentChild = merged.records[date][childId];
+          if (childRecordCompleteness(sourceChild) > childRecordCompleteness(currentChild)) {
+            merged.records[date][childId] = sourceChild;
+          }
+        });
+      });
+      return merged;
+    }
+
+    function protectStateBeforeSave() {
+      const savedState = readPrimaryStateWithRecovery();
+      const recoveredState = recoverRecordsFromDailyBackups(state);
+      const merged = mergeRicherRecords(recoveredState, savedState);
+      if (merged.records && JSON.stringify(merged.records) !== JSON.stringify(state.records || {})) {
+        state.records = merged.records;
+      }
+    }
+
     function readPrimaryStateWithRecovery() {
       const primary = readSavedState(storageKey);
       if (isRestorableState(primary)) {
@@ -2904,6 +2928,7 @@
 
     function save() {
       try {
+        protectStateBeforeSave();
         ensureDailyBackup(readSavedState(storageKey) || state);
         const serializedState = JSON.stringify(state);
         const previousSnapshot = localStorage.getItem(storageKey) || lastSavedSnapshot;

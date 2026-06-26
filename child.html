@@ -2508,6 +2508,7 @@
 
     const storageKey = "kriauklyciu-nuotykis";
     const legacyStorageKey = "kriauklyciu-nuotykis-v2";
+    const undoStorageKey = "kriauklyciu-nuotykis-undo-stack";
     const backupKeyPrefix = "kriauklyciu-nuotykis-backup_";
     const backupFormat = "kriauklyciu-nuotykis-backup";
     const backupVersion = 1;
@@ -2622,6 +2623,30 @@
         });
       });
       return recovered;
+    }
+
+    function mergeRicherRecords(target, source) {
+      if (!isRestorableState(target) || !isRestorableState(source)) return target;
+      const merged = { ...target, records: { ...(target.records || {}) } };
+      Object.entries(source.records || {}).forEach(([date, day]) => {
+        if (!merged.records[date]) merged.records[date] = {};
+        Object.entries(day || {}).forEach(([childId, sourceChild]) => {
+          const currentChild = merged.records[date][childId];
+          if (childRecordCompleteness(sourceChild) > childRecordCompleteness(currentChild)) {
+            merged.records[date][childId] = sourceChild;
+          }
+        });
+      });
+      return merged;
+    }
+
+    function protectStateBeforeSave() {
+      const savedState = readPrimaryStateWithRecovery();
+      const recoveredState = recoverRecordsFromDailyBackups(state);
+      const merged = mergeRicherRecords(recoveredState, savedState);
+      if (merged.records && JSON.stringify(merged.records) !== JSON.stringify(state.records || {})) {
+        state.records = merged.records;
+      }
     }
 
     function readPrimaryStateWithRecovery() {
@@ -2783,6 +2808,7 @@
 
     function save() {
       try {
+        protectStateBeforeSave();
         ensureDailyBackup(readSavedState(storageKey) || state);
         const serializedState = JSON.stringify(state);
         localStorage.setItem(storageKey, serializedState);
