@@ -75,15 +75,15 @@
     .hero {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 360px;
-      gap: 18px;
+      gap: 14px;
       align-items: stretch;
-      min-height: 220px;
+      min-height: 0;
     }
 
     .title-block {
       position: relative;
       overflow: hidden;
-      padding: 30px;
+      padding: 14px 16px;
       border-radius: 8px;
       background:
         linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(229, 250, 255, .78)),
@@ -95,51 +95,51 @@
     .title-block::after {
       content: "🦀  🐚  🫧  💎";
       position: absolute;
-      right: 18px;
-      bottom: 14px;
-      font-size: clamp(1.25rem, 2vw, 2rem);
+      right: 12px;
+      bottom: 8px;
+      font-size: clamp(1rem, 1.2vw, 1.35rem);
       letter-spacing: 0;
-      opacity: .34;
+      opacity: .28;
       pointer-events: none;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(2.4rem, 5vw, 4.8rem);
-      line-height: 1;
+      font-size: clamp(1.8rem, 2.8vw, 2.9rem);
+      line-height: .96;
       letter-spacing: 0;
-      max-width: 680px;
+      max-width: 520px;
       color: #1c2b36;
     }
 
     .subtitle {
       position: relative;
       z-index: 1;
-      margin: 14px 0 0;
-      font-size: 1.1rem;
+      margin: 6px 0 0;
+      font-size: .92rem;
       color: #3d5966;
-      max-width: 560px;
+      max-width: 520px;
       font-weight: 600;
     }
 
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-      padding: 7px 12px;
+      gap: 6px;
+      margin-bottom: 6px;
+      padding: 4px 9px;
       border-radius: 999px;
       background: rgba(255, 248, 231, .92);
       border: 1px solid rgba(255, 209, 102, .65);
       color: #6c4b05;
       font-weight: 900;
-      font-size: .92rem;
+      font-size: .8rem;
       box-shadow: 0 8px 18px rgba(31, 54, 71, .1);
     }
 
     .hero-undo-button {
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       border: 0;
       border-radius: 999px;
       background: rgba(255, 255, 255, .9);
@@ -153,15 +153,15 @@
 
     .parent-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      margin-top: 18px;
+      margin-top: 8px;
       position: relative;
       z-index: 1;
     }
 
     .parent-link {
-      min-height: 42px;
+      min-height: 32px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -170,8 +170,9 @@
       background: #e7f9ff;
       color: #0c718a;
       font-weight: 900;
-      padding: 0 14px;
+      padding: 0 10px;
       text-decoration: none;
+      font-size: .84rem;
     }
 
     .parent-page .hero {
@@ -181,43 +182,33 @@
 
     .parent-page .title-block {
       min-height: 0;
-      padding-bottom: 24px;
-    }
-
-    .parent-overview {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 14px;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      grid-template-areas:
+        "badge action"
+        "title action"
+        "subtitle action";
+      align-items: center;
+      column-gap: 18px;
     }
 
-    .parent-overview a,
-    .parent-overview button {
-      min-height: 72px;
-      border: 1px solid #dceaf1;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .9);
-      color: var(--ink);
-      display: grid;
-      gap: 4px;
-      align-content: center;
-      padding: 10px;
-      text-align: left;
-      text-decoration: none;
-      font: inherit;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(31, 54, 71, .08);
+    .parent-page .hero-badge {
+      grid-area: badge;
+      width: max-content;
     }
 
-    .parent-overview strong {
-      font-size: .95rem;
-      color: var(--ink);
+    .parent-page h1 {
+      grid-area: title;
     }
 
-    .parent-overview span {
-      font-size: .76rem;
-      color: var(--muted);
-      line-height: 1.25;
+    .parent-page .subtitle {
+      grid-area: subtitle;
+    }
+
+    .parent-page .parent-actions {
+      grid-area: action;
+      justify-content: flex-end;
+      margin-top: 0;
     }
 
     .parent-page #dataManagement,
@@ -1907,10 +1898,6 @@
         grid-template-columns: 1fr;
       }
 
-      .parent-overview {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
       .parent-page .dashboard {
         grid-template-columns: 1fr;
       }
@@ -1967,14 +1954,27 @@
         padding-top: 10px;
       }
 
-      .parent-overview,
       .parent-data-actions,
       .growth-fields {
         grid-template-columns: 1fr;
       }
 
       .title-block {
-        padding: 20px 20px 54px;
+        padding: 14px 16px 36px;
+      }
+
+      .parent-page .title-block {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "badge"
+          "title"
+          "subtitle"
+          "action";
+      }
+
+      .parent-page .parent-actions {
+        justify-content: flex-start;
+        margin-top: 8px;
       }
 
       .children, .task-grid, .actions, .penalty-controls {
