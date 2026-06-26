@@ -2606,9 +2606,42 @@
       return null;
     }
 
+    function childRecordCompleteness(child) {
+      if (!child || typeof child !== "object") return 0;
+      const shells = Number(child.shells || 0);
+      const logCount = Array.isArray(child.log) ? child.log.length : 0;
+      const doneCount = child.done ? Object.values(child.done).filter(Boolean).length : 0;
+      const emotionCount = Array.isArray(child.emotions) ? child.emotions.length : 0;
+      const emotionLogCount = Array.isArray(child.emotionLog) ? child.emotionLog.length : 0;
+      const growthCount = child.growthEntry && typeof child.growthEntry === "object"
+        ? Object.values(child.growthEntry).filter(value => String(value || "").trim()).length
+        : 0;
+      return shells * 1000000 + logCount * 10000 + doneCount * 1000 + emotionLogCount * 100 + emotionCount * 10 + growthCount;
+    }
+
+    function recoverRecordsFromDailyBackups(primary) {
+      if (!isRestorableState(primary)) return primary;
+      const recovered = { ...primary, records: { ...(primary.records || {}) } };
+      dailyBackupKeys().forEach(key => {
+        const backup = readSavedState(key);
+        const data = backup?.format === backupFormat ? backup.data : backup;
+        if (!isRestorableState(data)) return;
+        Object.entries(data.records || {}).forEach(([date, day]) => {
+          if (!recovered.records[date]) recovered.records[date] = {};
+          Object.entries(day || {}).forEach(([childId, backupChild]) => {
+            const currentChild = recovered.records[date][childId];
+            if (childRecordCompleteness(backupChild) > childRecordCompleteness(currentChild)) {
+              recovered.records[date][childId] = backupChild;
+            }
+          });
+        });
+      });
+      return recovered;
+    }
+
     function readPrimaryStateWithRecovery() {
       const primary = readSavedState(storageKey);
-      if (isRestorableState(primary)) return primary;
+      if (isRestorableState(primary)) return recoverRecordsFromDailyBackups(primary);
 
       const recovered = latestRestorableBackup();
       if (!recovered) return primary;
