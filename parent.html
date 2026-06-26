@@ -291,6 +291,81 @@
       gap: 10px;
     }
 
+    .growth-entry {
+      margin: 14px 0;
+      padding: 14px;
+      border: 1px solid #d9ecf2;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 253, 244, .96), rgba(239, 252, 255, .88));
+      box-shadow: 0 8px 18px rgba(31, 54, 71, .08);
+    }
+
+    .growth-entry h3 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .growth-entry p {
+      margin: 4px 0 12px;
+      color: var(--muted);
+      font-size: .88rem;
+      font-weight: 700;
+    }
+
+    .growth-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .growth-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .growth-field label {
+      font-size: .86rem;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .growth-field textarea {
+      width: 100%;
+      min-height: 72px;
+      resize: vertical;
+      border: 1px solid #cfe4ec;
+      border-radius: 8px;
+      padding: 10px 11px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .growth-field textarea:focus {
+      outline: 3px solid rgba(10, 153, 186, .16);
+      border-color: var(--accent);
+    }
+
+    .growth-summary {
+      display: grid;
+      gap: 8px;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: #fffaf0;
+      border: 1px solid #f1dfbd;
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .growth-summary strong {
+      display: block;
+      margin-bottom: 2px;
+      color: #0f6f82;
+      font-size: .88rem;
+    }
+
     .actions-history-title {
       display: flex;
       align-items: center;
@@ -1893,7 +1968,8 @@
       }
 
       .parent-overview,
-      .parent-data-actions {
+      .parent-data-actions,
+      .growth-fields {
         grid-template-columns: 1fr;
       }
 
@@ -2218,6 +2294,7 @@
         </div>
         <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
         <section class="emotion-island" id="emotionIsland" aria-label="Krabukų emocijų sala"></section>
+        <section class="growth-entry" id="growthEntry" aria-label="Dienos augimo įrašas"></section>
         <div id="contentArea"></div>
       </section>
 
@@ -2334,6 +2411,13 @@
       { id: "sad", label: "Liūdnas", image: "assets/emotion-sad.png" },
       { id: "angry", label: "Piktas", image: "assets/emotion-angry.png" },
       { id: "scared", label: "Išsigandęs", image: "assets/emotion-scared.png" }
+    ];
+
+    const growthEntryFields = [
+      { key: "joy", label: "❤️ Šiandien nudžiugino" },
+      { key: "progress", label: "🌱 Šiandien padarė pažangą" },
+      { key: "harder", label: "⚠️ Šiandien buvo sunkiau" },
+      { key: "notes", label: "💬 Papildomos pastabos" }
     ];
 
     const defaultChildTasks = {
@@ -2942,6 +3026,9 @@
         const child = targetState.records[key][childId];
         if (!Array.isArray(child.emotions)) child.emotions = [];
         if (!Array.isArray(child.emotionLog)) child.emotionLog = [];
+        if (!child.growthEntry || typeof child.growthEntry !== "object") {
+          child.growthEntry = {};
+        }
       });
       return targetState.records[key];
     }
@@ -3490,6 +3577,24 @@
       `;
     }
 
+    function renderGrowthSummary(child) {
+      const entry = child.growthEntry || {};
+      const filled = growthEntryFields
+        .map(field => ({ ...field, value: String(entry[field.key] || "").trim() }))
+        .filter(field => field.value);
+      if (!filled.length) return "";
+      return `
+        <div class="growth-summary" aria-label="Dienos augimo įrašas">
+          ${filled.map(field => `
+            <div>
+              <strong>${escapeHtml(field.label)}</strong>
+              <span>${escapeHtml(field.value)}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
     function activeEmotions() {
       const child = activeChild();
       if (!Array.isArray(child.emotions)) child.emotions = [];
@@ -3547,6 +3652,39 @@
         button.addEventListener("click", () => chooseEmotion(button.dataset.emotion));
       });
       island.querySelector("#emotionMenuButton")?.addEventListener("click", openEmotionEditor);
+    }
+
+    function renderGrowthEntry() {
+      const container = document.getElementById("growthEntry");
+      if (!container) return;
+      if (state.view !== "day") {
+        container.hidden = true;
+        return;
+      }
+      const child = activeChild();
+      child.growthEntry ||= {};
+      container.hidden = false;
+      container.innerHTML = `
+        <h3>Dienos augimo įrašas</h3>
+        <p>${escapeHtml(childName())} · ${escapeHtml(formatDate(state.selectedDate))}</p>
+        <div class="growth-fields">
+          ${growthEntryFields.map(field => `
+            <div class="growth-field">
+              <label for="growth-${escapeHtml(field.key)}">${escapeHtml(field.label)}</label>
+              <textarea id="growth-${escapeHtml(field.key)}" data-growth-field="${escapeHtml(field.key)}" maxlength="600" placeholder="Įrašykite, jei norite...">${escapeHtml(child.growthEntry[field.key] || "")}</textarea>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function updateGrowthEntry(fieldKey, value) {
+      if (!growthEntryFields.some(field => field.key === fieldKey)) return;
+      const child = activeChild();
+      child.growthEntry ||= {};
+      child.growthEntry[fieldKey] = value.trim();
+      child.growthEntryUpdatedAt = new Date().toISOString();
+      save();
     }
 
     function undoLogItem(item) {
@@ -3963,6 +4101,7 @@
       log.innerHTML = "";
       document.getElementById("logTitle").textContent = formatDate(state.selectedDate);
       log.insertAdjacentHTML("beforeend", renderEmotionSummary(child));
+      log.insertAdjacentHTML("beforeend", renderGrowthSummary(child));
       if (!child.log.length) {
         log.insertAdjacentHTML("beforeend", `<div class="empty">Dar nėra pažymėtų darbelių.</div>`);
         return;
@@ -4569,6 +4708,7 @@
       document.getElementById("activeName").textContent = activeName();
       document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
       renderEmotionIsland();
+      renderGrowthEntry();
 
       if (state.view === "day") renderTasks();
       if (state.view === "week") renderWeek();
@@ -4609,6 +4749,11 @@
     });
 
     document.getElementById("addTaskButton").addEventListener("click", addTask);
+    document.getElementById("growthEntry")?.addEventListener("input", event => {
+      const field = event.target.closest("[data-growth-field]");
+      if (!field) return;
+      updateGrowthEntry(field.dataset.growthField, field.value);
+    });
     document.getElementById("habitArchiveToggle")?.addEventListener("click", () => {
       habitArchiveExpanded = !habitArchiveExpanded;
       renderHabitArchive();
