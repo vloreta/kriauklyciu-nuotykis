@@ -2544,6 +2544,13 @@
         .sort();
     }
 
+    function safetyBackupKeys() {
+      return Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index))
+        .filter(Boolean)
+        .filter(key => key.startsWith(backupKeyPrefix))
+        .sort();
+    }
+
     function pruneDailyBackups() {
       const keys = dailyBackupKeys();
       keys.slice(0, Math.max(0, keys.length - retainedDailyBackups)).forEach(key => {
@@ -2552,7 +2559,7 @@
     }
 
     function latestRestorableBackup() {
-      const keys = dailyBackupKeys().reverse();
+      const keys = safetyBackupKeys().reverse();
       for (const key of keys) {
         const backup = readSavedState(key);
         const data = backup?.format === backupFormat ? backup.data : backup;
@@ -2574,12 +2581,35 @@
       return shells * 1000000 + logCount * 10000 + doneCount * 1000 + emotionLogCount * 100 + emotionCount * 10 + growthCount;
     }
 
+    function safetyStateCandidates() {
+      const candidates = [];
+      safetyBackupKeys().forEach(key => {
+        const backup = readSavedState(key);
+        const data = backup?.format === backupFormat ? backup.data : backup;
+        if (isRestorableState(data)) candidates.push(data);
+      });
+      try {
+        const snapshots = JSON.parse(localStorage.getItem(undoStorageKey) || "[]");
+        if (Array.isArray(snapshots)) {
+          snapshots.forEach(snapshot => {
+            try {
+              const data = JSON.parse(snapshot);
+              if (isRestorableState(data)) candidates.push(data);
+            } catch {
+              // Ignore a damaged undo snapshot and continue with the next one.
+            }
+          });
+        }
+      } catch {
+        // Undo storage is optional safety data.
+      }
+      return candidates;
+    }
+
     function recoverRecordsFromDailyBackups(primary) {
       if (!isRestorableState(primary)) return primary;
       const recovered = { ...primary, records: { ...(primary.records || {}) } };
-      dailyBackupKeys().forEach(key => {
-        const backup = readSavedState(key);
-        const data = backup?.format === backupFormat ? backup.data : backup;
+      safetyStateCandidates().forEach(data => {
         if (!isRestorableState(data)) return;
         Object.entries(data.records || {}).forEach(([date, day]) => {
           if (!recovered.records[date]) recovered.records[date] = {};
@@ -2596,7 +2626,17 @@
 
     function readPrimaryStateWithRecovery() {
       const primary = readSavedState(storageKey);
-      if (isRestorableState(primary)) return recoverRecordsFromDailyBackups(primary);
+      if (isRestorableState(primary)) {
+        const recovered = recoverRecordsFromDailyBackups(primary);
+        try {
+          if (JSON.stringify(recovered.records || {}) !== JSON.stringify(primary.records || {})) {
+            localStorage.setItem(storageKey, JSON.stringify(recovered));
+          }
+        } catch {
+          // Recovered data is still used for this session.
+        }
+        return recovered;
+      }
 
       const recovered = latestRestorableBackup();
       if (!recovered) return primary;
@@ -2617,6 +2657,16 @@
       try {
         localStorage.setItem(key, JSON.stringify(createBackupEnvelope(data, "daily")));
         pruneDailyBackups();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function ensureLatestBackup(data) {
+      if (!isRestorableState(data)) return false;
+      try {
+        localStorage.setItem(`${backupKeyPrefix}${todayKey()}-latest`, JSON.stringify(createBackupEnvelope(data, "latest")));
         return true;
       } catch {
         return false;
@@ -2736,6 +2786,7 @@
         ensureDailyBackup(readSavedState(storageKey) || state);
         const serializedState = JSON.stringify(state);
         localStorage.setItem(storageKey, serializedState);
+        ensureLatestBackup(state);
         lastSavedSnapshot = serializedState;
         return true;
       } catch {
