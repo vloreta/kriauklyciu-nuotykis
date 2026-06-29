@@ -552,7 +552,16 @@
     };
 
     function loadLibrary() {
-      return growthSource.load();
+      const loaded = growthSource.load();
+      if (!Array.isArray(loaded.cards) || loaded.cards.length === 0) {
+        return growthSource.save({ schemaVersion: 1, cards: growthSource.clone(seedCards) });
+      }
+      const hasSeedCard = loaded.cards.some(card => card.cardId === "MI-001-C01");
+      if (!hasSeedCard) {
+        loaded.cards.unshift(growthSource.clone(seedCards[0]));
+        return growthSource.save(loaded);
+      }
+      return loaded;
     }
 
     function saveLibrary() {
