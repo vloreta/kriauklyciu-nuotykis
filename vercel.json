@@ -1,8 +1,3 @@
 ﻿{
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/child", "destination": "/child.html" },
-    { "source": "/parent", "destination": "/parent.html" },
-    { "source": "/admin/growth-library", "destination": "/admin/growth-library.html" }
-  ]
+  "cleanUrls": true
 }
