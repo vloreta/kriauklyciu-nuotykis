@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Krabukų augimo biblioteka</title>
+  <style>
+    :root {
+      --sea: #0d8aa8;
+      --mint: #2fbf9d;
+      --ink: #1d2d38;
+      --muted: #607786;
+      --cream: #fff8e8;
+      --line: #d8e9ef;
+      --soft: #f4fbfb;
+      --pink: #f8bfd2;
+      --shadow: 0 18px 45px rgba(31, 54, 71, .12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Nunito", "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 14% 8%, rgba(255, 209, 102, .22), transparent 24%),
+        radial-gradient(circle at 82% 0%, rgba(248, 191, 210, .26), transparent 28%),
+        linear-gradient(135deg, #edf9ef 0%, #c9f5ff 52%, #eef6ff 100%);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1440px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 28px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, .72);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, .94), rgba(235, 251, 255, .86)),
+        linear-gradient(90deg, rgba(13, 138, 168, .12), rgba(255, 209, 102, .18));
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: max-content;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 209, 102, .7);
+      background: rgba(255, 248, 231, .9);
+      color: #6c4b05;
+      font-weight: 900;
+      font-size: .86rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 3.3vw, 3.4rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: #3d5966;
+      font-weight: 700;
+      max-width: 780px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .button {
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 14px;
+      color: #fff;
+      background: linear-gradient(135deg, #1195ad, #32c092);
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(13, 138, 168, .18);
+    }
+
+    .button.secondary {
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .button.danger {
+      background: #f35d64;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) 220px auto;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      color: var(--ink);
+      font-size: .86rem;
+      font-weight: 900;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #cfe3eb;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .92);
+      color: var(--ink);
+      padding: 10px 11px;
+      font-weight: 700;
+      outline-color: rgba(13, 138, 168, .28);
+    }
+
+    textarea {
+      min-height: 98px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 460px);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid rgba(255, 255, 255, .74);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .86);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .74);
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .count {
+      color: var(--muted);
+      font-weight: 900;
+      font-size: .88rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .library-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 108px minmax(0, 1fr);
+      gap: 12px;
+      min-height: 156px;
+      padding: 10px 12px 34px;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fffaf6, #f6fdff);
+      box-shadow: 0 9px 22px rgba(31, 54, 71, .08);
+      text-align: left;
+    }
+
+    .library-card:hover,
+    .library-card.active {
+      border-color: rgba(13, 138, 168, .45);
+      box-shadow: 0 14px 30px rgba(31, 54, 71, .14);
+    }
+
+    .library-card.archived {
+      opacity: .62;
+    }
+
+    .card-image {
+      width: 108px;
+      height: 108px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid #f3c9d8;
+      background: #fff;
+    }
+
+    .card-title {
+      display: block;
+      margin: 2px 0 7px;
+      font-size: 1rem;
+      line-height: 1.18;
+      font-weight: 1000;
+    }
+
+    .meta {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      color: #31515f;
+      background: #edf8fb;
+      font-size: .72rem;
+      font-weight: 900;
+    }
+
+    .shell-mark {
+      position: absolute;
+      right: 9px;
+      bottom: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      object-fit: cover;
+      background: #fff;
+      box-shadow: 0 6px 14px rgba(31, 54, 71, .14);
+    }
+
+    .editor {
+      position: sticky;
+      top: 12px;
+    }
+
+    .editor-body {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .image-preview {
+      width: 100%;
+      aspect-ratio: 16 / 8;
+      object-fit: cover;
+      border: 1px solid #f3c9d8;
+      border-radius: 8px;
+      background: var(--cream);
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .save-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+
+    .empty {
+      padding: 28px 16px;
+      color: var(--muted);
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .status {
+      min-height: 24px;
+      color: #0c718a;
+      font-size: .86rem;
+      font-weight: 900;
+    }
+
+    @media (max-width: 940px) {
+      .hero,
+      .toolbar,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        justify-content: flex-start;
+      }
+
+      .editor {
+        position: static;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        width: calc(100% - 18px);
+        padding-top: 10px;
+      }
+
+      .library-card {
+        grid-template-columns: 88px minmax(0, 1fr);
+      }
+
+      .card-image {
+        width: 88px;
+        height: 88px;
+      }
+
+      .two {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <script src="../assets/growthCards.js"></script>
+  <script src="../assets/selectGrowthScenario.js"></script>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">📚 Kūrėjo administravimas</span>
+        <h1>Krabukų augimo biblioteka</h1>
+        <p>Aktyvi misijų kortelių bazė: sisteminiai tekstai, kompetencijos, scenarijai ir vakaro žinutės ateities analitikai.</p>
+      </div>
+      <div class="hero-actions">
+        <button class="button" id="createCardButton" type="button">➕ Sukurti naują kortelę</button>
+        <button class="button secondary" id="duplicateCardButton" type="button">📄 Dubliuoti</button>
+        <button class="button danger" id="archiveCardButton" type="button">🗑 Archyvuoti</button>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="Bibliotekos paieška ir filtrai">
+      <div class="field">
+        <label for="searchInput">🔍 Paieška</label>
+        <input id="searchInput" type="search" placeholder="Ieškoti pagal pavadinimą, ID, kompetenciją">
+      </div>
+      <div class="field">
+        <label for="categoryFilter">📂 Kategorija</label>
+        <select id="categoryFilter"></select>
+      </div>
+      <div class="field">
+        <label for="visibilityFilter">Būsena</label>
+        <select id="visibilityFilter">
+          <option value="active">Aktyvios kortelės</option>
+          <option value="all">Visos kortelės</option>
+          <option value="archived">Tik archyvuotos</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="layout">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>📚 Visų kortelių sąrašas</h2>
+          <span class="count" id="cardCount"></span>
+        </div>
+        <div class="card-grid" id="cardGrid"></div>
+      </section>
+
+      <aside class="panel editor" aria-label="Kortelės redagavimas">
+        <div class="panel-header">
+          <h2 id="editorTitle">Kortelės redagavimas</h2>
+          <span class="count" id="saveStatus">Išsaugota lokaliai</span>
+        </div>
+        <form class="editor-body" id="cardForm">
+          <div class="two">
+            <div class="field">
+              <label for="cardId">cardId</label>
+              <input id="cardId" type="text" readonly>
+            </div>
+            <div class="field">
+              <label for="missionId">missionId</label>
+              <input id="missionId" type="text" readonly>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="title">title</label>
+            <input id="title" type="text" required maxlength="140">
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label for="category">category</label>
+              <input id="category" type="text" required>
+            </div>
+            <div class="field">
+              <label for="version">version</label>
+              <input id="version" type="text" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="image">image</label>
+            <input id="image" type="text" placeholder="../assets/growth-sleep-alone.png">
+            <input id="imageUpload" type="file" accept="image/*">
+            <p class="hint">Naują paveikslėlį galima įkelti čia: jis bus išsaugotas šioje bibliotekoje kaip duomenų URL. Vėliau DB versijoje tai taps failo nuoroda.</p>
+          </div>
+          <img class="image-preview" id="imagePreview" alt="Kortelės paveikslėlio peržiūra">
+
+          <div class="field">
+            <label for="competencies">competencies</label>
+            <input id="competencies" type="text" placeholder="savarankiškumas, miegas, rutina">
+            <p class="hint">Kompetencijas rašyk per kablelį.</p>
+          </div>
+
+          <div class="field">
+            <label for="shortMessage">fixedText.shortMessage</label>
+            <textarea id="shortMessage"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="whyImportant">fixedText.whyImportant</label>
+            <textarea id="whyImportant"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="dynamicScenarios">dynamicScenarios</label>
+            <textarea id="dynamicScenarios" spellcheck="false"></textarea>
+            <p class="hint">Rašyk JSON masyvą. Kiekvienas scenarijus gali turėti id, when, message, parentHint.</p>
+          </div>
+
+          <div class="field">
+            <label for="eveningGift">eveningGift</label>
+            <textarea id="eveningGift"></textarea>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label for="author">author</label>
+              <input id="author" type="text">
+            </div>
+            <div class="field">
+              <label for="lastUpdated">lastUpdated</label>
+              <input id="lastUpdated" type="date">
+            </div>
+          </div>
+
+          <p class="status" id="formMessage"></p>
+          <div class="save-row">
+            <button class="button" type="submit">Išsaugoti kortelę</button>
+            <button class="button secondary" type="button" id="resetSeedButton">Atkurti pradinę kortelę</button>
+          </div>
+        </form>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const today = () => new Date().toISOString().slice(0, 10);
+    const growthSource = window.KrabukaiGrowthLibrary;
+    const shellIcon = "/icons/shell-growth.png";
+    const seedCards = growthSource.defaultCards;
+
+    let library = loadLibrary();
+    let selectedCardId = library.cards[0]?.cardId || null;
+
+    const els = {
+      grid: document.getElementById("cardGrid"),
+      count: document.getElementById("cardCount"),
+      search: document.getElementById("searchInput"),
+      categoryFilter: document.getElementById("categoryFilter"),
+      visibilityFilter: document.getElementById("visibilityFilter"),
+      form: document.getElementById("cardForm"),
+      formMessage: document.getElementById("formMessage"),
+      saveStatus: document.getElementById("saveStatus"),
+      editorTitle: document.getElementById("editorTitle"),
+      create: document.getElementById("createCardButton"),
+      duplicate: document.getElementById("duplicateCardButton"),
+      archive: document.getElementById("archiveCardButton"),
+      resetSeed: document.getElementById("resetSeedButton"),
+      imageUpload: document.getElementById("imageUpload"),
+      imagePreview: document.getElementById("imagePreview")
+    };
+
+    const fields = {
+      cardId: document.getElementById("cardId"),
+      missionId: document.getElementById("missionId"),
+      title: document.getElementById("title"),
+      category: document.getElementById("category"),
+      image: document.getElementById("image"),
+      competencies: document.getElementById("competencies"),
+      shortMessage: document.getElementById("shortMessage"),
+      whyImportant: document.getElementById("whyImportant"),
+      dynamicScenarios: document.getElementById("dynamicScenarios"),
+      eveningGift: document.getElementById("eveningGift"),
+      version: document.getElementById("version"),
+      author: document.getElementById("author"),
+      lastUpdated: document.getElementById("lastUpdated")
+    };
+
+    function loadLibrary() {
+      return growthSource.load();
+    }
+
+    function saveLibrary() {
+      library.updatedAt = new Date().toISOString();
+      library = growthSource.save(library);
+      els.saveStatus.textContent = "Išsaugota lokaliai";
+      els.formMessage.textContent = "Kortelė išsaugota.";
+      window.setTimeout(() => {
+        if (els.formMessage.textContent === "Kortelė išsaugota.") els.formMessage.textContent = "";
+      }, 1800);
+    }
+
+    function selectedCard() {
+      return library.cards.find(card => card.cardId === selectedCardId) || library.cards[0] || null;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function slugify(text) {
+      return String(text || "kortele")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 44) || "kortele";
+    }
+
+    function categories() {
+      return [...new Set(library.cards.map(card => card.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "lt"));
+    }
+
+    function filteredCards() {
+      const query = els.search.value.trim().toLowerCase();
+      const category = els.categoryFilter.value;
+      const visibility = els.visibilityFilter.value;
+      return library.cards.filter(card => {
+        if (visibility === "active" && card.archived) return false;
+        if (visibility === "archived" && !card.archived) return false;
+        if (category !== "all" && card.category !== category) return false;
+        if (!query) return true;
+        const haystack = [
+          card.title,
+          card.cardId,
+          card.missionId,
+          card.category,
+          ...(card.competencies || [])
+        ].join(" ").toLowerCase();
+        return haystack.includes(query);
+      });
+    }
+
+    function renderCategoryFilter() {
+      const current = els.categoryFilter.value || "all";
+      els.categoryFilter.innerHTML = `<option value="all">Visos kategorijos</option>${categories().map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("")}`;
+      els.categoryFilter.value = categories().includes(current) ? current : "all";
+    }
+
+    function renderCards() {
+      renderCategoryFilter();
+      const cards = filteredCards();
+      els.count.textContent = `${cards.length} kort.`;
+      if (!cards.length) {
+        els.grid.innerHTML = `<div class="empty">Kortelių pagal pasirinktą filtrą nėra.</div>`;
+        return;
+      }
+
+      els.grid.innerHTML = cards.map(card => `
+        <button class="library-card ${card.cardId === selectedCardId ? "active" : ""} ${card.archived ? "archived" : ""}" type="button" data-card-id="${escapeHtml(card.cardId)}">
+          <img class="card-image" src="${escapeHtml(card.image)}" alt="">
+          <span>
+            <strong class="card-title">${escapeHtml(card.title)}</strong>
+            <span class="meta">
+              <span>cardId: ${escapeHtml(card.cardId)}</span>
+              <span>missionId: ${escapeHtml(card.missionId)}</span>
+              <span>Kategorija: ${escapeHtml(card.category)}</span>
+              <span>Versija: ${escapeHtml(card.version)}</span>
+              <span>Atnaujinta: ${escapeHtml(card.lastUpdated)}</span>
+            </span>
+            <span class="chips">${(card.competencies || []).map(item => `<span class="chip">${escapeHtml(item)}</span>`).join("")}</span>
+          </span>
+          <img class="shell-mark" src="${escapeHtml(card.shellIcon || shellIcon)}" alt="">
+        </button>
+      `).join("");
+
+      els.grid.querySelectorAll("[data-card-id]").forEach(button => {
+        button.addEventListener("click", () => {
+          selectedCardId = button.dataset.cardId;
+          render();
+        });
+      });
+    }
+
+    function renderEditor() {
+      const card = selectedCard();
+      if (!card) {
+        els.editorTitle.textContent = "Kortelės redagavimas";
+        els.form.reset();
+        return;
+      }
+      els.editorTitle.textContent = card.archived ? "Archyvuota kortelė" : "Kortelės redagavimas";
+      fields.cardId.value = card.cardId;
+      fields.missionId.value = card.missionId;
+      fields.title.value = card.title || "";
+      fields.category.value = card.category || "";
+      fields.image.value = card.image || "";
+      fields.competencies.value = (card.competencies || []).join(", ");
+      fields.shortMessage.value = card.fixedText?.shortMessage || "";
+      fields.whyImportant.value = card.fixedText?.whyImportant || "";
+      fields.dynamicScenarios.value = JSON.stringify(card.dynamicScenarios || [], null, 2);
+      fields.eveningGift.value = card.eveningGift || "";
+      fields.version.value = card.version || "1.0.0";
+      fields.author.value = card.author || "";
+      fields.lastUpdated.value = card.lastUpdated || today();
+      els.imagePreview.src = card.image || "";
+    }
+
+    function render() {
+      renderCards();
+      renderEditor();
+    }
+
+    function readFormCard() {
+      let scenarios;
+      try {
+        scenarios = JSON.parse(fields.dynamicScenarios.value || "[]");
+        if (!Array.isArray(scenarios)) throw new Error("dynamicScenarios turi būti masyvas.");
+      } catch (error) {
+        els.formMessage.textContent = `Klaida: ${error.message}`;
+        return null;
+      }
+
+      return {
+        cardId: fields.cardId.value,
+        missionId: fields.missionId.value,
+        title: fields.title.value.trim(),
+        category: fields.category.value.trim(),
+        image: fields.image.value.trim(),
+        shellIcon,
+        competencies: fields.competencies.value.split(",").map(item => item.trim()).filter(Boolean),
+        fixedText: {
+          shortMessage: fields.shortMessage.value.trim(),
+          whyImportant: fields.whyImportant.value.trim()
+        },
+        dynamicScenarios: scenarios,
+        eveningGift: fields.eveningGift.value.trim(),
+        version: fields.version.value.trim() || "1.0.0",
+        author: fields.author.value.trim(),
+        lastUpdated: fields.lastUpdated.value || today()
+      };
+    }
+
+    function createCard() {
+      const base = {
+        cardId: `card-${Date.now()}`,
+        missionId: `mission-${Date.now()}`,
+        category: "Nauja kategorija",
+        title: "Nauja kortelė",
+        image: "/cards/mi-001.png",
+        shellIcon,
+        competencies: [],
+        fixedText: { shortMessage: "", whyImportant: "" },
+        dynamicScenarios: [],
+        eveningGift: "",
+        version: "1.0.0",
+        author: "Loreta",
+        lastUpdated: today(),
+        archived: false,
+        createdAt: today()
+      };
+      library.cards.unshift(base);
+      selectedCardId = base.cardId;
+      saveLibrary();
+      render();
+    }
+
+    function duplicateCard() {
+      const card = selectedCard();
+      if (!card) return;
+      const copy = JSON.parse(JSON.stringify(card));
+      const suffix = Date.now();
+      copy.cardId = `${card.cardId}-copy-${suffix}`;
+      copy.missionId = `${card.missionId}-copy-${suffix}`;
+      copy.title = `${card.title} kopija`;
+      copy.version = "1.0.0";
+      copy.lastUpdated = today();
+      copy.createdAt = today();
+      copy.archived = false;
+      library.cards.unshift(copy);
+      selectedCardId = copy.cardId;
+      saveLibrary();
+      render();
+    }
+
+    function archiveCard() {
+      const card = selectedCard();
+      if (!card) return;
+      card.archived = !card.archived;
+      card.lastUpdated = today();
+      saveLibrary();
+      render();
+    }
+
+    els.form.addEventListener("submit", event => {
+      event.preventDefault();
+      const next = readFormCard();
+      if (!next) return;
+      const index = library.cards.findIndex(card => card.cardId === selectedCardId);
+      if (index < 0) return;
+      library.cards[index] = {
+        ...library.cards[index],
+        ...next,
+        updatedAt: new Date().toISOString()
+      };
+      saveLibrary();
+      render();
+    });
+
+    els.image.addEventListener("input", () => {
+      els.imagePreview.src = els.image.value.trim();
+    });
+
+    els.imageUpload.addEventListener("change", event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        fields.image.value = String(reader.result || "");
+        els.imagePreview.src = fields.image.value;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    els.search.addEventListener("input", renderCards);
+    els.categoryFilter.addEventListener("change", renderCards);
+    els.visibilityFilter.addEventListener("change", renderCards);
+    els.create.addEventListener("click", createCard);
+    els.duplicate.addEventListener("click", duplicateCard);
+    els.archive.addEventListener("click", archiveCard);
+    els.resetSeed.addEventListener("click", () => {
+      if (!confirm("Atkurti pradinę bibliotekos kortelę? Esami bibliotekos pakeitimai bus pakeisti tik šiame admin localStorage.")) return;
+      library = growthSource.save({ schemaVersion: 1, cards: growthSource.clone(seedCards) });
+      selectedCardId = library.cards[0].cardId;
+      saveLibrary();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
