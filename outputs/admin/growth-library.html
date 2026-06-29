@@ -670,8 +670,8 @@
 
     function filteredCards() {
       const query = els.search.value.trim().toLowerCase();
-      const category = els.categoryFilter.value;
-      const visibility = els.visibilityFilter.value;
+      const category = els.categoryFilter.value || "all";
+      const visibility = els.visibilityFilter.value || "all";
       return library.cards.filter(card => {
         if (visibility === "active" && card.archived) return false;
         if (visibility === "archived" && !card.archived) return false;
