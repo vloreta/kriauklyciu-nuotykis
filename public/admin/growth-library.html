@@ -510,10 +510,55 @@
 
   <script>
     const today = () => new Date().toISOString().slice(0, 10);
-    const growthSource = window.KrabukaiGrowthLibrary;
+        const fallbackSeedCard = {
+      cardId: "MI-001-C01",
+      missionId: "MI-001",
+      category: "Miegas",
+      title: "Pati užmigau be kitų",
+      image: "/cards/mi-001.png",
+      shellIcon: "/icons/shell-growth.png",
+      version: "1.0",
+      author: "Krabukų biblioteka",
+      lastUpdated: "2026-06-29",
+      archived: false,
+      competencies: ["Savarankiškumas", "Pasitikėjimas savimi", "Drąsa"],
+      fixedText: {
+        shortMessage: "Ši kortelė padeda vaikui pamažu kurti saugų, ramų ir savarankišką užmigimo ritualą.",
+        whyImportant: "Savarankiškas užmigimas stiprina vaiko pasitikėjimą savimi, saugumo jausmą ir gebėjimą nurimti be nuolatinės suaugusiojo pagalbos."
+      },
+      dynamicScenarios: [
+        { id: "FIRST_TIME", when: "Pirmas kartas", message: "Šiandien tu žengei pirmą labai svarbų žingsnį. Net jei buvo nedrąsu, tu pabandei būti savarankiška.", parentHint: "Pastebėkite pastangą, ne rezultatą. Pabrėžkite, kad svarbiausia buvo pabandyti." },
+        { id: "AFTER_FAILURE", when: "Po sunkesnės dienos", message: "Vakar buvo sunkiau, bet šiandien tu vėl pabandei. Tai rodo, kad mokaisi nepasiduoti.", parentHint: "Priminkite, kad augimas vyksta bangomis. Venkite lyginimo su vakar diena kaip priekaišto." },
+        { id: "SUCCESS_STREAK_3", when: "3 kartai iš eilės", message: "Jau kelias dienas iš eilės tau pavyksta užmigti savarankiškai. Tavo vakaro drąsa auga.", parentHint: "Įvardykite tęstinumą: vaikas pradeda matyti save kaip gebantį." },
+        { id: "SUCCESS_STREAK_7", when: "7 kartai iš eilės", message: "Savaitę tu kūrei savo ramų užmigimo įprotį. Tai jau tikras augimas.", parentHint: "Galima pažymėti mažą ritualinį pasidžiaugimą, bet nepaversti to spaudimu tęsti tobulai." },
+        { id: "SUCCESS_STREAK_14", when: "14 kartų iš eilės", message: "Tavo kūnas ir širdelė vis geriau prisimena, kaip nurimti vakare.", parentHint: "Švelniai parodykite, kad įprotis jau tampa vaiko vidine stiprybe." },
+        { id: "SUCCESS_STREAK_30", when: "30 kartų iš eilės", message: "Tai jau didelis tavo pasiekimas. Savarankiškas užmigimas tapo tavo stiprybe.", parentHint: "Galima svarstyti kortelę perkelti į įpročių archyvą." },
+        { id: "BIG_PROGRESS", when: "Didelė pažanga", message: "Tu vis dažniau parodai, kad gali nurimti ir pasiruošti miegui pati.", parentHint: "Pastebėkite procesą: kas padėjo vaikui nurimti?" },
+        { id: "SMALL_PROGRESS", when: "Maža pažanga", message: "Net mažas žingsnelis vakare yra svarbus. Tu mokaisi.", parentHint: "Tinka po dalinio pavykimo. Nekelkite reikalavimo, kad viskas turi būti tobula." },
+        { id: "LONG_BREAK", when: "Po ilgesnės pertraukos", message: "Po pertraukos vėl pabandei. Tai labai drąsu.", parentHint: "Padėkite vaikui grįžti be gėdos jausmo." },
+        { id: "DEFAULT", when: "Įprasta diena", message: "Šiandien tu pasirūpinai savo vakaro ramybe ir užmigai savarankiškai.", parentHint: "Pagirkite konkrečiai: ką vaikas padarė pats?" }
+      ],
+      eveningGift: {
+        title: "Perlo žinutė vakarui",
+        text: "Šį vakarą tavo kriauklytėje švyti ramybės perlas. Jis primena, kad tu gali nurimti ir augti savo tempu."
+      }
+    };
+    const growthSource = window.KrabukaiGrowthLibrary || {
+      STORAGE_KEY: "kriauklyciu-growth-library-v1",
+      defaultCards: [fallbackSeedCard],
+      clone: value => JSON.parse(JSON.stringify(value)),
+      load() {
+        try { return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || "null") || { schemaVersion: 1, cards: [this.clone(fallbackSeedCard)] }; }
+        catch { return { schemaVersion: 1, cards: [this.clone(fallbackSeedCard)] }; }
+      },
+      save(library) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(library));
+        return library;
+      }
+    };
     const shellIcon = "/icons/shell-growth.png";
-    const seedCards = growthSource.defaultCards;
-    const requiredSeedCard = growthSource.clone(seedCards[0]);
+    const seedCards = Array.isArray(growthSource.defaultCards) && growthSource.defaultCards.length ? growthSource.defaultCards : [fallbackSeedCard];
+    const requiredSeedCard = growthSource.clone ? growthSource.clone(seedCards[0]) : JSON.parse(JSON.stringify(seedCards[0]));
 
     let library = loadLibrary();
     ensureRequiredSeedCard();
