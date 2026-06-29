@@ -513,9 +513,11 @@
     const growthSource = window.KrabukaiGrowthLibrary;
     const shellIcon = "/icons/shell-growth.png";
     const seedCards = growthSource.defaultCards;
+    const requiredSeedCard = growthSource.clone(seedCards[0]);
 
     let library = loadLibrary();
-    let selectedCardId = library.cards[0]?.cardId || null;
+    ensureRequiredSeedCard();
+    let selectedCardId = library.cards[0]?.cardId || requiredSeedCard.cardId;
 
     const els = {
       grid: document.getElementById("cardGrid"),
@@ -551,6 +553,26 @@
       lastUpdated: document.getElementById("lastUpdated")
     };
 
+    function ensureRequiredSeedCard() {
+      if (!library || !Array.isArray(library.cards)) {
+        library = { schemaVersion: 1, cards: [] };
+      }
+      const existingIndex = library.cards.findIndex(card => card.cardId === requiredSeedCard.cardId);
+      if (existingIndex === -1) {
+        library.cards.unshift(growthSource.clone(requiredSeedCard));
+        library = growthSource.save(library);
+        return;
+      }
+      const existing = library.cards[existingIndex];
+      library.cards[existingIndex] = {
+        ...growthSource.clone(requiredSeedCard),
+        ...existing,
+        archived: false,
+        image: existing.image || requiredSeedCard.image,
+        shellIcon: existing.shellIcon || requiredSeedCard.shellIcon
+      };
+      library = growthSource.save(library);
+    }
     function loadLibrary() {
       const loaded = growthSource.load();
       if (!Array.isArray(loaded.cards) || loaded.cards.length === 0) {
@@ -628,6 +650,7 @@
     }
 
     function renderCards() {
+      ensureRequiredSeedCard();
       renderCategoryFilter();
       const cards = filteredCards();
       els.count.textContent = `${cards.length} kort.`;
