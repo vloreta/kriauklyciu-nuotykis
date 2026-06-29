@@ -357,6 +357,96 @@
       font-size: .88rem;
     }
 
+    .growth-card-archive {
+      margin: 14px 0;
+      padding: 14px;
+      border: 1px solid #d9ecf2;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .82);
+      box-shadow: 0 10px 24px rgba(31, 54, 71, .08);
+    }
+
+    .growth-card-archive h3 {
+      margin: 0 0 4px;
+      font-size: 1.02rem;
+    }
+
+    .growth-card-archive p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: .88rem;
+      font-weight: 700;
+    }
+
+    .growth-archive-tools,
+    .growth-archive-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .growth-archive-tools {
+      margin-bottom: 10px;
+    }
+
+    .growth-archive-tools select,
+    .growth-archive-actions input {
+      min-height: 36px;
+      border: 1px solid #d7e8ee;
+      border-radius: 8px;
+      padding: 0 10px;
+      background: #fff;
+      font-weight: 900;
+    }
+
+    .growth-archive-actions input {
+      width: 86px;
+    }
+
+    .growth-archive-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .growth-archive-card {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 12px;
+      padding: 10px;
+      border: 1px solid #dcecf2;
+      border-radius: 8px;
+      background: #fffdf7;
+    }
+
+    .growth-archive-card img {
+      width: 96px;
+      height: 96px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid #f3c9d8;
+    }
+
+    .growth-archive-meta {
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 800;
+    }
+
+    .growth-archive-actions {
+      margin-top: 8px;
+    }
+
+    .growth-archive-actions button {
+      min-height: 34px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 10px;
+      color: #fff;
+      background: var(--sea);
+      font-weight: 900;
+    }
+
     .actions-history-title {
       display: flex;
       align-items: center;
@@ -2123,6 +2213,8 @@
       }
     }
   </style>
+  <script src="src/data/growthCards.js"></script>
+  <script src="src/lib/selectGrowthScenario.js"></script>
 </head>
 <body class="parent-page">
   <main class="app">
@@ -2269,6 +2361,7 @@
         <div class="today" id="activeTotal">0 Jūros kriauklyčių</div>
         <section class="emotion-island" id="emotionIsland" aria-label="Krabukų emocijų sala"></section>
         <section class="growth-entry" id="growthEntry" aria-label="Dienos augimo įrašas"></section>
+        <section class="growth-card-archive" id="growthCardArchive" aria-label="Kortelių archyvas"></section>
         <div id="contentArea"></div>
       </section>
 
@@ -2546,6 +2639,10 @@
     const legacyStorageKey = "kriauklyciu-nuotykis-v2";
     const undoStorageKey = "kriauklyciu-nuotykis-undo-stack";
     const backupKeyPrefix = "kriauklyciu-nuotykis-backup_";
+    const growthAssignmentsKey = "kriauklyciu-growth-assignments-v1";
+    const growthMissionTaskIds = {
+      "MI-001": ["oliSleepAlone", "domSleepAlone"]
+    };
     const automaticBackupPrefix = "kriauklyciu-nuotykis-backup-";
     const latestBackupKey = "kriauklyciu-nuotykis-backup-latest";
     const familyKeyStorageKey = "kriauklyciu-nuotykis-family-key";
@@ -3932,6 +4029,88 @@
       save();
     }
 
+    function readJsonStorage(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || "null") || fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function writeJsonStorage(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function growthLibrary() {
+      return window.KrabukaiGrowthLibrary?.load?.() || { cards: [] };
+    }
+
+    function growthAssignments() {
+      return readJsonStorage(growthAssignmentsKey, {});
+    }
+
+    function saveGrowthAssignment(childId, cardId, updates) {
+      const assignments = growthAssignments();
+      const key = `${childId}:${cardId}`;
+      assignments[key] = {
+        childId,
+        cardId,
+        shells: Number(assignments[key]?.shells || 1),
+        active: assignments[key]?.active === true,
+        updatedAt: new Date().toISOString(),
+        ...updates
+      };
+      writeJsonStorage(growthAssignmentsKey, assignments);
+    }
+
+    function renderGrowthCardArchive() {
+      const container = document.getElementById("growthCardArchive");
+      if (!container) return;
+      const cards = growthLibrary().cards.filter(card => !card.archived);
+      const categories = [...new Set(cards.map(card => card.category))];
+      const selectedCategory = container.dataset.category || "all";
+      const visibleCards = cards.filter(card => selectedCategory === "all" || card.category === selectedCategory);
+      const assignments = growthAssignments();
+      const childId = state.active;
+      container.innerHTML = `
+        <h3>Kortelių archyvas</h3>
+        <p>Čia tėvai parenka bibliotekos korteles vaikui. Sisteminiai tekstai neredaguojami.</p>
+        <div class="growth-archive-tools">
+          <select data-growth-category>
+            <option value="all">Visos kategorijos</option>
+            ${categories.map(category => `<option value="${escapeHtml(category)}" ${category === selectedCategory ? "selected" : ""}>${escapeHtml(category)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="growth-archive-list">
+          ${visibleCards.map(card => {
+            const assignment = assignments[`${childId}:${card.cardId}`] || {};
+            const isActive = assignment.active === true;
+            const shells = Number(assignment.shells || 1);
+            return `
+              <article class="growth-archive-card">
+                <img src="${escapeHtml(card.image)}" alt="">
+                <div>
+                  <strong>${escapeHtml(card.title)}</strong>
+                  <div class="growth-archive-meta">
+                    cardId: ${escapeHtml(card.cardId)} · missionId: ${escapeHtml(card.missionId)}<br>
+                    ${escapeHtml(card.category)} · ${escapeHtml((card.competencies || []).join(", "))}
+                  </div>
+                  <div class="growth-archive-actions">
+                    <label>
+                      Kriauklytės
+                      <input type="number" min="0" max="99" value="${shells}" data-growth-shells="${escapeHtml(card.cardId)}">
+                    </label>
+                    <button type="button" data-growth-toggle="${escapeHtml(card.cardId)}">${isActive ? "Išjungti vaikui" : "Įjungti vaikui"}</button>
+                    <button type="button" data-growth-preview="${escapeHtml(card.cardId)}">Peržiūrėti</button>
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join("") || `<div class="empty">Kortelių nėra.</div>`}
+        </div>
+      `;
+    }
+
     function undoLogItem(item) {
       if (typeof item === "string" || item.undone) return;
 
@@ -4963,6 +5142,7 @@
       document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
       renderEmotionIsland();
       renderGrowthEntry();
+      renderGrowthCardArchive();
 
       if (state.view === "day") renderTasks();
       if (state.view === "week") renderWeek();
@@ -5007,6 +5187,38 @@
       const field = event.target.closest("[data-growth-field]");
       if (!field) return;
       updateGrowthEntry(field.dataset.growthField, field.value);
+    });
+    document.getElementById("growthCardArchive")?.addEventListener("change", event => {
+      const category = event.target.closest("[data-growth-category]");
+      if (category) {
+        event.currentTarget.dataset.category = category.value;
+        renderGrowthCardArchive();
+        return;
+      }
+      const shellsInput = event.target.closest("[data-growth-shells]");
+      if (shellsInput) {
+        saveGrowthAssignment(state.active, shellsInput.dataset.growthShells, {
+          shells: Math.max(0, Math.min(99, Number(shellsInput.value) || 0))
+        });
+        renderGrowthCardArchive();
+      }
+    });
+    document.getElementById("growthCardArchive")?.addEventListener("click", event => {
+      const toggle = event.target.closest("[data-growth-toggle]");
+      if (toggle) {
+        const cardId = toggle.dataset.growthToggle;
+        const current = growthAssignments()[`${state.active}:${cardId}`];
+        saveGrowthAssignment(state.active, cardId, { active: !(current?.active === true) });
+        renderGrowthCardArchive();
+        return;
+      }
+      const preview = event.target.closest("[data-growth-preview]");
+      if (preview) {
+        const card = growthLibrary().cards.find(item => item.cardId === preview.dataset.growthPreview);
+        if (!card) return;
+        const scenario = (card.dynamicScenarios || []).find(item => item.scenarioId === "DEFAULT");
+        alert(`${card.title}\n\n${card.fixedText?.shortMessage || ""}\n\n${scenario?.childMessage || ""}\n\n${scenario?.eveningGift || ""}`);
+      }
     });
     document.getElementById("habitArchiveToggle")?.addEventListener("click", () => {
       habitArchiveExpanded = !habitArchiveExpanded;

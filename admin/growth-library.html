@@ -373,6 +373,8 @@
       }
     }
   </style>
+  <script src="../src/data/growthCards.js"></script>
+  <script src="../src/lib/selectGrowthScenario.js"></script>
 </head>
 <body>
   <main class="app">
@@ -507,45 +509,10 @@
   </main>
 
   <script>
-    const STORAGE_KEY = "kriauklyciu-growth-library-v1";
     const today = () => new Date().toISOString().slice(0, 10);
-    const shellIcon = "../assets/growth-pearl-shell.png";
-
-    const seedCards = [
-      {
-        cardId: "card-sleep-alone-olivia-v1",
-        missionId: "sleep-alone",
-        category: "Miegas ir vakaro rutina",
-        title: "Pati užmigau be kitų",
-        image: "../assets/growth-sleep-alone.png",
-        shellIcon,
-        competencies: ["savarankiškumas", "emocinis saugumas", "miego rutina"],
-        fixedText: {
-          shortMessage: "Tu labai drąsiai pabandei užmigti pati. Tai didelis žingsnis į ramų vakarą.",
-          whyImportant: "Ši misija padeda vaikui stiprinti saugumo jausmą, savarankiškumą ir pasitikėjimą savo gebėjimu nurimti."
-        },
-        dynamicScenarios: [
-          {
-            id: "first-success",
-            when: "Kai vaikas pirmą kartą užmiega pats",
-            message: "Šiandien tu atradai savo ramybės perlą.",
-            parentHint: "Pabrėžkite konkretų veiksmą: vaikas pabandė, išbuvo ir nurimo."
-          },
-          {
-            id: "repeated-success",
-            when: "Kai misija kartojasi kelias dienas",
-            message: "Tavo vakaro ramybė auga kaip mažas perlas kriauklėje.",
-            parentHint: "Pastebėkite tęstinumą, o ne tik vienos dienos rezultatą."
-          }
-        ],
-        eveningGift: "Švelnus vakaro pagyrimas ir trumpa pasirinkta pasaka prieš miegą.",
-        version: "1.0.0",
-        author: "Loreta",
-        lastUpdated: today(),
-        archived: false,
-        createdAt: today()
-      }
-    ];
+    const growthSource = window.KrabukaiGrowthLibrary;
+    const shellIcon = "/icons/shell-growth.png";
+    const seedCards = growthSource.defaultCards;
 
     let library = loadLibrary();
     let selectedCardId = library.cards[0]?.cardId || null;
@@ -585,22 +552,12 @@
     };
 
     function loadLibrary() {
-      try {
-        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-        if (parsed?.cards?.length) return parsed;
-      } catch {
-        // Fall back to seed data.
-      }
-      return {
-        schemaVersion: 1,
-        updatedAt: new Date().toISOString(),
-        cards: seedCards.map(card => ({ ...card, fixedText: { ...card.fixedText }, dynamicScenarios: card.dynamicScenarios.map(item => ({ ...item })) }))
-      };
+      return growthSource.load();
     }
 
     function saveLibrary() {
       library.updatedAt = new Date().toISOString();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(library));
+      library = growthSource.save(library);
       els.saveStatus.textContent = "Išsaugota lokaliai";
       els.formMessage.textContent = "Kortelė išsaugota.";
       window.setTimeout(() => {
@@ -761,7 +718,7 @@
         missionId: `mission-${Date.now()}`,
         category: "Nauja kategorija",
         title: "Nauja kortelė",
-        image: "../assets/growth-sleep-alone.png",
+        image: "/cards/mi-001.png",
         shellIcon,
         competencies: [],
         fixedText: { shortMessage: "", whyImportant: "" },
@@ -844,11 +801,7 @@
     els.archive.addEventListener("click", archiveCard);
     els.resetSeed.addEventListener("click", () => {
       if (!confirm("Atkurti pradinę bibliotekos kortelę? Esami bibliotekos pakeitimai bus pakeisti tik šiame admin localStorage.")) return;
-      library = {
-        schemaVersion: 1,
-        updatedAt: new Date().toISOString(),
-        cards: seedCards.map(card => ({ ...card, fixedText: { ...card.fixedText }, dynamicScenarios: card.dynamicScenarios.map(item => ({ ...item })) }))
-      };
+      library = growthSource.save({ schemaVersion: 1, cards: growthSource.clone(seedCards) });
       selectedCardId = library.cards[0].cardId;
       saveLibrary();
       render();

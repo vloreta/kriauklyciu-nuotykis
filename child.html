@@ -1184,6 +1184,81 @@
       visibility: hidden !important;
     }
 
+    .growth-card-trigger {
+      position: absolute;
+      right: 42px;
+      bottom: 8px;
+      width: 30px;
+      height: 30px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .92);
+      padding: 2px;
+      box-shadow: 0 7px 16px rgba(31, 54, 71, .16);
+    }
+
+    .growth-card-trigger img {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .growth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(16, 39, 50, .36);
+    }
+
+    .growth-modal.open {
+      display: flex;
+    }
+
+    .growth-modal-card {
+      width: min(560px, 100%);
+      max-height: min(88vh, 720px);
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(244, 168, 200, .55);
+      background: linear-gradient(145deg, #fffafd, #fff8e8);
+      box-shadow: 0 28px 70px rgba(31, 54, 71, .26);
+      padding: 16px;
+    }
+
+    .growth-modal-card img {
+      width: 100%;
+      border-radius: 12px;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .growth-modal-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+
+    .growth-modal-card p {
+      margin: 8px 0;
+      color: #355361;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .growth-modal-card .growth-gift {
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(255, 248, 231, .9);
+      border: 1px solid rgba(236, 199, 127, .48);
+      color: #6c4b05;
+    }
+
     .task-edit-actions {
       position: absolute;
       right: 8px;
@@ -2173,6 +2248,8 @@
       }
     }
   </style>
+  <script src="src/data/growthCards.js"></script>
+  <script src="src/lib/selectGrowthScenario.js"></script>
 </head>
 <body class="child-page">
   <main class="app">
@@ -2280,6 +2357,7 @@
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="growth-modal" id="growthCardModal" role="dialog" aria-modal="true" aria-labelledby="growthCardTitle" aria-hidden="true"></div>
   <div class="edit-dialog" id="taskEditDialog" role="dialog" aria-modal="true" aria-labelledby="taskEditHeading" aria-hidden="true">
     <form class="edit-card" id="taskEditForm">
       <h3 id="taskEditHeading">Keisti užduotį</h3>
@@ -2512,6 +2590,11 @@
     const legacyStorageKey = "kriauklyciu-nuotykis-v2";
     const undoStorageKey = "kriauklyciu-nuotykis-undo-stack";
     const backupKeyPrefix = "kriauklyciu-nuotykis-backup_";
+    const growthAssignmentsKey = "kriauklyciu-growth-assignments-v1";
+    const growthOpeningsKey = "kriauklyciu-growth-openings-v1";
+    const growthMissionTaskIds = {
+      "MI-001": ["oliSleepAlone", "domSleepAlone"]
+    };
     const automaticBackupPrefix = "kriauklyciu-nuotykis-backup-";
     const latestBackupKey = "kriauklyciu-nuotykis-backup-latest";
     const familyKeyStorageKey = "kriauklyciu-nuotykis-family-key";
@@ -2939,6 +3022,103 @@
     const legacyTaskStartDate = "2026-06-11";
     let editingTaskId = null;
 
+    function readJsonStorage(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || "null") || fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function writeJsonStorage(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function growthLibrary() {
+      return window.KrabukaiGrowthLibrary?.load?.() || { cards: [] };
+    }
+
+    function growthCardForTask(task) {
+      const library = growthLibrary();
+      return library.cards.find(card => (growthMissionTaskIds[card.missionId] || []).includes(task.id) && !card.archived) || null;
+    }
+
+    function growthAssignmentFor(childId, cardId) {
+      const assignments = readJsonStorage(growthAssignmentsKey, {});
+      return assignments[`${childId}:${cardId}`] || null;
+    }
+
+    function isGrowthCardEnabledForTask(childId, task) {
+      const card = growthCardForTask(task);
+      if (!card) return false;
+      const assignment = growthAssignmentFor(childId, card.cardId);
+      return assignment ? assignment.active !== false : true;
+    }
+
+    function taskEffectiveShells(childId, task) {
+      const card = growthCardForTask(task);
+      const assignment = card ? growthAssignmentFor(childId, card.cardId) : null;
+      if (card && assignment?.active === true) return Math.max(0, Math.min(99, Number(assignment.shells) || task.shells));
+      return task.shells;
+    }
+
+    function recordGrowthOpening({ card, scenario }) {
+      const openings = readJsonStorage(growthOpeningsKey, []);
+      openings.push({
+        cardId: card.cardId,
+        missionId: card.missionId,
+        childId: state.active,
+        date: state.selectedDate,
+        selectedScenario: scenario?.scenarioId || "DEFAULT",
+        openedAt: new Date().toISOString()
+      });
+      writeJsonStorage(growthOpeningsKey, openings.slice(-500));
+    }
+
+    function growthCardMarkup(task) {
+      const card = growthCardForTask(task);
+      if (!card || !isGrowthCardEnabledForTask(state.active, task)) return "";
+      return `
+        <button class="growth-card-trigger" type="button" data-growth-card="${escapeHtml(card.cardId)}" aria-label="Atidaryti augimo kortelę">
+          <img src="${escapeHtml(card.shellIcon || "/icons/shell-growth.png")}" alt="">
+        </button>
+      `;
+    }
+
+    function openGrowthCard(task) {
+      const card = growthCardForTask(task);
+      const modal = document.getElementById("growthCardModal");
+      if (!card || !modal) return;
+      const scenario = window.KrabukaiSelectGrowthScenario?.({
+        childId: state.active,
+        missionId: card.missionId,
+        date: state.selectedDate,
+        history: state.records,
+        card
+      }) || (card.dynamicScenarios || []).find(item => item.scenarioId === "DEFAULT");
+      recordGrowthOpening({ card, scenario });
+      modal.innerHTML = `
+        <article class="growth-modal-card">
+          <img src="${escapeHtml(card.image)}" alt="">
+          <h3 id="growthCardTitle">${escapeHtml(card.title)}</h3>
+          <p>${escapeHtml(card.fixedText?.shortMessage || "")}</p>
+          <p>${escapeHtml(scenario?.childMessage || "")}</p>
+          <p class="growth-gift">${escapeHtml(scenario?.eveningGift || "")}</p>
+          <button class="action" type="button" data-close-growth>Uždaryti</button>
+        </article>
+      `;
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeGrowthCard() {
+      const modal = document.getElementById("growthCardModal");
+      if (!modal) return;
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      modal.innerHTML = "";
+    }
+
     function save() {
       try {
         protectStateBeforeSave();
@@ -3340,7 +3520,7 @@
     }
 
     function maxDailyShells(childId = state.active) {
-      return tasksForChild(childId).reduce((sum, task) => sum + task.shells, 0);
+      return tasksForChild(childId).reduce((sum, task) => sum + taskEffectiveShells(childId, task), 0);
     }
 
     function maxFamilyDailyShells() {
@@ -3535,7 +3715,7 @@
         action,
         taskId: task.id,
         taskTitleAtTime: taskTitle(task),
-        taskShellsAtTime: task.shells,
+        taskShellsAtTime: Math.abs(delta),
         delta
       });
     }
@@ -3581,16 +3761,17 @@
       if (state.editMode) return;
       const child = activeChild();
       const title = taskTitle(task);
+      const shells = taskEffectiveShells(state.active, task);
       if (child.done[task.id]) {
         child.done[task.id] = false;
-        child.shells = Math.max(0, child.shells - task.shells);
+        child.shells = Math.max(0, child.shells - shells);
         addLog(child, {
-          text: `${activeName()}: atšaukta - ${title} (-${task.shells})`,
-          delta: -task.shells,
+          text: `${activeName()}: atšaukta - ${title} (-${shells})`,
+          delta: -shells,
           taskId: task.id,
           kind: "toggleOff"
         });
-        addTaskEvent(child, task, "cancelled", -task.shells);
+        addTaskEvent(child, task, "cancelled", -shells);
         save();
         render();
         const retryMessage = state.active === "olivia"
@@ -3600,31 +3781,31 @@
             : `Nieko tokio, ${activeName()}. Jūros draugas laukia, kol pabandysi dar kartą.`;
         setChildGuide(state.active, retryMessage);
         save();
-        showToast(`${title} atšaukta: -${task.shells} ${shellWord(task.shells)}.`);
+        showToast(`${title} atšaukta: -${shells} ${shellWord(shells)}.`);
         return;
       }
       child.done[task.id] = true;
-      child.shells += task.shells;
+      child.shells += shells;
       addLog(child, {
-        text: `${activeName()}: ${title} (+${task.shells})`,
-        delta: task.shells,
+        text: `${activeName()}: ${title} (+${shells})`,
+        delta: shells,
         taskId: task.id,
         kind: "complete"
       });
-      addTaskEvent(child, task, "completed", task.shells);
+      addTaskEvent(child, task, "completed", shells);
       const milestone = checkChildMilestones(state.active);
       if (!milestone) {
         const successMessage = state.active === "olivia"
-          ? `Puiku, Olivia! Undinė įdėjo ${task.shells} ${shellWord(task.shells)} į tavo lobį.`
+          ? `Puiku, Olivia! Undinė įdėjo ${shells} ${shellWord(shells)} į tavo lobį.`
           : state.active === "dominik"
-            ? `Šaunu, Dominik! Drakonas pridėjo ${task.shells} ${shellWord(task.shells)} prie tavo kelio.`
-            : `Puiku, ${activeName()}! Jūros draugas pridėjo ${task.shells} ${shellWord(task.shells)} prie tavo kelio.`;
+            ? `Šaunu, Dominik! Drakonas pridėjo ${shells} ${shellWord(shells)} prie tavo kelio.`
+            : `Puiku, ${activeName()}! Jūros draugas pridėjo ${shells} ${shellWord(shells)} prie tavo kelio.`;
         setChildGuide(state.active, successMessage);
       }
       save();
       render();
       animateTreasureShell(state.active);
-      showToast(`${activeName()} gavo ${task.shells} ${shellWord(task.shells)}!`);
+      showToast(`${activeName()} gavo ${shells} ${shellWord(shells)}!`);
     }
 
     function editTask(taskId) {
@@ -3828,6 +4009,7 @@
 
       visibleTasks.forEach(task => {
         const title = taskTitle(task);
+        const shells = taskEffectiveShells(state.active, task);
         const safeTaskId = escapeHtml(task.id);
         const button = document.createElement(state.editMode ? "div" : "button");
         if (!state.editMode) button.type = "button";
@@ -3837,7 +4019,7 @@
           <span class="task-icon" aria-hidden="true">${escapeHtml(task.icon)}</span>
           <span>
             <span class="task-title">${escapeHtml(title)}</span>
-            <span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span>
+            <span class="task-shells">+${shells} ${shellWord(shells)}</span>
           </span>
           ${state.editMode && isToday ? `
             <span class="task-edit-actions">
@@ -3846,10 +4028,16 @@
             </span>
           ` : ""}
           ${parentTipMarkup(task)}
+          ${growthCardMarkup(task)}
         `;
         if (!state.editMode) {
           button.addEventListener("click", () => completeTask(task));
         }
+        button.querySelector("[data-growth-card]")?.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openGrowthCard(task);
+        });
         button.querySelector("[data-parent-tip]")?.addEventListener("click", event => {
           event.preventDefault();
           event.stopPropagation();
@@ -3874,6 +4062,10 @@
     }
 
     document.addEventListener("click", event => {
+      if (event.target.closest("[data-close-growth]") || event.target.id === "growthCardModal") {
+        closeGrowthCard();
+        return;
+      }
       if (event.target.closest("[data-parent-tip]") || event.target.closest(".parent-tip-popover")) return;
       document.querySelectorAll(".task.parent-tip-open").forEach(card => {
         card.classList.remove("parent-tip-open");
@@ -4058,7 +4250,7 @@
       tasksForChild().forEach(task => {
         const option = document.createElement("option");
         option.value = task.id;
-        option.textContent = `${taskTitle(task)} (-${task.shells})`;
+        option.textContent = `${taskTitle(task)} (-${shells})`;
         select.appendChild(option);
       });
     }
