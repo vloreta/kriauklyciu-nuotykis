@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -416,7 +416,27 @@
           <h2>📚 Visų kortelių sąrašas</h2>
           <span class="count" id="cardCount"></span>
         </div>
-        <div class="card-grid" id="cardGrid"></div>
+        <div class="card-grid" id="cardGrid">
+          <button class="library-card active" type="button" data-card-id="MI-001-C01">
+            <img class="card-image" src="/cards/mi-001.png" alt="Pati užmigau be kitų">
+            <span>
+              <strong class="card-title">Pati užmigau be kitų</strong>
+              <span class="meta">
+                <span>cardId: MI-001-C01</span>
+                <span>missionId: MI-001</span>
+                <span>Kategorija: Miegas</span>
+                <span>Versija: 1.0</span>
+                <span>Atnaujinta: 2026-06-29</span>
+              </span>
+              <span class="chips">
+                <span class="chip">Savarankiškumas</span>
+                <span class="chip">Pasitikėjimas savimi</span>
+                <span class="chip">Drąsa</span>
+              </span>
+            </span>
+            <img class="shell-mark" src="/icons/shell-growth.png" alt="">
+          </button>
+        </div>
       </section>
 
       <aside class="panel editor" aria-label="Kortelės redagavimas">
@@ -562,7 +582,7 @@
 
     let library = loadLibrary();
     ensureRequiredSeedCard();
-    let selectedCardId = library.cards[0]?.cardId || requiredSeedCard.cardId;
+    let selectedCardId = requiredSeedCard.cardId;
 
     const els = {
       grid: document.getElementById("cardGrid"),
@@ -597,40 +617,73 @@
       author: document.getElementById("author"),
       lastUpdated: document.getElementById("lastUpdated")
     };
+    function seedCard() {
+      const card = growthSource.clone(requiredSeedCard);
+      card.archived = false;
+      card.image = card.image || "/cards/mi-001.png";
+      card.shellIcon = card.shellIcon || "/icons/shell-growth.png";
+      return card;
+    }
 
     function ensureRequiredSeedCard() {
       if (!library || !Array.isArray(library.cards)) {
         library = { schemaVersion: 1, cards: [] };
       }
-      const existingIndex = library.cards.findIndex(card => card.cardId === requiredSeedCard.cardId);
+      const card = seedCard();
+      const existingIndex = library.cards.findIndex(item => item.cardId === card.cardId);
       if (existingIndex === -1) {
-        library.cards.unshift(growthSource.clone(requiredSeedCard));
-        library = growthSource.save(library);
-        return;
+        library.cards.unshift(card);
+      } else {
+        const existing = library.cards[existingIndex] || {};
+        library.cards[existingIndex] = {
+          ...card,
+          ...existing,
+          cardId: card.cardId,
+          missionId: existing.missionId || card.missionId,
+          title: existing.title || card.title,
+          category: existing.category || card.category,
+          competencies: Array.isArray(existing.competencies) && existing.competencies.length ? existing.competencies : card.competencies,
+          fixedText: existing.fixedText && Object.keys(existing.fixedText).length ? existing.fixedText : card.fixedText,
+          dynamicScenarios: Array.isArray(existing.dynamicScenarios) && existing.dynamicScenarios.length ? existing.dynamicScenarios : card.dynamicScenarios,
+          eveningGift: existing.eveningGift && Object.keys(existing.eveningGift).length ? existing.eveningGift : card.eveningGift,
+          image: existing.image || card.image,
+          shellIcon: existing.shellIcon || card.shellIcon,
+          archived: false
+        };
       }
-      const existing = library.cards[existingIndex];
-      library.cards[existingIndex] = {
-        ...growthSource.clone(requiredSeedCard),
-        ...existing,
-        archived: false,
-        image: existing.image || requiredSeedCard.image,
-        shellIcon: existing.shellIcon || requiredSeedCard.shellIcon
-      };
+      selectedCardId = card.cardId;
       library = growthSource.save(library);
     }
-    function loadLibrary() {
-      const loaded = growthSource.load();
-      if (!Array.isArray(loaded.cards) || loaded.cards.length === 0) {
-        return growthSource.save({ schemaVersion: 1, cards: growthSource.clone(seedCards) });
-      }
-      const hasSeedCard = loaded.cards.some(card => card.cardId === "MI-001-C01");
-      if (!hasSeedCard) {
-        loaded.cards.unshift(growthSource.clone(seedCards[0]));
-        return growthSource.save(loaded);
-      }
-      return loaded;
-    }
 
+    function loadLibrary() {
+      const card = seedCard();
+      let loaded = growthSource.load();
+      if (!loaded || !Array.isArray(loaded.cards)) {
+        loaded = { schemaVersion: 1, cards: [] };
+      }
+      const existingIndex = loaded.cards.findIndex(item => item.cardId === card.cardId);
+      if (existingIndex === -1) {
+        loaded.cards.unshift(card);
+      } else {
+        const existing = loaded.cards[existingIndex] || {};
+        loaded.cards[existingIndex] = {
+          ...card,
+          ...existing,
+          cardId: card.cardId,
+          missionId: existing.missionId || card.missionId,
+          title: existing.title || card.title,
+          category: existing.category || card.category,
+          competencies: Array.isArray(existing.competencies) && existing.competencies.length ? existing.competencies : card.competencies,
+          fixedText: existing.fixedText && Object.keys(existing.fixedText).length ? existing.fixedText : card.fixedText,
+          dynamicScenarios: Array.isArray(existing.dynamicScenarios) && existing.dynamicScenarios.length ? existing.dynamicScenarios : card.dynamicScenarios,
+          eveningGift: existing.eveningGift && Object.keys(existing.eveningGift).length ? existing.eveningGift : card.eveningGift,
+          image: existing.image || card.image,
+          shellIcon: existing.shellIcon || card.shellIcon,
+          archived: false
+        };
+      }
+      return growthSource.save(loaded);
+    }
     function saveLibrary() {
       library.updatedAt = new Date().toISOString();
       library = growthSource.save(library);
@@ -697,11 +750,17 @@
     function renderCards() {
       ensureRequiredSeedCard();
       renderCategoryFilter();
-      const cards = filteredCards();
+      let cards = filteredCards();
+      if (!cards.length) {
+        els.search.value = "";
+        els.categoryFilter.value = "all";
+        els.visibilityFilter.value = "active";
+        cards = library.cards.filter(card => card.cardId === requiredSeedCard.cardId);
+      }
       els.count.textContent = `${cards.length} kort.`;
       if (!cards.length) {
-        els.grid.innerHTML = `<div class="empty">Kortelių pagal pasirinktą filtrą nėra.</div>`;
-        return;
+        ensureRequiredSeedCard();
+        cards = [library.cards.find(card => card.cardId === requiredSeedCard.cardId)].filter(Boolean);
       }
 
       els.grid.innerHTML = cards.map(card => `
