@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kriauklyčių nuotykio duomenų atkūrimas</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #18313f; background: #eefbfc; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; }
+    main { width: min(760px, 100%); margin: 0 auto; background: #fff; border: 1px solid #cfe4e8; border-radius: 8px; padding: 24px; }
+    h1 { margin-top: 0; font-size: 1.5rem; }
+    textarea { width: 100%; min-height: 220px; resize: vertical; padding: 12px; border: 1px solid #9fbec5; border-radius: 6px; font: 13px/1.45 ui-monospace, monospace; }
+    button, a { min-height: 44px; border-radius: 6px; font-weight: 700; }
+    button { width: 100%; margin-top: 12px; border: 0; color: #fff; background: #0c93aa; cursor: pointer; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    a { display: inline-flex; align-items: center; margin-top: 16px; color: #075f72; }
+    #result { margin-top: 16px; padding: 14px; border-radius: 6px; background: #f3f8fa; white-space: pre-line; }
+    .success { background: #e8f8ef !important; color: #155b36; }
+    .error { background: #fff0f0 !important; color: #8d2525; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Saugus duomenų atkūrimas</h1>
+    <p>Įklijuokite visą patvirtintos JSON kopijos turinį. Prieš atkūrimą dabartinė būsena bus išsaugota atskirai.</p>
+    <label for="backupJson"><strong>JSON kopija</strong></label>
+    <textarea id="backupJson" spellcheck="false" autocomplete="off"></textarea>
+    <button id="restoreButton" type="button">Patikrinti ir atkurti</button>
+    <div id="result" role="status" aria-live="polite">Duomenys dar neatkurti.</div>
+    <a href="./index.html">Grįžti į programėlę</a>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "kriauklyciu-nuotykis";
+    const BACKUP_PREFIX = "kriauklyciu-nuotykis-backup_";
+    const EXPECTED = {
+      olivia: { shells: 275, logs: 120 },
+      dominik: { shells: 224, logs: 124 },
+      firstDate: "2026-06-11",
+      lastDate: "2026-06-21"
+    };
+
+    function summarize(data) {
+      if (!data || typeof data !== "object" || !data.records || typeof data.records !== "object") {
+        throw new Error("Kopijoje nėra tinkamos records struktūros.");
+      }
+
+      const result = {
+        olivia: { shells: 0, logs: 0 },
+        dominik: { shells: 0, logs: 0 },
+        dates: []
+      };
+
+      for (const [date, day] of Object.entries(data.records)) {
+        let hasShells = false;
+        for (const childId of ["olivia", "dominik"]) {
+          const record = day?.[childId];
+          if (!record) continue;
+          const shells = Number(record.shells || 0);
+          const logs = Array.isArray(record.log) ? record.log.length : 0;
+          if (!Number.isFinite(shells)) throw new Error(`Netinkamas kriauklyčių skaičius: ${date}, ${childId}.`);
+          result[childId].shells += shells;
+          result[childId].logs += logs;
+          if (shells !== 0) hasShells = true;
+        }
+        if (hasShells) result.dates.push(date);
+      }
+
+      result.dates.sort();
+      result.firstDate = result.dates[0] || "";
+      result.lastDate = result.dates.at(-1) || "";
+      return result;
+    }
+
+    function validateEnvelope(envelope) {
+      if (envelope?.format !== "kriauklyciu-nuotykis-backup" || envelope?.storageKey !== STORAGE_KEY) {
+        throw new Error("Tai nėra patvirtinta Kriauklyčių nuotykio kopija.");
+      }
+      const summary = summarize(envelope.data);
+      for (const childId of ["olivia", "dominik"]) {
+        if (summary[childId].shells !== EXPECTED[childId].shells || summary[childId].logs !== EXPECTED[childId].logs) {
+          throw new Error(`Neatitinka ${childId} duomenų kontrolinės sumos.`);
+        }
+      }
+      if (summary.firstDate !== EXPECTED.firstDate || summary.lastDate !== EXPECTED.lastDate) {
+        throw new Error("Neatitinka duomenų datų intervalas.");
+      }
+      return summary;
+    }
+
+    document.getElementById("restoreButton").addEventListener("click", () => {
+      const resultElement = document.getElementById("result");
+      resultElement.className = "";
+      try {
+        const envelope = JSON.parse(document.getElementById("backupJson").value);
+        const summary = validateEnvelope(envelope);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const currentValue = localStorage.getItem(STORAGE_KEY);
+        localStorage.setItem(`${STORAGE_KEY}-pre-restore_${timestamp}`, currentValue ?? "null");
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope.data));
+        localStorage.setItem(`${BACKUP_PREFIX}${new Date().toISOString().slice(0, 10)}`, JSON.stringify({
+          format: "kriauklyciu-nuotykis-backup",
+          version: 1,
+          createdAt: new Date().toISOString(),
+          reason: "verified-restore",
+          data: envelope.data
+        }));
+
+        const restored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        const verified = summarize(restored);
+        resultElement.className = "success";
+        resultElement.textContent = [
+          "Atkūrimas sėkmingas.",
+          `Olivia: ${verified.olivia.shells} kriauklytės, ${verified.olivia.logs} istorijos įrašų.`,
+          `Dominik: ${verified.dominik.shells} kriauklytės, ${verified.dominik.logs} istorijos įrašai.`,
+          `Datos: ${verified.firstDate}–${verified.lastDate}.`,
+          "Struktūros klaidų: 0."
+        ].join("\n");
+      } catch (error) {
+        resultElement.className = "error";
+        resultElement.textContent = `Atkūrimas neatliktas: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
