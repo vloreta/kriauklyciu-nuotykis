@@ -274,19 +274,49 @@
 
     .load-card-bar .field { min-width: 0; }
     .load-card-button { min-height: 42px; white-space: nowrap; }
-
     .library-card {
       position: relative;
       display: grid;
       grid-template-columns: 108px minmax(0, 1fr);
       gap: 12px;
-      min-height: 156px;
-      padding: 10px 12px 34px;
-      border: 2px solid transparent;
+      width: 100%;
+      min-height: 150px;
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: linear-gradient(135deg, #fffaf6, #f6fdff);
-      box-shadow: 0 9px 22px rgba(31, 54, 71, .08);
+      background: rgba(255, 255, 255, .94);
+      padding: 10px 42px 10px 10px;
+      color: inherit;
       text-align: left;
+      box-shadow: 0 10px 20px rgba(31, 54, 71, .08);
+    }
+
+    .library-card.layout-top {
+      grid-template-columns: 1fr;
+    }
+
+    .library-card.layout-top .card-image {
+      width: 100%;
+      height: 160px;
+    }
+
+    .library-card.layout-hero {
+      grid-template-columns: 136px minmax(0, 1fr);
+      min-height: 180px;
+    }
+
+    .library-card.layout-hero .card-image {
+      width: 136px;
+      height: 136px;
+    }
+
+    .library-card.layout-compact {
+      grid-template-columns: 82px minmax(0, 1fr);
+      min-height: 118px;
+    }
+
+    .library-card.layout-compact .card-image {
+      width: 82px;
+      height: 82px;
     }
 
     .library-card:hover,
@@ -588,7 +618,6 @@
             <label for="title">title</label>
             <input id="title" type="text" required maxlength="140">
           </div>
-
           <div class="two">
             <div class="field">
               <label for="category">category</label>
@@ -612,6 +641,18 @@
               <input id="version" type="text" required>
             </div>
           </div>
+
+          <div class="field">
+            <label for="layoutPreset">Kortelės maketas</label>
+            <select id="layoutPreset">
+              <option value="left">Paveikslėlis kairėje</option>
+              <option value="top">Paveikslėlis viršuje</option>
+              <option value="hero">Didesnis paveikslėlis</option>
+              <option value="compact">Kompaktiška kortelė</option>
+            </select>
+            <p class="hint">Maketas keičia objektų vietas kortelėje ir iškart matomas peržiūroje.</p>
+          </div>
+
 
           <div class="field">
             <label for="image">image</label>
@@ -706,6 +747,7 @@ const fallbackSeedCard = {
       title: "Pati užmigau be kitų",
       image: "/cards/mi-001.png",
       shellIcon: "/icons/shell-growth.png",
+      layoutPreset: "left",
       version: "1.0",
       author: "Krabukų biblioteka",
       lastUpdated: "2026-06-29",
@@ -790,7 +832,8 @@ const fallbackSeedCard = {
       eveningGift: document.getElementById("eveningGift"),
       version: document.getElementById("version"),
       author: document.getElementById("author"),
-      lastUpdated: document.getElementById("lastUpdated")
+      lastUpdated: document.getElementById("lastUpdated"),
+      layoutPreset: document.getElementById("layoutPreset")
     };
     function seedCard() {
       const card = growthSource.clone(requiredSeedCard);
@@ -823,6 +866,7 @@ const fallbackSeedCard = {
           eveningGift: existing.eveningGift && Object.keys(existing.eveningGift).length ? existing.eveningGift : card.eveningGift,
           image: existing.image || card.image,
           shellIcon: existing.shellIcon || card.shellIcon,
+          layoutPreset: existing.layoutPreset || card.layoutPreset || "left",
           archived: false
         };
       }
@@ -856,6 +900,7 @@ const fallbackSeedCard = {
           eveningGift: existing.eveningGift && Object.keys(existing.eveningGift).length ? existing.eveningGift : card.eveningGift,
           image: existing.image || card.image,
           shellIcon: existing.shellIcon || card.shellIcon,
+          layoutPreset: existing.layoutPreset || card.layoutPreset || "left",
           archived: false
         };
       }
@@ -964,6 +1009,25 @@ const fallbackSeedCard = {
       els.editorPanel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
+    function cardLayoutClass(card) {
+      const layout = card.layoutPreset || "left";
+      return layout === "left" ? "" : "layout-" + layout;
+    }
+
+    function draftFromEditor(card) {
+      if (!card || fields.cardId.value !== card.cardId) return card;
+      return {
+        ...card,
+        title: fields.title.value.trim() || card.title,
+        category: normalizeCategory(fields.category.value || card.category),
+        image: fields.image.value.trim() || card.image,
+        competencies: fields.competencies.value.split(",").map(item => item.trim()).filter(Boolean),
+        version: fields.version.value.trim() || card.version,
+        lastUpdated: fields.lastUpdated.value || card.lastUpdated,
+        layoutPreset: fields.layoutPreset.value || card.layoutPreset || "left"
+      };
+    }
+
     function renderCards() {
       ensureRequiredSeedCard();
       renderCategoryList();
@@ -982,34 +1046,33 @@ const fallbackSeedCard = {
         cards = [library.cards.find(card => card.cardId === requiredSeedCard.cardId)].filter(Boolean);
       }
 
-      els.grid.innerHTML = cards.map(card => `
-        <button class="library-card ${card.cardId === selectedCardId ? "active" : ""} ${card.archived ? "archived" : ""}" type="button" data-card-id="${escapeHtml(card.cardId)}">
-          <img class="card-image" src="${escapeHtml(card.image)}" alt="">
+      els.grid.innerHTML = cards.map(card => {
+        const displayCard = draftFromEditor(card);
+        return `
+        <button class="library-card ${displayCard.cardId === selectedCardId ? "active" : ""} ${displayCard.archived ? "archived" : ""} ${cardLayoutClass(displayCard)}" type="button" data-card-id="${escapeHtml(displayCard.cardId)}">
+          <img class="card-image" src="${escapeHtml(displayCard.image)}" alt="">
           <span>
-            <strong class="card-title">${escapeHtml(card.title)}</strong>
+            <strong class="card-title">${escapeHtml(displayCard.title)}</strong>
             <span class="meta">
-              <span>cardId: ${escapeHtml(card.cardId)}</span>
-              <span>missionId: ${escapeHtml(card.missionId)}</span>
-              <span>Kategorija: ${escapeHtml(categoryLabel(normalizeCategory(card.category)))}</span>
-              <span>Versija: ${escapeHtml(card.version)}</span>
-              <span>Atnaujinta: ${escapeHtml(card.lastUpdated)}</span>
+              <span>cardId: ${escapeHtml(displayCard.cardId)}</span>
+              <span>missionId: ${escapeHtml(displayCard.missionId)}</span>
+              <span>Kategorija: ${escapeHtml(categoryLabel(normalizeCategory(displayCard.category)))}</span>
+              <span>Versija: ${escapeHtml(displayCard.version)}</span>
+              <span>Atnaujinta: ${escapeHtml(displayCard.lastUpdated)}</span>
             </span>
-            <span class="chips">${(card.competencies || []).map(item => `<span class="chip">${escapeHtml(item)}</span>`).join("")}</span>
+            <span class="chips">${(displayCard.competencies || []).map(item => `<span class="chip">${escapeHtml(item)}</span>`).join("")}</span>
           </span>
           <span class="button secondary" style="justify-self:start;min-height:32px;padding:6px 10px;font-size:.82rem;">Redaguoti</span>
-          <img class="shell-mark" src="${escapeHtml(card.shellIcon || shellIcon)}" alt="">
-        </button>
-      `).join("");
+          <img class="shell-mark" src="${escapeHtml(displayCard.shellIcon || shellIcon)}" alt="">
+        </button>`;
+      }).join("");
 
       els.grid.querySelectorAll("[data-card-id]").forEach(button => {
-        button.addEventListener("click", () => {
-          selectedCardId = button.dataset.cardId;
-          setEditorOpen(true);
-          render();
-        });
+        button.addEventListener("click", () => loadSelectedCardForEditing(button.dataset.cardId));
       });
     }
     function renderEditor() {
+
       const card = selectedCard();
       if (!card) {
         els.editorTitle.textContent = "Kortelės redagavimas";
@@ -1030,6 +1093,7 @@ const fallbackSeedCard = {
       fields.version.value = card.version || "1.0.0";
       fields.author.value = card.author || "";
       fields.lastUpdated.value = card.lastUpdated || today();
+      fields.layoutPreset.value = card.layoutPreset || "left";
       els.imagePreview.src = card.image || "";
     }
 
@@ -1064,7 +1128,8 @@ const fallbackSeedCard = {
         eveningGift: fields.eveningGift.value.trim(),
         version: fields.version.value.trim() || "1.0.0",
         author: fields.author.value.trim(),
-        lastUpdated: fields.lastUpdated.value || today()
+        lastUpdated: fields.lastUpdated.value || today(),
+        layoutPreset: fields.layoutPreset.value || "left"
       };
     }
 
@@ -1076,6 +1141,7 @@ const fallbackSeedCard = {
         title: "Nauja kortelė",
         image: "/cards/mi-001.png",
         shellIcon,
+        layoutPreset: "left",
         competencies: [],
         fixedText: { shortMessage: "", whyImportant: "" },
         dynamicScenarios: [],
@@ -1134,6 +1200,16 @@ const fallbackSeedCard = {
       render();
     });
 
+    function updateLivePreview() {
+      els.imagePreview.src = fields.image.value.trim();
+      renderCards();
+    }
+
+    [fields.title, fields.category, fields.image, fields.competencies, fields.version, fields.lastUpdated, fields.layoutPreset].forEach(field => {
+      field.addEventListener("input", updateLivePreview);
+      field.addEventListener("change", updateLivePreview);
+    });
+
     els.image.addEventListener("input", () => {
       els.imagePreview.src = els.image.value.trim();
     });
@@ -1145,6 +1221,7 @@ const fallbackSeedCard = {
       reader.onload = () => {
         fields.image.value = String(reader.result || "");
         els.imagePreview.src = fields.image.value;
+        updateLivePreview();
       };
       reader.readAsDataURL(file);
     });
