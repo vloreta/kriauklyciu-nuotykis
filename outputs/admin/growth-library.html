@@ -343,6 +343,31 @@
       box-shadow: 0 6px 14px rgba(31, 54, 71, .14);
     }
 
+
+
+    .editor-toggle {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--sea);
+      padding: 0 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .editor.collapsed {
+      align-self: start;
+    }
+
+    .editor.collapsed .editor-body {
+      display: none;
+    }
+
+    .editor.collapsed .panel-header {
+      border-bottom: 0;
+    }
+
     .editor {
       position: sticky;
       top: 12px;
@@ -522,9 +547,10 @@
         </div>
       </section>
 
-      <aside class="panel editor" aria-label="Kortelės redagavimas">
+      <aside class="panel editor collapsed" id="editorPanel" aria-label="Kortelės redagavimas">
         <div class="panel-header">
           <h2 id="editorTitle">Kortelės redagavimas</h2>
+          <button class="editor-toggle" id="editorToggle" type="button" aria-expanded="false">Išskleisti</button>
           <span class="count" id="saveStatus">Išsaugota lokaliai</span>
         </div>
         <form class="editor-body" id="cardForm">
@@ -720,6 +746,8 @@ const fallbackSeedCard = {
       formMessage: document.getElementById("formMessage"),
       saveStatus: document.getElementById("saveStatus"),
       editorTitle: document.getElementById("editorTitle"),
+      editorPanel: document.getElementById("editorPanel"),
+      editorToggle: document.getElementById("editorToggle"),
       create: document.getElementById("createCardButton"),
       duplicate: document.getElementById("duplicateCardButton"),
       archive: document.getElementById("archiveCardButton"),
@@ -818,6 +846,14 @@ const fallbackSeedCard = {
       window.setTimeout(() => {
         if (els.formMessage.textContent === "Kortelė išsaugota.") els.formMessage.textContent = "";
       }, 1800);
+    }
+
+
+
+    function setEditorOpen(open) {
+      els.editorPanel.classList.toggle("collapsed", !open);
+      els.editorToggle.textContent = open ? "Sutraukti" : "Išskleisti";
+      els.editorToggle.setAttribute("aria-expanded", open ? "true" : "false");
     }
 
     function selectedCard() {
@@ -924,6 +960,7 @@ const fallbackSeedCard = {
       els.grid.querySelectorAll("[data-card-id]").forEach(button => {
         button.addEventListener("click", () => {
           selectedCardId = button.dataset.cardId;
+          setEditorOpen(true);
           render();
         });
       });
@@ -1069,6 +1106,7 @@ const fallbackSeedCard = {
       reader.readAsDataURL(file);
     });
 
+    els.editorToggle.addEventListener("click", () => setEditorOpen(els.editorPanel.classList.contains("collapsed")));
     els.search.addEventListener("input", renderCards);
     els.categoryFilter.addEventListener("change", renderCards);
     els.visibilityFilter.addEventListener("change", renderCards);
