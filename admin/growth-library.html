@@ -780,8 +780,8 @@ const fallbackSeedCard = {
     const requiredSeedCard = growthSource.clone ? growthSource.clone(seedCards[0]) : JSON.parse(JSON.stringify(seedCards[0]));
 
     let library = loadLibrary();
-    ensureRequiredSeedCard();
     let selectedCardId = requiredSeedCard.cardId;
+    ensureRequiredSeedCard();
 
     const els = {
       grid: document.getElementById("cardGrid"),
