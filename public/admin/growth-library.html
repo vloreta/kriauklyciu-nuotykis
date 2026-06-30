@@ -165,6 +165,67 @@
       align-items: start;
     }
 
+
+    .categories-panel {
+      margin: 14px 0;
+    }
+
+    .categories-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid rgba(13, 138, 168, .18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink);
+      padding: 12px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(31, 54, 71, .08);
+    }
+
+    .categories-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid rgba(13, 138, 168, .14);
+      border-top: 0;
+      border-radius: 0 0 8px 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .category-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      border: 1px solid rgba(13, 138, 168, .14);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .82);
+      padding: 8px 10px;
+    }
+
+    .category-code {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      min-height: 26px;
+      border-radius: 999px;
+      background: rgba(13, 138, 168, .12);
+      color: var(--sea);
+      font-weight: 900;
+    }
+
+    .category-name {
+      font-weight: 800;
+      color: var(--ink);
+    }
+
     .panel {
       border: 1px solid rgba(255, 255, 255, .74);
       border-radius: 8px;
@@ -362,6 +423,7 @@
       .library-card {
         grid-template-columns: 88px minmax(0, 1fr);
       }
+      .categories-list { grid-template-columns: 1fr; }
 
       .card-image {
         width: 88px;
@@ -410,6 +472,17 @@
       </div>
     </section>
 
+
+    <section class="categories-panel" aria-label="Krabukų augimo bibliotekos kategorijos">
+      <details id="categoryDetails">
+        <summary class="categories-toggle">
+          <span>📂 Kategorijos</span>
+          <span id="categorySummary">12 kategorijų</span>
+        </summary>
+        <div class="categories-list" id="categoryList"></div>
+      </details>
+    </section>
+
     <section class="layout">
       <section class="panel">
         <div class="panel-header">
@@ -424,7 +497,7 @@
               <span class="meta">
                 <span>cardId: MI-001-C01</span>
                 <span>missionId: MI-001</span>
-                <span>Kategorija: Miegas</span>
+                <span>Kategorija: MI – Miegas ir poilsis</span>
                 <span>Versija: 1.0</span>
                 <span>Atnaujinta: 2026-06-29</span>
               </span>
@@ -464,7 +537,7 @@
           <div class="two">
             <div class="field">
               <label for="category">category</label>
-              <input id="category" type="text" required>
+              <select id="category" required></select>
             </div>
             <div class="field">
               <label for="version">version</label>
@@ -530,10 +603,38 @@
 
   <script>
     const today = () => new Date().toISOString().slice(0, 10);
-        const fallbackSeedCard = {
+            const growthCategories = [
+      { code: "MI", name: "Miegas ir poilsis" },
+      { code: "SA", name: "Savarankiškumas" },
+      { code: "TV", name: "Tvarka ir atsakomybė" },
+      { code: "VA", name: "Valgymas" },
+      { code: "SN", name: "Santykiai šeimoje" },
+      { code: "DR", name: "Draugystė ir bendravimas" },
+      { code: "EM", name: "Emocijos ir savireguliacija" },
+      { code: "DM", name: "Darželis ir mokykla" },
+      { code: "LA", name: "Laukas ir viešos vietos" },
+      { code: "KU", name: "Kūryba ir mokymasis" },
+      { code: "PG", name: "Pasiekimai" },
+      { code: "RY", name: "Ryšio dovanos" }
+    ];
+
+    function categoryLabel(code) {
+      const found = growthCategories.find(category => category.code === code);
+      return found ? `${found.code} – ${found.name}` : code || "Nepriskirta";
+    }
+
+    function normalizeCategory(value) {
+      const clean = String(value || "").trim();
+      const byCode = growthCategories.find(category => category.code === clean);
+      if (byCode) return byCode.code;
+      const byName = growthCategories.find(category => category.name === clean || `${category.code} – ${category.name}` === clean || clean === "Miegas");
+      return byName ? byName.code : "MI";
+    }
+
+const fallbackSeedCard = {
       cardId: "MI-001-C01",
       missionId: "MI-001",
-      category: "Miegas",
+      category: "MI",
       title: "Pati užmigau be kitų",
       image: "/cards/mi-001.png",
       shellIcon: "/icons/shell-growth.png",
@@ -589,6 +690,8 @@
       count: document.getElementById("cardCount"),
       search: document.getElementById("searchInput"),
       categoryFilter: document.getElementById("categoryFilter"),
+      categoryList: document.getElementById("categoryList"),
+      categorySummary: document.getElementById("categorySummary"),
       visibilityFilter: document.getElementById("visibilityFilter"),
       form: document.getElementById("cardForm"),
       formMessage: document.getElementById("formMessage"),
@@ -641,7 +744,7 @@
           cardId: card.cardId,
           missionId: existing.missionId || card.missionId,
           title: existing.title || card.title,
-          category: existing.category || card.category,
+          category: existing.category || categoryLabel(normalizeCategory(card.category)),
           competencies: Array.isArray(existing.competencies) && existing.competencies.length ? existing.competencies : card.competencies,
           fixedText: existing.fixedText && Object.keys(existing.fixedText).length ? existing.fixedText : card.fixedText,
           dynamicScenarios: Array.isArray(existing.dynamicScenarios) && existing.dynamicScenarios.length ? existing.dynamicScenarios : card.dynamicScenarios,
@@ -672,7 +775,7 @@
           cardId: card.cardId,
           missionId: existing.missionId || card.missionId,
           title: existing.title || card.title,
-          category: existing.category || card.category,
+          category: normalizeCategory(existing.category || card.category),
           competencies: Array.isArray(existing.competencies) && existing.competencies.length ? existing.competencies : card.competencies,
           fixedText: existing.fixedText && Object.keys(existing.fixedText).length ? existing.fixedText : card.fixedText,
           dynamicScenarios: Array.isArray(existing.dynamicScenarios) && existing.dynamicScenarios.length ? existing.dynamicScenarios : card.dynamicScenarios,
@@ -718,7 +821,17 @@
     }
 
     function categories() {
-      return [...new Set(library.cards.map(card => card.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "lt"));
+      return growthCategories.map(category => category.code);
+    }
+
+    function renderCategoryList() {
+      els.categorySummary.textContent = `${growthCategories.length} kategorijų`;
+      els.categoryList.innerHTML = growthCategories.map(category => `
+        <div class="category-item">
+          <span class="category-code">${escapeHtml(category.code)}</span>
+          <span class="category-name">${escapeHtml(category.name)}</span>
+        </div>
+      `).join("");
     }
 
     function filteredCards() {
@@ -728,7 +841,7 @@
       return library.cards.filter(card => {
         if (visibility === "active" && card.archived) return false;
         if (visibility === "archived" && !card.archived) return false;
-        if (category !== "all" && card.category !== category) return false;
+        if (category !== "all" && normalizeCategory(card.category) !== category) return false;
         if (!query) return true;
         const haystack = [
           card.title,
@@ -743,12 +856,15 @@
 
     function renderCategoryFilter() {
       const current = els.categoryFilter.value || "all";
-      els.categoryFilter.innerHTML = `<option value="all">Visos kategorijos</option>${categories().map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("")}`;
+      const options = growthCategories.map(category => `<option value="${escapeHtml(category.code)}">${escapeHtml(categoryLabel(category.code))}</option>`).join("");
+      els.categoryFilter.innerHTML = `<option value="all">Visos kategorijos</option>${options}`;
       els.categoryFilter.value = categories().includes(current) ? current : "all";
+      fields.category.innerHTML = options;
     }
 
     function renderCards() {
       ensureRequiredSeedCard();
+      renderCategoryList();
       renderCategoryFilter();
       let cards = filteredCards();
       if (!cards.length) {
@@ -771,7 +887,7 @@
             <span class="meta">
               <span>cardId: ${escapeHtml(card.cardId)}</span>
               <span>missionId: ${escapeHtml(card.missionId)}</span>
-              <span>Kategorija: ${escapeHtml(card.category)}</span>
+              <span>Kategorija: ${escapeHtml(categoryLabel(normalizeCategory(card.category)))}</span>
               <span>Versija: ${escapeHtml(card.version)}</span>
               <span>Atnaujinta: ${escapeHtml(card.lastUpdated)}</span>
             </span>
@@ -800,7 +916,7 @@
       fields.cardId.value = card.cardId;
       fields.missionId.value = card.missionId;
       fields.title.value = card.title || "";
-      fields.category.value = card.category || "";
+      fields.category.value = normalizeCategory(card.category);
       fields.image.value = card.image || "";
       fields.competencies.value = (card.competencies || []).join(", ");
       fields.shortMessage.value = card.fixedText?.shortMessage || "";
@@ -832,7 +948,7 @@
         cardId: fields.cardId.value,
         missionId: fields.missionId.value,
         title: fields.title.value.trim(),
-        category: fields.category.value.trim(),
+        category: normalizeCategory(fields.category.value),
         image: fields.image.value.trim(),
         shellIcon,
         competencies: fields.competencies.value.split(",").map(item => item.trim()).filter(Boolean),
@@ -852,7 +968,7 @@
       const base = {
         cardId: `card-${Date.now()}`,
         missionId: `mission-${Date.now()}`,
-        category: "Nauja kategorija",
+        category: "MI",
         title: "Nauja kortelė",
         image: "/cards/mi-001.png",
         shellIcon,
