@@ -385,6 +385,127 @@
       gap: 10px;
     }
 
+
+    .template-preview-wrap {
+      border: 1px solid rgba(243, 201, 216, .85);
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(255, 247, 252, .95), rgba(232, 252, 252, .9));
+      padding: 12px;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .65);
+    }
+
+    .template-preview-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 900;
+    }
+
+    .growth-card-template {
+      position: relative;
+      min-height: 190px;
+      overflow: hidden;
+      border: 1px solid rgba(243, 201, 216, .95);
+      border-radius: 14px;
+      background: linear-gradient(160deg, #fff8fd 0%, #fff 46%, #eafafa 100%);
+      box-shadow: 0 16px 36px rgba(31, 54, 71, .14);
+    }
+
+    .growth-card-template::after {
+      content: "";
+      position: absolute;
+      inset: auto -34px -46px auto;
+      width: 150px;
+      height: 150px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255, 220, 237, .85), rgba(255, 255, 255, 0) 68%);
+      pointer-events: none;
+    }
+
+    .template-top {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 14px;
+      padding: 14px;
+      align-items: start;
+    }
+
+    .template-image {
+      width: 112px;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 3px solid #fff;
+      box-shadow: 0 10px 24px rgba(31, 54, 71, .16);
+      background: #fff;
+    }
+
+    .template-category {
+      display: inline-flex;
+      width: fit-content;
+      border-radius: 999px;
+      background: rgba(13, 138, 168, .1);
+      color: var(--sea);
+      padding: 5px 9px;
+      font-size: .78rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .template-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 1.24rem;
+      line-height: 1.08;
+      font-weight: 950;
+    }
+
+    .template-message {
+      margin: 8px 0 0;
+      color: #506879;
+      font-size: .9rem;
+      line-height: 1.35;
+    }
+
+    .template-competencies {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 14px 14px;
+      padding-right: 54px;
+    }
+
+    .template-competencies span {
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .88);
+      border: 1px solid rgba(13, 138, 168, .13);
+      color: #426071;
+      padding: 5px 8px;
+      font-size: .76rem;
+      font-weight: 850;
+    }
+
+    .template-shell {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      filter: drop-shadow(0 7px 12px rgba(31, 54, 71, .18));
+      z-index: 1;
+    }
+
+    @media (max-width: 520px) {
+      .template-top { grid-template-columns: 88px minmax(0, 1fr); }
+      .template-image { width: 88px; }
+      .template-title { font-size: 1.05rem; }
+    }
+
     .image-preview {
       width: 100%;
       aspect-ratio: 16 / 8;
@@ -554,6 +675,25 @@
           <span class="count" id="saveStatus">Išsaugota lokaliai</span>
         </div>
         <form class="editor-body" id="cardForm">
+          <section class="template-preview-wrap" aria-label="Kortelės šablono peržiūra">
+            <p class="template-preview-label">
+              <span>Gražus kortelės šablonas</span>
+              <span id="templatePreviewId">MI-001-C01</span>
+            </p>
+            <article class="growth-card-template" id="templatePreview">
+              <div class="template-top">
+                <img class="template-image" id="templatePreviewImage" src="/cards/mi-001.png" alt="Kortelės paveikslėlis">
+                <div>
+                  <span class="template-category" id="templatePreviewCategory">MI – Miegas ir poilsis</span>
+                  <h3 class="template-title" id="templatePreviewTitle">Pati užmigau be kitų</h3>
+                  <p class="template-message" id="templatePreviewMessage">Ši kortelė padeda vaikui pamažu kurti saugų, ramų ir savarankišką užmigimo ritualą.</p>
+                </div>
+              </div>
+              <div class="template-competencies" id="templatePreviewCompetencies"></div>
+              <img class="template-shell" id="templatePreviewShell" src="/icons/shell-growth.png" alt="">
+            </article>
+          </section>
+
           <div class="two">
             <div class="field">
               <label for="cardId">cardId</label>
@@ -753,7 +893,14 @@ const fallbackSeedCard = {
       archive: document.getElementById("archiveCardButton"),
       resetSeed: document.getElementById("resetSeedButton"),
       imageUpload: document.getElementById("imageUpload"),
-      imagePreview: document.getElementById("imagePreview")
+      imagePreview: document.getElementById("imagePreview"),
+      templatePreviewId: document.getElementById("templatePreviewId"),
+      templatePreviewImage: document.getElementById("templatePreviewImage"),
+      templatePreviewCategory: document.getElementById("templatePreviewCategory"),
+      templatePreviewTitle: document.getElementById("templatePreviewTitle"),
+      templatePreviewMessage: document.getElementById("templatePreviewMessage"),
+      templatePreviewCompetencies: document.getElementById("templatePreviewCompetencies"),
+      templatePreviewShell: document.getElementById("templatePreviewShell")
     };
 
     const fields = {
@@ -966,6 +1113,32 @@ const fallbackSeedCard = {
       });
     }
 
+
+    function renderTemplatePreview(card) {
+      const competencies = Array.isArray(card?.competencies) ? card.competencies : [];
+      els.templatePreviewId.textContent = card?.cardId || "Nauja kortelė";
+      els.templatePreviewImage.src = card?.image || "/cards/mi-001.png";
+      els.templatePreviewCategory.textContent = categoryLabel(normalizeCategory(card?.category));
+      els.templatePreviewTitle.textContent = card?.title || "Nauja kortelė";
+      els.templatePreviewMessage.textContent = card?.fixedText?.shortMessage || "Trumpa kortelės žinutė vaikui ir tėvams.";
+      els.templatePreviewCompetencies.innerHTML = competencies.length
+        ? competencies.map(item => "<span>" + escapeHtml(item) + "</span>").join("")
+        : "<span>Kompetencija</span>";
+      els.templatePreviewShell.src = card?.shellIcon || shellIcon;
+    }
+
+    function currentPreviewCard() {
+      return {
+        cardId: fields.cardId.value || "Nauja kortelė",
+        title: fields.title.value || "Nauja kortelė",
+        category: normalizeCategory(fields.category.value),
+        image: fields.image.value || "/cards/mi-001.png",
+        shellIcon,
+        competencies: fields.competencies.value.split(",").map(item => item.trim()).filter(Boolean),
+        fixedText: { shortMessage: fields.shortMessage.value.trim() }
+      };
+    }
+
     function renderEditor() {
       const card = selectedCard();
       if (!card) {
@@ -988,6 +1161,7 @@ const fallbackSeedCard = {
       fields.author.value = card.author || "";
       fields.lastUpdated.value = card.lastUpdated || today();
       els.imagePreview.src = card.image || "";
+      renderTemplatePreview(card);
     }
 
     function render() {
@@ -1091,8 +1265,12 @@ const fallbackSeedCard = {
       render();
     });
 
+    [fields.title, fields.category, fields.competencies, fields.shortMessage].forEach(field => field.addEventListener("input", () => renderTemplatePreview(currentPreviewCard())));
+    fields.category.addEventListener("change", () => renderTemplatePreview(currentPreviewCard()));
+
     els.image.addEventListener("input", () => {
       els.imagePreview.src = els.image.value.trim();
+      renderTemplatePreview(currentPreviewCard());
     });
 
     els.imageUpload.addEventListener("change", event => {
@@ -1102,6 +1280,7 @@ const fallbackSeedCard = {
       reader.onload = () => {
         fields.image.value = String(reader.result || "");
         els.imagePreview.src = fields.image.value;
+        renderTemplatePreview(currentPreviewCard());
       };
       reader.readAsDataURL(file);
     });
