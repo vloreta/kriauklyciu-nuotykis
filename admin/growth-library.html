@@ -262,6 +262,19 @@
       padding: 14px;
     }
 
+    .load-card-bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .62);
+    }
+
+    .load-card-bar .field { min-width: 0; }
+    .load-card-button { min-height: 42px; white-space: nowrap; }
+
     .library-card {
       position: relative;
       display: grid;
@@ -523,6 +536,13 @@
           <h2>📚 Visų kortelių sąrašas</h2>
           <span class="count" id="cardCount"></span>
         </div>
+        <div class="load-card-bar" aria-label="Pasirinkti kortelę redagavimui">
+          <div class="field">
+            <label for="cardLoader">Kortelė redagavimui</label>
+            <select id="cardLoader"></select>
+          </div>
+          <button class="button secondary load-card-button" type="button" id="loadCardButton">Įkelti į redagavimą</button>
+        </div>
         <div class="card-grid" id="cardGrid">
           <button class="library-card active" type="button" data-card-id="MI-001-C01">
             <img class="card-image" src="/cards/mi-001.png" alt="Pati užmigau be kitų">
@@ -741,6 +761,8 @@ const fallbackSeedCard = {
       categoryList: document.getElementById("categoryList"),
       categorySummary: document.getElementById("categorySummary"),
       visibilityFilter: document.getElementById("visibilityFilter"),
+      cardLoader: document.getElementById("cardLoader"),
+      loadCard: document.getElementById("loadCardButton"),
       form: document.getElementById("cardForm"),
       formMessage: document.getElementById("formMessage"),
       saveStatus: document.getElementById("saveStatus"),
@@ -804,7 +826,9 @@ const fallbackSeedCard = {
           archived: false
         };
       }
-      selectedCardId = card.cardId;
+      if (!selectedCardId || !library.cards.some(item => item.cardId === selectedCardId)) {
+        selectedCardId = card.cardId;
+      }
       library = growthSource.save(library);
     }
 
@@ -920,11 +944,31 @@ const fallbackSeedCard = {
       fields.category.innerHTML = options;
       if (!fields.category.value) fields.category.value = "MI";
     }
+    function renderCardLoader() {
+      const allCards = library.cards.slice().sort((a, b) => String(a.title || "").localeCompare(String(b.title || ""), "lt"));
+      els.cardLoader.innerHTML = allCards.map(card => {
+        const label = (card.title || "Be pavadinimo") + " · " + card.cardId + " · " + categoryLabel(normalizeCategory(card.category)) + (card.archived ? " · archyvuota" : "");
+        return '<option value="' + escapeHtml(card.cardId) + '">' + escapeHtml(label) + '</option>';
+      }).join("");
+      if (!allCards.some(card => card.cardId === selectedCardId)) {
+        selectedCardId = allCards[0]?.cardId || requiredSeedCard.cardId;
+      }
+      els.cardLoader.value = selectedCardId;
+    }
+
+    function loadSelectedCardForEditing(cardId) {
+      if (!library.cards.some(card => card.cardId === cardId)) return;
+      selectedCardId = cardId;
+      setEditorOpen(true);
+      render();
+      els.editorPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
 
     function renderCards() {
       ensureRequiredSeedCard();
       renderCategoryList();
       renderCategoryFilter();
+      renderCardLoader();
       let cards = filteredCards();
       if (!cards.length) {
         els.search.value = "";
@@ -952,6 +996,7 @@ const fallbackSeedCard = {
             </span>
             <span class="chips">${(card.competencies || []).map(item => `<span class="chip">${escapeHtml(item)}</span>`).join("")}</span>
           </span>
+          <span class="button secondary" style="justify-self:start;min-height:32px;padding:6px 10px;font-size:.82rem;">Redaguoti</span>
           <img class="shell-mark" src="${escapeHtml(card.shellIcon || shellIcon)}" alt="">
         </button>
       `).join("");
@@ -1107,6 +1152,8 @@ const fallbackSeedCard = {
     els.search.addEventListener("input", renderCards);
     els.categoryFilter.addEventListener("change", renderCards);
     els.visibilityFilter.addEventListener("change", renderCards);
+    els.cardLoader.addEventListener("change", () => loadSelectedCardForEditing(els.cardLoader.value));
+    els.loadCard.addEventListener("click", () => loadSelectedCardForEditing(els.cardLoader.value));
     els.create.addEventListener("click", createCard);
     els.duplicate.addEventListener("click", duplicateCard);
     els.archive.addEventListener("click", archiveCard);
