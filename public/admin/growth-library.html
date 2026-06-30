@@ -261,21 +261,9 @@
       gap: 12px;
       padding: 14px;
     }
-
-    .load-card-bar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: end;
-      padding: 14px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, .62);
-    }
-
-    .load-card-bar .field { min-width: 0; }
-    .load-card-button { min-height: 42px; white-space: nowrap; }
     .library-card {
       position: relative;
+      cursor: pointer;
       display: grid;
       grid-template-columns: 108px minmax(0, 1fr);
       gap: 12px;
@@ -327,6 +315,13 @@
 
     .library-card.archived {
       opacity: .62;
+    }
+    .edit-card-button {
+      justify-self: start;
+      min-height: 32px;
+      padding: 7px 12px;
+      font-size: 13px;
+      margin-top: 6px;
     }
 
     .card-image {
@@ -566,13 +561,6 @@
           <h2>📚 Visų kortelių sąrašas</h2>
           <span class="count" id="cardCount"></span>
         </div>
-        <div class="load-card-bar" aria-label="Pasirinkti kortelę redagavimui">
-          <div class="field">
-            <label for="cardLoader">Kortelė redagavimui</label>
-            <select id="cardLoader"></select>
-          </div>
-          <button class="button secondary load-card-button" type="button" id="loadCardButton">Įkelti į redagavimą</button>
-        </div>
         <div class="card-grid" id="cardGrid">
           <button class="library-card active" type="button" data-card-id="MI-001-C01">
             <img class="card-image" src="/cards/mi-001.png" alt="Pati užmigau be kitų">
@@ -596,10 +584,10 @@
         </div>
       </section>
 
-      <aside class="panel editor collapsed" id="editorPanel" aria-label="Kortelės redagavimas">
+      <aside class="panel editor" id="editorPanel" aria-label="Kortelės redagavimas">
         <div class="panel-header">
           <h2 id="editorTitle">Kortelės redagavimas</h2>
-          <button class="editor-toggle" id="editorToggle" type="button" aria-expanded="false" onclick="const panel=document.getElementById('editorPanel'); const open=panel.classList.toggle('collapsed') === false; this.textContent=open ? 'Sutraukti' : 'Išskleisti'; this.setAttribute('aria-expanded', open ? 'true' : 'false');">Išskleisti</button>
+          <button class="editor-toggle" id="editorToggle" type="button" aria-expanded="true" onclick="const panel=document.getElementById('editorPanel'); const open=panel.classList.toggle('collapsed') === false; this.textContent=open ? 'Sutraukti' : 'Išskleisti'; this.setAttribute('aria-expanded', open ? 'true' : 'false');">Sutraukti</button>
           <span class="count" id="saveStatus">Išsaugota lokaliai</span>
         </div>
         <form class="editor-body" id="cardForm">
@@ -803,8 +791,6 @@ const fallbackSeedCard = {
       categoryList: document.getElementById("categoryList"),
       categorySummary: document.getElementById("categorySummary"),
       visibilityFilter: document.getElementById("visibilityFilter"),
-      cardLoader: document.getElementById("cardLoader"),
-      loadCard: document.getElementById("loadCardButton"),
       form: document.getElementById("cardForm"),
       formMessage: document.getElementById("formMessage"),
       saveStatus: document.getElementById("saveStatus"),
@@ -989,24 +975,16 @@ const fallbackSeedCard = {
       fields.category.innerHTML = options;
       if (!fields.category.value) fields.category.value = "MI";
     }
-    function renderCardLoader() {
-      const allCards = library.cards.slice().sort((a, b) => String(a.title || "").localeCompare(String(b.title || ""), "lt"));
-      els.cardLoader.innerHTML = allCards.map(card => {
-        const label = (card.title || "Be pavadinimo") + " · " + card.cardId + " · " + categoryLabel(normalizeCategory(card.category)) + (card.archived ? " · archyvuota" : "");
-        return '<option value="' + escapeHtml(card.cardId) + '">' + escapeHtml(label) + '</option>';
-      }).join("");
-      if (!allCards.some(card => card.cardId === selectedCardId)) {
-        selectedCardId = allCards[0]?.cardId || requiredSeedCard.cardId;
-      }
-      els.cardLoader.value = selectedCardId;
-    }
-
     function loadSelectedCardForEditing(cardId) {
       if (!library.cards.some(card => card.cardId === cardId)) return;
       selectedCardId = cardId;
       setEditorOpen(true);
       render();
+      els.editorPanel.classList.remove("collapsed");
+      els.editorToggle.textContent = "Sutraukti";
+      els.editorToggle.setAttribute("aria-expanded", "true");
       els.editorPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => fields.title.focus({ preventScroll: true }), 0);
     }
 
     function cardLayoutClass(card) {
@@ -1032,7 +1010,6 @@ const fallbackSeedCard = {
       ensureRequiredSeedCard();
       renderCategoryList();
       renderCategoryFilter();
-      renderCardLoader();
       let cards = filteredCards();
       if (!cards.length) {
         els.search.value = "";
@@ -1049,7 +1026,7 @@ const fallbackSeedCard = {
       els.grid.innerHTML = cards.map(card => {
         const displayCard = draftFromEditor(card);
         return `
-        <button class="library-card ${displayCard.cardId === selectedCardId ? "active" : ""} ${displayCard.archived ? "archived" : ""} ${cardLayoutClass(displayCard)}" type="button" data-card-id="${escapeHtml(displayCard.cardId)}">
+        <article class="library-card ${displayCard.cardId === selectedCardId ? "active" : ""} ${displayCard.archived ? "archived" : ""} ${cardLayoutClass(displayCard)}" data-card-id="${escapeHtml(displayCard.cardId)}" tabindex="0" role="button" aria-label="Redaguoti kortelę ${escapeHtml(displayCard.title || displayCard.cardId)}">
           <img class="card-image" src="${escapeHtml(displayCard.image)}" alt="">
           <span>
             <strong class="card-title">${escapeHtml(displayCard.title)}</strong>
@@ -1062,13 +1039,25 @@ const fallbackSeedCard = {
             </span>
             <span class="chips">${(displayCard.competencies || []).map(item => `<span class="chip">${escapeHtml(item)}</span>`).join("")}</span>
           </span>
-          <span class="button secondary edit-card-chip" style="justify-self:start;min-height:32px;padding:6px 10px;font-size:.82rem;">Redaguoti</span>
+          <button class="button secondary edit-card-button" type="button" data-edit-card-id="${escapeHtml(displayCard.cardId)}">Redaguoti</button>
           <img class="shell-mark" src="${escapeHtml(displayCard.shellIcon || shellIcon)}" alt="">
-        </button>`;
+        </article>`;
       }).join("");
 
-      els.grid.querySelectorAll("[data-card-id]").forEach(button => {
-        button.addEventListener("click", () => loadSelectedCardForEditing(button.dataset.cardId));
+      els.grid.querySelectorAll("[data-card-id]").forEach(cardEl => {
+        cardEl.addEventListener("click", () => loadSelectedCardForEditing(cardEl.dataset.cardId));
+        cardEl.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            loadSelectedCardForEditing(cardEl.dataset.cardId);
+          }
+        });
+      });
+      els.grid.querySelectorAll("[data-edit-card-id]").forEach(button => {
+        button.addEventListener("click", event => {
+          event.stopPropagation();
+          loadSelectedCardForEditing(button.dataset.editCardId);
+        });
       });
     }
     function renderEditor() {
@@ -1229,8 +1218,6 @@ const fallbackSeedCard = {
     els.search.addEventListener("input", renderCards);
     els.categoryFilter.addEventListener("change", renderCards);
     els.visibilityFilter.addEventListener("change", renderCards);
-    els.cardLoader.addEventListener("change", () => loadSelectedCardForEditing(els.cardLoader.value));
-    els.loadCard.addEventListener("click", () => loadSelectedCardForEditing(els.cardLoader.value));
     els.create.addEventListener("click", createCard);
     els.duplicate.addEventListener("click", duplicateCard);
     els.archive.addEventListener("click", archiveCard);
