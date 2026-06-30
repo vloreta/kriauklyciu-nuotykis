@@ -264,6 +264,8 @@
     .library-card {
       position: relative;
       cursor: pointer;
+      text-decoration: none;
+      color: inherit;
       display: grid;
       grid-template-columns: 108px minmax(0, 1fr);
       gap: 12px;
@@ -562,7 +564,7 @@
           <span class="count" id="cardCount"></span>
         </div>
         <div class="card-grid" id="cardGrid">
-          <button class="library-card active" type="button" data-card-id="MI-001-C01">
+          <a class="library-card active" href="#editorPanel" data-card-id="MI-001-C01" role="button" aria-label="Redaguoti kortelę Pati užmigau be kitų">
             <img class="card-image" src="/cards/mi-001.png" alt="Pati užmigau be kitų">
             <span>
               <strong class="card-title">Pati užmigau be kitų</strong>
@@ -579,8 +581,9 @@
                 <span class="chip">Drąsa</span>
               </span>
             </span>
+            <span class="button secondary edit-card-button">Redaguoti</span>
             <img class="shell-mark" src="/icons/shell-growth.png" alt="">
-          </button>
+          </a>
         </div>
       </section>
 
@@ -594,23 +597,23 @@
           <div class="two">
             <div class="field">
               <label for="cardId">cardId</label>
-              <input id="cardId" type="text" readonly>
+              <input id="cardId" type="text" value="MI-001-C01" readonly>
             </div>
             <div class="field">
               <label for="missionId">missionId</label>
-              <input id="missionId" type="text" readonly>
+              <input id="missionId" type="text" value="MI-001" readonly>
             </div>
           </div>
 
           <div class="field">
             <label for="title">title</label>
-            <input id="title" type="text" required maxlength="140">
+            <input id="title" type="text" required maxlength="140" value="Pati užmigau be kitų">
           </div>
           <div class="two">
             <div class="field">
               <label for="category">category</label>
               <select id="category" required>
-                <option value="MI">MI – Miegas ir poilsis</option>
+                <option value="MI" selected>MI – Miegas ir poilsis</option>
                 <option value="SA">SA – Savarankiškumas</option>
                 <option value="TV">TV – Tvarka ir atsakomybė</option>
                 <option value="VA">VA – Valgymas</option>
@@ -626,7 +629,7 @@
             </div>
             <div class="field">
               <label for="version">version</label>
-              <input id="version" type="text" required>
+              <input id="version" type="text" required value="1.0">
             </div>
           </div>
 
@@ -644,47 +647,111 @@
 
           <div class="field">
             <label for="image">image</label>
-            <input id="image" type="text" placeholder="../assets/growth-sleep-alone.png">
+            <input id="image" type="text" placeholder="../assets/growth-sleep-alone.png" value="/cards/mi-001.png">
             <input id="imageUpload" type="file" accept="image/*">
             <p class="hint">Naują paveikslėlį galima įkelti čia: jis bus išsaugotas šioje bibliotekoje kaip duomenų URL. Vėliau DB versijoje tai taps failo nuoroda.</p>
           </div>
-          <img class="image-preview" id="imagePreview" alt="Kortelės paveikslėlio peržiūra">
+          <img class="image-preview" id="imagePreview" src="/cards/mi-001.png" alt="Kortelės paveikslėlio peržiūra">
 
           <div class="field">
             <label for="competencies">competencies</label>
-            <input id="competencies" type="text" placeholder="savarankiškumas, miegas, rutina">
+            <input id="competencies" type="text" placeholder="savarankiškumas, miegas, rutina" value="Savarankiškumas, Pasitikėjimas savimi, Drąsa">
             <p class="hint">Kompetencijas rašyk per kablelį.</p>
           </div>
 
           <div class="field">
             <label for="shortMessage">fixedText.shortMessage</label>
-            <textarea id="shortMessage"></textarea>
+            <textarea id="shortMessage">Ši kortelė padeda vaikui pamažu kurti saugų, ramų ir savarankišką užmigimo ritualą.</textarea>
           </div>
 
           <div class="field">
             <label for="whyImportant">fixedText.whyImportant</label>
-            <textarea id="whyImportant"></textarea>
+            <textarea id="whyImportant">Savarankiškas užmigimas stiprina vaiko pasitikėjimą savimi, saugumo jausmą ir gebėjimą nurimti be nuolatinės suaugusiojo pagalbos.</textarea>
           </div>
 
           <div class="field">
             <label for="dynamicScenarios">dynamicScenarios</label>
-            <textarea id="dynamicScenarios" spellcheck="false"></textarea>
+            <textarea id="dynamicScenarios" spellcheck="false">[
+  {
+    "id": "FIRST_TIME",
+    "when": "Pirmas kartas",
+    "message": "Šiandien tu žengei pirmą labai svarbų žingsnį. Net jei buvo nedrąsu, tu pabandei būti savarankiška.",
+    "parentHint": "Pastebėkite pastangą, ne rezultatą. Pabrėžkite, kad svarbiausia buvo pabandyti."
+  },
+  {
+    "id": "AFTER_FAILURE",
+    "when": "Po sunkesnės dienos",
+    "message": "Vakar buvo sunkiau, bet šiandien tu vėl pabandei. Tai rodo, kad mokaisi nepasiduoti.",
+    "parentHint": "Priminkite, kad augimas vyksta bangomis. Venkite lyginimo su vakar diena kaip priekaišto."
+  },
+  {
+    "id": "SUCCESS_STREAK_3",
+    "when": "3 kartai iš eilės",
+    "message": "Jau kelias dienas iš eilės tau pavyksta užmigti savarankiškai. Tavo vakaro drąsa auga.",
+    "parentHint": "Įvardykite tęstinumą: vaikas pradeda matyti save kaip gebantį."
+  },
+  {
+    "id": "SUCCESS_STREAK_7",
+    "when": "7 kartai iš eilės",
+    "message": "Savaitę tu kūrei savo ramų užmigimo įprotį. Tai jau tikras augimas.",
+    "parentHint": "Galima pažymėti mažą ritualinį pasidžiaugimą, bet nepaversti to spaudimu tęsti tobulai."
+  },
+  {
+    "id": "SUCCESS_STREAK_14",
+    "when": "14 kartų iš eilės",
+    "message": "Tavo kūnas ir širdelė vis geriau prisimena, kaip nurimti vakare.",
+    "parentHint": "Švelniai parodykite, kad įprotis jau tampa vaiko vidine stiprybe."
+  },
+  {
+    "id": "SUCCESS_STREAK_30",
+    "when": "30 kartų iš eilės",
+    "message": "Tai jau didelis tavo pasiekimas. Savarankiškas užmigimas tapo tavo stiprybe.",
+    "parentHint": "Galima svarstyti kortelę perkelti į įpročių archyvą."
+  },
+  {
+    "id": "BIG_PROGRESS",
+    "when": "Didelė pažanga",
+    "message": "Tu vis dažniau parodai, kad gali nurimti ir pasiruošti miegui pati.",
+    "parentHint": "Pastebėkite procesą: kas padėjo vaikui nurimti?"
+  },
+  {
+    "id": "SMALL_PROGRESS",
+    "when": "Maža pažanga",
+    "message": "Net mažas žingsnelis vakare yra svarbus. Tu mokaisi.",
+    "parentHint": "Tinka po dalinio pavykimo. Nekelkite reikalavimo, kad viskas turi būti tobula."
+  },
+  {
+    "id": "LONG_BREAK",
+    "when": "Po ilgesnės pertraukos",
+    "message": "Po pertraukos vėl pabandei. Tai labai drąsu.",
+    "parentHint": "Padėkite vaikui grįžti be gėdos jausmo."
+  },
+  {
+    "id": "DEFAULT",
+    "when": "Įprasta diena",
+    "message": "Šiandien tu pasirūpinai savo vakaro ramybe ir užmigai savarankiškai.",
+    "parentHint": "Pagirkite konkrečiai: ką vaikas padarė pats?"
+  }
+]</textarea>
             <p class="hint">Rašyk JSON masyvą. Kiekvienas scenarijus gali turėti id, when, message, parentHint.</p>
           </div>
 
           <div class="field">
             <label for="eveningGift">eveningGift</label>
-            <textarea id="eveningGift"></textarea>
+            <textarea id="eveningGift">{
+  "title": "Perlo žinutė vakarui",
+  "text": "Šį vakarą tavo kriauklytėje švyti ramybės perlas. Jis primena, kad tu gali nurimti ir augti savo tempu."
+}</textarea>
           </div>
 
           <div class="two">
             <div class="field">
               <label for="author">author</label>
-              <input id="author" type="text">
+              <input id="author" type="text" value="Krabukų biblioteka">
             </div>
             <div class="field">
               <label for="lastUpdated">lastUpdated</label>
-              <input id="lastUpdated" type="date">
+              <input id="lastUpdated" type="date" value="2026-06-29">
             </div>
           </div>
 
