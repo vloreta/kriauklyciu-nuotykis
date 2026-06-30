@@ -1062,7 +1062,7 @@ const fallbackSeedCard = {
             </span>
             <span class="chips">${(displayCard.competencies || []).map(item => `<span class="chip">${escapeHtml(item)}</span>`).join("")}</span>
           </span>
-          <span class="button secondary" style="justify-self:start;min-height:32px;padding:6px 10px;font-size:.82rem;">Redaguoti</span>
+          <span class="button secondary edit-card-chip" style="justify-self:start;min-height:32px;padding:6px 10px;font-size:.82rem;">Redaguoti</span>
           <img class="shell-mark" src="${escapeHtml(displayCard.shellIcon || shellIcon)}" alt="">
         </button>`;
       }).join("");
@@ -1072,11 +1072,11 @@ const fallbackSeedCard = {
       });
     }
     function renderEditor() {
-
       const card = selectedCard();
       if (!card) {
         els.editorTitle.textContent = "Kortelės redagavimas";
         els.form.reset();
+        els.imagePreview.removeAttribute("src");
         return;
       }
       els.editorTitle.textContent = card.archived ? "Archyvuota kortelė" : "Kortelės redagavimas";
@@ -1089,7 +1089,7 @@ const fallbackSeedCard = {
       fields.shortMessage.value = card.fixedText?.shortMessage || "";
       fields.whyImportant.value = card.fixedText?.whyImportant || "";
       fields.dynamicScenarios.value = JSON.stringify(card.dynamicScenarios || [], null, 2);
-      fields.eveningGift.value = card.eveningGift || "";
+      fields.eveningGift.value = typeof card.eveningGift === "string" ? card.eveningGift : JSON.stringify(card.eveningGift || {}, null, 2);
       fields.version.value = card.version || "1.0.0";
       fields.author.value = card.author || "";
       fields.lastUpdated.value = card.lastUpdated || today();
