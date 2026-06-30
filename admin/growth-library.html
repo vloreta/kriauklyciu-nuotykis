@@ -458,10 +458,7 @@
         <label for="searchInput">🔍 Paieška</label>
         <input id="searchInput" type="search" placeholder="Ieškoti pagal pavadinimą, ID, kompetenciją">
       </div>
-      <div class="field">
-        <label for="categoryFilter">📂 Kategorija</label>
-        <select id="categoryFilter"></select>
-      </div>
+      <select id="categoryFilter" hidden><option value="all">Visos kategorijos</option></select>
       <div class="field">
         <label for="visibilityFilter">Būsena</label>
         <select id="visibilityFilter">
@@ -550,7 +547,20 @@
           <div class="two">
             <div class="field">
               <label for="category">category</label>
-              <select id="category" required></select>
+              <select id="category" required>
+                <option value="MI">MI – Miegas ir poilsis</option>
+                <option value="SA">SA – Savarankiškumas</option>
+                <option value="TV">TV – Tvarka ir atsakomybė</option>
+                <option value="VA">VA – Valgymas</option>
+                <option value="SN">SN – Santykiai šeimoje</option>
+                <option value="DR">DR – Draugystė ir bendravimas</option>
+                <option value="EM">EM – Emocijos ir savireguliacija</option>
+                <option value="DM">DM – Darželis ir mokykla</option>
+                <option value="LA">LA – Laukas ir viešos vietos</option>
+                <option value="KU">KU – Kūryba ir mokymasis</option>
+                <option value="PG">PG – Pasiekimai</option>
+                <option value="RY">RY – Ryšio dovanos</option>
+              </select>
             </div>
             <div class="field">
               <label for="version">version</label>
@@ -757,7 +767,7 @@ const fallbackSeedCard = {
           cardId: card.cardId,
           missionId: existing.missionId || card.missionId,
           title: existing.title || card.title,
-          category: existing.category || categoryLabel(normalizeCategory(card.category)),
+          category: normalizeCategory(existing.category || card.category),
           competencies: Array.isArray(existing.competencies) && existing.competencies.length ? existing.competencies : card.competencies,
           fixedText: existing.fixedText && Object.keys(existing.fixedText).length ? existing.fixedText : card.fixedText,
           dynamicScenarios: Array.isArray(existing.dynamicScenarios) && existing.dynamicScenarios.length ? existing.dynamicScenarios : card.dynamicScenarios,
@@ -873,6 +883,7 @@ const fallbackSeedCard = {
       els.categoryFilter.innerHTML = `<option value="all">Visos kategorijos</option>${options}`;
       els.categoryFilter.value = categories().includes(current) ? current : "all";
       fields.category.innerHTML = options;
+      if (!fields.category.value) fields.category.value = "MI";
     }
 
     function renderCards() {
