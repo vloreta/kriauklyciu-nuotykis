@@ -550,7 +550,7 @@
       <aside class="panel editor collapsed" id="editorPanel" aria-label="Kortelės redagavimas">
         <div class="panel-header">
           <h2 id="editorTitle">Kortelės redagavimas</h2>
-          <button class="editor-toggle" id="editorToggle" type="button" aria-expanded="false">Išskleisti</button>
+          <button class="editor-toggle" id="editorToggle" type="button" aria-expanded="false" onclick="const panel=document.getElementById('editorPanel'); const open=panel.classList.toggle('collapsed') === false; this.textContent=open ? 'Sutraukti' : 'Išskleisti'; this.setAttribute('aria-expanded', open ? 'true' : 'false');">Išskleisti</button>
           <span class="count" id="saveStatus">Išsaugota lokaliai</span>
         </div>
         <form class="editor-body" id="cardForm">
@@ -1106,7 +1106,6 @@ const fallbackSeedCard = {
       reader.readAsDataURL(file);
     });
 
-    els.editorToggle.addEventListener("click", () => setEditorOpen(els.editorPanel.classList.contains("collapsed")));
     els.search.addEventListener("input", renderCards);
     els.categoryFilter.addEventListener("change", renderCards);
     els.visibilityFilter.addEventListener("change", renderCards);
