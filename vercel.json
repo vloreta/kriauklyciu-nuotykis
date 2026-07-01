@@ -1,8 +1,8 @@
 ﻿{
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/child", "destination": "/child.html" },
-    { "source": "/parent", "destination": "/parent.html" },
-    { "source": "/admin/growth-library", "destination": "/admin/growth-library.html" }
+  "routes": [
+    { "src": "/child", "dest": "/child.html" },
+    { "src": "/parent", "dest": "/parent.html" },
+    { "src": "/admin/growth-library", "dest": "/admin/growth-library.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
