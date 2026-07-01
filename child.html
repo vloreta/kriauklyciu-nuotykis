@@ -1573,22 +1573,60 @@
 
     .month-grid {
       display: grid;
+      gap: 16px;
+    }
+
+    .year-calendar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    .calendar-month {
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      padding: 10px;
+      box-shadow: 0 8px 22px rgba(41, 116, 141, 0.08);
+    }
+
+    .calendar-month-title {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--ink);
+      text-align: center;
+      text-transform: capitalize;
+    }
+
+    .calendar-weekdays,
+    .calendar-days {
+      display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 8px;
+      gap: 4px;
+    }
+
+    .calendar-weekday {
+      font-size: .72rem;
+      font-weight: 900;
+      color: var(--muted);
+      text-align: center;
     }
 
     .month-day {
-      min-height: 92px;
+      min-height: 58px;
       border: 1px solid var(--card-border);
       border-radius: 8px;
       background: #fff;
-      padding: 10px;
+      padding: 6px;
       display: grid;
-      gap: 6px;
+      gap: 3px;
       align-content: start;
       cursor: pointer;
       color: var(--ink);
       text-align: left;
+      font: inherit;
     }
 
     .month-day.muted {
@@ -4762,32 +4800,53 @@
 
     function renderMonth() {
       const selected = parseDate(state.selectedDate);
-      const first = new Date(selected.getFullYear(), selected.getMonth(), 1);
-      const startDay = first.getDay() || 7;
-      const gridStart = new Date(first);
-      gridStart.setDate(first.getDate() - startDay + 1);
-      const selectedMonth = selected.getMonth();
+      const year = selected.getFullYear();
+      const monthNames = Array.from({ length: 12 }, (_, month) =>
+        new Intl.DateTimeFormat("lt-LT", { month: "long" }).format(new Date(year, month, 1))
+      );
+      const weekdays = ["Pr", "An", "Tr", "Kt", "Pn", "Št", "Sk"];
 
-      contentArea.className = "month-grid";
+      contentArea.className = "month-grid year-calendar";
       contentArea.innerHTML = "";
 
-      for (let index = 0; index < 42; index += 1) {
-        const date = new Date(gridStart);
-        date.setDate(gridStart.getDate() + index);
-        const key = dateKey(date);
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = `month-day${date.getMonth() !== selectedMonth ? " muted" : ""}${key === todayKey() ? " today-mark" : ""}`;
-        card.innerHTML = `
-          <span class="month-date">${date.getDate()}</span>
-          ${childIds().map(childId => {
-            const initial = childName(childId).slice(0, 1);
-            return `<span>${escapeHtml(initial)}: ${childTotal(childId, [key])}</span>`;
-          }).join("")}
+      for (let month = 0; month < 12; month += 1) {
+        const monthSection = document.createElement("section");
+        monthSection.className = "calendar-month";
+        monthSection.innerHTML = `
+          <h3 class="calendar-month-title">${escapeHtml(monthNames[month])}</h3>
+          <div class="calendar-weekdays" aria-hidden="true">
+            ${weekdays.map(day => `<span class="calendar-weekday">${day}</span>`).join("")}
+          </div>
+          <div class="calendar-days"></div>
         `;
-        card.title = "Paspauskite, kad matytumėte tos dienos istoriją";
-        card.addEventListener("click", () => openDay(key, state.active));
-        contentArea.appendChild(card);
+        const daysGrid = monthSection.querySelector(".calendar-days");
+        const first = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startDay = first.getDay() || 7;
+        for (let blank = 1; blank < startDay; blank += 1) {
+          const spacer = document.createElement("span");
+          spacer.className = "month-day muted";
+          spacer.setAttribute("aria-hidden", "true");
+          daysGrid.appendChild(spacer);
+        }
+        for (let day = 1; day <= daysInMonth; day += 1) {
+          const date = new Date(year, month, day);
+          const key = dateKey(date);
+          const card = document.createElement("button");
+          card.type = "button";
+          card.className = `month-day${key === state.selectedDate ? " active" : ""}${key === todayKey() ? " today-mark" : ""}`;
+          card.innerHTML = `
+            <span class="month-date">${day}</span>
+            ${childIds().map(childId => {
+              const initial = childName(childId).slice(0, 1);
+              return `<span>${escapeHtml(initial)}: ${childTotal(childId, [key])}</span>`;
+            }).join("")}
+          `;
+          card.title = "Paspauskite, kad matytumėte tos dienos istoriją";
+          card.addEventListener("click", () => openDay(key, state.active));
+          daysGrid.appendChild(card);
+        }
+        contentArea.appendChild(monthSection);
       }
     }
 
@@ -4821,7 +4880,7 @@
       document.getElementById("addTaskButton").style.display = state.editMode && state.view === "day" ? "" : "none";
 
       document.getElementById("todayText").textContent = state.view === "month"
-        ? formatDate(state.selectedDate, "month")
+        ? `${parseDate(state.selectedDate).getFullYear()} m. kalendorius`
         : formatDate(state.selectedDate);
       document.getElementById("activeName").textContent = activeName();
       document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
@@ -4992,8 +5051,13 @@
     });
 
     document.getElementById("prevDayButton").addEventListener("click", () => {
-      const step = state.view === "month" ? -30 : -1;
-      state.selectedDate = addDays(state.selectedDate, step);
+      if (state.view === "month") {
+        const date = parseDate(state.selectedDate);
+        date.setFullYear(date.getFullYear() - 1);
+        state.selectedDate = dateKey(date);
+      } else {
+        state.selectedDate = addDays(state.selectedDate, -1);
+      }
       save();
       render();
     });
@@ -5005,8 +5069,13 @@
     });
 
     document.getElementById("nextDayButton").addEventListener("click", () => {
-      const step = state.view === "month" ? 30 : 1;
-      state.selectedDate = addDays(state.selectedDate, step);
+      if (state.view === "month") {
+        const date = parseDate(state.selectedDate);
+        date.setFullYear(date.getFullYear() + 1);
+        state.selectedDate = dateKey(date);
+      } else {
+        state.selectedDate = addDays(state.selectedDate, 1);
+      }
       save();
       render();
     });
