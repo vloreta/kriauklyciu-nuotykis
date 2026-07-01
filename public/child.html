@@ -4631,8 +4631,8 @@
     function renderRace(todayTotals) {
       const scene = document.getElementById("oceanScene");
       const lanes = document.getElementById("oceanLanes");
-      const ids = childIds();
-      const laneHeight = ids.length <= 2 ? 150 : 105;
+      const ids = ["olivia", "dominik"].filter(childId => childProfiles()[childId]);
+      const laneHeight = 150;
       const mobileOcean = window.matchMedia("(max-width: 620px)").matches;
       scene.style.height = mobileOcean ? "" : `${Math.min(525, Math.max(220, ids.length * laneHeight))}px`;
       scene.style.overflowY = ids.length > 5 ? "auto" : "hidden";
@@ -4801,7 +4801,7 @@
       renderSurprises();
       renderPenaltyOptions();
       renderRace(todayTotals);
-      childIds().forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
+      ["olivia", "dominik"].filter(childId => childProfiles()[childId]).forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
     }
 
     // User interactions
@@ -5075,5 +5075,7 @@
 </script>
 </body>
 </html>
+
+
 
 
