@@ -378,6 +378,52 @@
       font-weight: 700;
     }
 
+    .growth-layered-library-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(220px, 360px) minmax(0, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .growth-layered-preview {
+      position: relative;
+      min-height: 156px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(182,153,238,.35);
+      background: #fff8fd;
+    }
+
+    .growth-layered-preview > img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .growth-layered-preview-text {
+      position: absolute;
+      right: 7%;
+      top: 18%;
+      width: 42%;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      text-align: center;
+      color: #092968;
+      font-weight: 1000;
+      z-index: 1;
+    }
+
+    .growth-layered-preview-title { font-size: clamp(1.1rem, 2.2vw, 1.8rem); line-height: 1.06; }
+    .growth-layered-preview-shells { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.82); }
+    .growth-layered-preview-shells img { width: 24px; height: 24px; object-fit: contain; }
+    .growth-layered-action-shell { position: absolute; right: 10px; bottom: 8px; width: 34px; height: 34px; border: 0; border-radius: 999px; background: rgba(255,255,255,.92); padding: 2px; box-shadow: 0 7px 16px rgba(31,54,71,.16); }
+    .growth-layered-action-shell img { width: 100%; height: 100%; object-fit: contain; }
+    @media (max-width: 760px) { .growth-layered-library-card { grid-template-columns: 1fr; } .growth-layered-preview { min-height: 142px; } }
+
     .growth-archive-tools,
     .growth-archive-actions {
       display: flex;
@@ -4084,11 +4130,18 @@
         <div class="growth-archive-list">
           ${visibleCards.map(card => {
             const assignment = assignments[`${childId}:${card.cardId}`] || {};
-            const isActive = assignment.active === true;
-            const shells = Number(assignment.shells || 1);
+            const isActive = assignment.active !== false;
+            const shells = Number(assignment.shells || card.points || 1);
             return `
-              <article class="growth-archive-card">
-                <img src="${escapeHtml(card.image)}" alt="">
+              <article class="growth-archive-card growth-layered-library-card">
+                <div class="growth-layered-preview">
+                  <img src="${escapeHtml(card.image)}" alt="">
+                  <div class="growth-layered-preview-text">
+                    <span class="growth-layered-preview-title">${escapeHtml(card.title)}</span>
+                    <span class="growth-layered-preview-shells"><img src="${escapeHtml(card.shellIcon || "/icons/shell-growth-pearl.png")}" alt=""> ${shells}</span>
+                  </div>
+                  <button class="growth-layered-action-shell" type="button" data-growth-preview="${escapeHtml(card.cardId)}" aria-label="Atidaryti kortelės kriauklę"><img src="${escapeHtml(card.shellIcon || "/icons/shell-growth-pearl.png")}" alt=""></button>
+                </div>
                 <div>
                   <strong>${escapeHtml(card.title)}</strong>
                   <div class="growth-archive-meta">
@@ -4101,7 +4154,6 @@
                       <input type="number" min="0" max="99" value="${shells}" data-growth-shells="${escapeHtml(card.cardId)}">
                     </label>
                     <button type="button" data-growth-toggle="${escapeHtml(card.cardId)}">${isActive ? "Išjungti vaikui" : "Įjungti vaikui"}</button>
-                    <button type="button" data-growth-preview="${escapeHtml(card.cardId)}">Peržiūrėti</button>
                   </div>
                 </div>
               </article>
@@ -5208,7 +5260,7 @@
       if (toggle) {
         const cardId = toggle.dataset.growthToggle;
         const current = growthAssignments()[`${state.active}:${cardId}`];
-        saveGrowthAssignment(state.active, cardId, { active: !(current?.active === true) });
+        saveGrowthAssignment(state.active, cardId, { active: current ? !(current.active !== false) : false });
         renderGrowthCardArchive();
         return;
       }
@@ -5216,8 +5268,7 @@
       if (preview) {
         const card = growthLibrary().cards.find(item => item.cardId === preview.dataset.growthPreview);
         if (!card) return;
-        const scenario = (card.dynamicScenarios || []).find(item => item.scenarioId === "DEFAULT");
-        alert(`${card.title}\n\n${card.fixedText?.shortMessage || ""}\n\n${scenario?.childMessage || ""}\n\n${scenario?.eveningGift || ""}`);
+        alert("");
       }
     });
     document.getElementById("habitArchiveToggle")?.addEventListener("click", () => {

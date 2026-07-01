@@ -335,6 +335,15 @@
       background: #fff;
     }
 
+    .library-card.layered-mission { grid-template-columns: 210px minmax(0, 1fr); min-height: 160px; }
+    .admin-layered-preview { position: relative; min-height: 136px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(182,153,238,.35); background: #fff8fd; }
+    .admin-layered-preview > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .admin-layered-text { position: absolute; right: 7%; top: 18%; width: 42%; display: grid; justify-items: center; gap: 7px; text-align: center; color: #092968; font-weight: 1000; z-index: 1; }
+    .admin-layered-title { font-size: clamp(.9rem, 1.7vw, 1.35rem); line-height: 1.06; }
+    .admin-layered-shells { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.82); }
+    .admin-layered-shells img, .admin-layered-action-shell img { width: 22px; height: 22px; object-fit: contain; }
+    .admin-layered-action-shell { position: absolute; right: 8px; bottom: 7px; width: 30px; height: 30px; border: 0; border-radius: 999px; background: rgba(255,255,255,.92); padding: 2px; }
+
     .card-title {
       display: block;
       margin: 2px 0 7px;
@@ -565,7 +574,7 @@
         </div>
         <div class="card-grid" id="cardGrid">
           <a class="library-card active" href="#editorPanel" data-card-id="MI-001-C01" role="button" aria-label="Redaguoti kortelę Pati užmigau be kitų">
-            <img class="card-image" src="/cards/mi-001.png" alt="Pati užmigau be kitų">
+            <img class="card-image" src="/cards/mi-001-layered.png" alt="Pati užmigau be kitų">
             <span>
               <strong class="card-title">Pati užmigau be kitų</strong>
               <span class="meta">
@@ -582,7 +591,7 @@
               </span>
             </span>
             <span class="button secondary edit-card-button">Redaguoti</span>
-            <img class="shell-mark" src="/icons/shell-growth.png" alt="">
+            <img class="shell-mark" src="/icons/shell-growth-pearl.png" alt="">
           </a>
         </div>
       </section>
@@ -647,11 +656,11 @@
 
           <div class="field">
             <label for="image">image</label>
-            <input id="image" type="text" placeholder="../assets/growth-sleep-alone.png" value="/cards/mi-001.png">
+            <input id="image" type="text" placeholder="../assets/growth-sleep-alone.png" value="/cards/mi-001-layered.png">
             <input id="imageUpload" type="file" accept="image/*">
             <p class="hint">Naują paveikslėlį galima įkelti čia: jis bus išsaugotas šioje bibliotekoje kaip duomenų URL. Vėliau DB versijoje tai taps failo nuoroda.</p>
           </div>
-          <img class="image-preview" id="imagePreview" src="/cards/mi-001.png" alt="Kortelės paveikslėlio peržiūra">
+          <img class="image-preview" id="imagePreview" src="/cards/mi-001-layered.png" alt="Kortelės paveikslėlio peržiūra">
 
           <div class="field">
             <label for="competencies">competencies</label>
@@ -800,8 +809,10 @@ const fallbackSeedCard = {
       missionId: "MI-001",
       category: "MI",
       title: "Pati užmigau be kitų",
-      image: "/cards/mi-001.png",
-      shellIcon: "/icons/shell-growth.png",
+      image: "/cards/mi-001-layered.png",
+      shellIcon: "/icons/shell-growth-pearl.png",
+      points: 3,
+      layout: { variant: "layeredSleepCard" },
       layoutPreset: "left",
       version: "1.0",
       author: "Krabukų biblioteka",
@@ -842,7 +853,7 @@ const fallbackSeedCard = {
         return library;
       }
     };
-    const shellIcon = "/icons/shell-growth.png";
+    const shellIcon = "/icons/shell-growth-pearl.png";
     const seedCards = Array.isArray(growthSource.defaultCards) && growthSource.defaultCards.length ? growthSource.defaultCards : [fallbackSeedCard];
     const requiredSeedCard = growthSource.clone ? growthSource.clone(seedCards[0]) : JSON.parse(JSON.stringify(seedCards[0]));
 
@@ -891,8 +902,8 @@ const fallbackSeedCard = {
     function seedCard() {
       const card = growthSource.clone(requiredSeedCard);
       card.archived = false;
-      card.image = card.image || "/cards/mi-001.png";
-      card.shellIcon = card.shellIcon || "/icons/shell-growth.png";
+      card.image = card.image || "/cards/mi-001-layered.png";
+      card.shellIcon = card.shellIcon || "/icons/shell-growth-pearl.png";
       return card;
     }
 
@@ -979,6 +990,15 @@ const fallbackSeedCard = {
 
     function selectedCard() {
       return library.cards.find(card => card.cardId === selectedCardId) || library.cards[0] || null;
+    }
+
+    function growthCardShellCount(card) {
+      try {
+        const assignments = JSON.parse(localStorage.getItem("kriauklyciu-growth-assignments-v1") || "{}");
+        const match = Object.values(assignments).find(item => item && item.cardId === card.cardId && item.shells !== undefined);
+        if (match) return Math.max(0, Math.min(99, Number(match.shells) || card.points || 3));
+      } catch {}
+      return Math.max(0, Math.min(99, Number(card.points) || 3));
     }
 
     function escapeHtml(value) {
@@ -1092,9 +1112,12 @@ const fallbackSeedCard = {
 
       els.grid.innerHTML = cards.map(card => {
         const displayCard = draftFromEditor(card);
+        const shellCount = growthCardShellCount(displayCard);
+        const shellPath = displayCard.shellIcon || shellIcon;
+        const isLayered = displayCard.layout?.variant === "layeredSleepCard" || displayCard.cardId === "MI-001-C01";
         return `
-        <article class="library-card ${displayCard.cardId === selectedCardId ? "active" : ""} ${displayCard.archived ? "archived" : ""} ${cardLayoutClass(displayCard)}" data-card-id="${escapeHtml(displayCard.cardId)}" tabindex="0" role="button" aria-label="Redaguoti kortelę ${escapeHtml(displayCard.title || displayCard.cardId)}">
-          <img class="card-image" src="${escapeHtml(displayCard.image)}" alt="">
+        <article class="library-card ${displayCard.cardId === selectedCardId ? "active" : ""} ${displayCard.archived ? "archived" : ""} ${cardLayoutClass(displayCard)} ${isLayered ? "layered-mission" : ""}" data-card-id="${escapeHtml(displayCard.cardId)}" tabindex="0" role="button" aria-label="Redaguoti kortelę ${escapeHtml(displayCard.title || displayCard.cardId)}">
+          ${isLayered ? `<span class="admin-layered-preview"><img src="${escapeHtml(displayCard.image)}" alt=""><span class="admin-layered-text"><span class="admin-layered-title">${escapeHtml(displayCard.title)}</span><span class="admin-layered-shells"><img src="${escapeHtml(shellPath)}" alt=""> ${shellCount}</span></span><button class="admin-layered-action-shell" type="button" data-shell-card-id="${escapeHtml(displayCard.cardId)}" aria-label="Atidaryti kriauklę"><img src="${escapeHtml(shellPath)}" alt=""></button></span>` : `<img class="card-image" src="${escapeHtml(displayCard.image)}" alt="">`}
           <span>
             <strong class="card-title">${escapeHtml(displayCard.title)}</strong>
             <span class="meta">
@@ -1107,7 +1130,7 @@ const fallbackSeedCard = {
             <span class="chips">${(displayCard.competencies || []).map(item => `<span class="chip">${escapeHtml(item)}</span>`).join("")}</span>
           </span>
           <button class="button secondary edit-card-button" type="button" data-edit-card-id="${escapeHtml(displayCard.cardId)}">Redaguoti</button>
-          <img class="shell-mark" src="${escapeHtml(displayCard.shellIcon || shellIcon)}" alt="">
+          ${isLayered ? "" : `<img class="shell-mark" src="${escapeHtml(displayCard.shellIcon || shellIcon)}" alt="">`}
         </article>`;
       }).join("");
 
@@ -1124,6 +1147,12 @@ const fallbackSeedCard = {
         button.addEventListener("click", event => {
           event.stopPropagation();
           loadSelectedCardForEditing(button.dataset.editCardId);
+        });
+      });
+      els.grid.querySelectorAll("[data-shell-card-id]").forEach(button => {
+        button.addEventListener("click", event => {
+          event.stopPropagation();
+          alert("");
         });
       });
     }
@@ -1195,7 +1224,7 @@ const fallbackSeedCard = {
         missionId: `mission-${Date.now()}`,
         category: "MI",
         title: "Nauja kortelė",
-        image: "/cards/mi-001.png",
+        image: "/cards/mi-001-layered.png",
         shellIcon,
         layoutPreset: "left",
         competencies: [],
