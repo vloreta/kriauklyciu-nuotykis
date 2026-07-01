@@ -400,9 +400,9 @@
 
     .race-progress {
       position: absolute;
-      left: 0;
+      left: 42px;
       top: 50%;
-      width: var(--progress, 0%);
+      width: calc((100% - 146px) * var(--progress-value, 0));
       height: 8px;
       border-radius: 999px;
       background: linear-gradient(90deg, #ffcf5a, #ff8a65);
@@ -412,7 +412,7 @@
 
     .race-crab {
       position: absolute;
-      left: var(--progress, 0%);
+      left: calc(42px + (100% - 146px) * var(--progress-value, 0));
       top: 50%;
       z-index: 2;
       transform: translate(-50%, -57%);
@@ -423,7 +423,7 @@
 
     .treasure-shell {
       position: absolute;
-      right: -92px;
+      right: 18px;
       top: 50%;
       width: 92px;
       height: 76px;
@@ -2314,7 +2314,7 @@
       }
 
       .treasure-shell {
-        right: -74px;
+        right: 10px;
         width: 76px;
         height: 62px;
       }
@@ -4659,7 +4659,7 @@
             <span class="guide-text" id="${safeChildId}GuideText">${escapeHtml(childGuideText(childId, shells))}</span>
           </div>
           <span class="milestone-badge" id="${safeChildId}MilestoneBadge">⭐ Pusė kelio!</span>
-          <div class="race-track" id="${safeChildId}RaceTrack" aria-hidden="true" style="--progress: ${percent}%">
+          <div class="race-track" id="${safeChildId}RaceTrack" aria-hidden="true" style="--progress: ${percent}%; --progress-value: ${percent / 100}">
             <span class="race-path"></span>
             <span class="race-progress"></span>
             <span class="race-crab">🦀</span>
