@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -378,6 +378,52 @@
       font-weight: 700;
     }
 
+    .growth-layered-library-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
+    .growth-layered-preview {
+      position: relative;
+      width: 150px;
+      aspect-ratio: 16 / 10;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(182,153,238,.35);
+      background: #fff8fd;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.75);
+    }
+
+    .growth-layered-preview > img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .growth-layered-preview-text { display: none; }
+
+    .growth-layered-preview-title { font-size: clamp(1.1rem, 2.2vw, 1.8rem); line-height: 1.06; }
+    .growth-layered-preview-shells { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.82); }
+    .growth-layered-preview-shells img { width: 24px; height: 24px; object-fit: contain; }
+    .growth-layered-action-shell { position: absolute; right: 8px; bottom: 6px; width: 32px; height: 32px; border: 0; border-radius: 999px; background: rgba(255,255,255,.92); padding: 2px; box-shadow: 0 7px 16px rgba(31,54,71,.16); cursor: pointer; }
+    .growth-layered-action-shell img { width: 100%; height: 100%; object-fit: contain; }
+
+    .growth-assign-modal { position: fixed; inset: 0; z-index: 140; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(22,38,45,.24); backdrop-filter: blur(3px); }
+    .growth-assign-modal.open { display: flex; }
+    .growth-assign-card { width: min(420px, calc(100vw - 32px)); border-radius: 14px; border: 1px solid rgba(178,217,224,.95); background: #fffdf7; box-shadow: 0 18px 54px rgba(54,80,92,.2); padding: 16px; display: grid; gap: 12px; }
+    .growth-assign-card h3 { margin: 0; font-size: 1.05rem; }
+    .growth-assign-card label { display: grid; gap: 5px; font-weight: 900; color: var(--ink); }
+    .growth-assign-card select { width: 100%; }
+    .growth-shell-stepper { display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; gap: 8px; }
+    .growth-shell-stepper button { min-height: 42px; border-radius: 10px; border: 1px solid rgba(178,217,224,.95); background: #f7fcfd; color: #0f8ca6; font-size: 1.45rem; font-weight: 1000; cursor: pointer; }
+    .growth-shell-count { min-height: 42px; border-radius: 10px; border: 1px solid rgba(178,217,224,.95); background: #fff; display: grid; place-items: center; font-weight: 1000; color: #0a7894; }
+    .growth-assign-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    @media (max-width: 760px) { .growth-layered-library-card { grid-template-columns: 112px minmax(0, 1fr); gap: 10px; } .growth-layered-preview { width: 112px; } }
     .growth-archive-tools,
     .growth-archive-actions {
       display: flex;
@@ -4063,6 +4109,56 @@
       writeJsonStorage(growthAssignmentsKey, assignments);
     }
 
+
+    let growthAssignDraft = null;
+
+    function childOptionsMarkup(selectedId) {
+      return state.children.map(child => `<option value="${escapeHtml(child.id)}" ${child.id === selectedId ? "selected" : ""}>${escapeHtml(child.name)}</option>`).join("");
+    }
+
+    function openGrowthAssignModal(cardId) {
+      const card = growthLibrary().cards.find(item => item.cardId === cardId);
+      if (!card) return;
+      const childId = state.active || state.children[0]?.id;
+      const existing = growthAssignments()[`${childId}:${cardId}`] || {};
+      growthAssignDraft = { cardId, childId, shells: Math.max(0, Math.min(99, Number(existing.shells || card.points || 1))) };
+      let modal = document.getElementById("growthAssignModal");
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "growthAssignModal";
+        modal.className = "growth-assign-modal";
+        document.body.appendChild(modal);
+      }
+      modal.innerHTML = `
+        <section class="growth-assign-card" role="dialog" aria-modal="true" aria-label="Priskirti kortelę vaikui">
+          <h3>Priskirti vaikui</h3>
+          <label>Vaikas<select data-growth-assign-child>${childOptionsMarkup(growthAssignDraft.childId)}</select></label>
+          <label>Kriauklyčių skaičius
+            <span class="growth-shell-stepper">
+              <button type="button" data-growth-shell-delta="-1" aria-label="Sumažinti">-</button>
+              <span class="growth-shell-count" data-growth-shell-count>🐚 ${growthAssignDraft.shells}</span>
+              <button type="button" data-growth-shell-delta="1" aria-label="Padidinti">+</button>
+            </span>
+          </label>
+          <div class="growth-assign-actions">
+            <button type="button" data-growth-assign-save>Išsaugoti</button>
+            <button type="button" class="secondary" data-growth-assign-close>Atšaukti</button>
+          </div>
+        </section>`;
+      modal.classList.add("open");
+    }
+
+    function closeGrowthAssignModal() {
+      const modal = document.getElementById("growthAssignModal");
+      if (modal) modal.classList.remove("open");
+      growthAssignDraft = null;
+    }
+
+    function refreshGrowthAssignCount() {
+      const count = document.querySelector("[data-growth-shell-count]");
+      if (count && growthAssignDraft) count.textContent = `🐚 ${growthAssignDraft.shells}`;
+    }
+
     function renderGrowthCardArchive() {
       const container = document.getElementById("growthCardArchive");
       if (!container) return;
@@ -4071,7 +4167,6 @@
       const selectedCategory = container.dataset.category || "all";
       const visibleCards = cards.filter(card => selectedCategory === "all" || card.category === selectedCategory);
       const assignments = growthAssignments();
-      const childId = state.active;
       container.innerHTML = `
         <h3>Kortelių archyvas</h3>
         <p>Čia tėvai parenka bibliotekos korteles vaikui. Sisteminiai tekstai neredaguojami.</p>
@@ -4083,25 +4178,28 @@
         </div>
         <div class="growth-archive-list">
           ${visibleCards.map(card => {
-            const assignment = assignments[`${childId}:${card.cardId}`] || {};
-            const isActive = assignment.active === true;
-            const shells = Number(assignment.shells || 1);
+            const shellIcon = card.shellIcon || "/icons/shell-growth-pearl.png";
+            const assigned = state.children
+              .map(child => ({ child, assignment: assignments[`${child.id}:${card.cardId}`] }))
+              .filter(item => item.assignment && item.assignment.active !== false);
+            const summary = assigned.length
+              ? assigned.map(item => `${escapeHtml(item.child.name)} · 🐚 ${Number(item.assignment.shells || card.points || 1)}`).join(" · ")
+              : "Dar nepriskirta vaikui";
             return `
-              <article class="growth-archive-card">
-                <img src="${escapeHtml(card.image)}" alt="">
+              <article class="growth-archive-card growth-layered-library-card">
+                <div class="growth-layered-preview">
+                  <img src="${escapeHtml(card.image)}" alt="">
+                  <button class="growth-layered-action-shell" type="button" data-growth-preview="${escapeHtml(card.cardId)}" aria-label="Atidaryti kortelės kriauklę"><img src="${escapeHtml(shellIcon)}" alt=""></button>
+                </div>
                 <div>
                   <strong>${escapeHtml(card.title)}</strong>
                   <div class="growth-archive-meta">
                     cardId: ${escapeHtml(card.cardId)} · missionId: ${escapeHtml(card.missionId)}<br>
-                    ${escapeHtml(card.category)} · ${escapeHtml((card.competencies || []).join(", "))}
+                    ${escapeHtml(card.category)} · ${escapeHtml((card.competencies || []).join(", "))}<br>
+                    ${summary}
                   </div>
                   <div class="growth-archive-actions">
-                    <label>
-                      Kriauklytės
-                      <input type="number" min="0" max="99" value="${shells}" data-growth-shells="${escapeHtml(card.cardId)}">
-                    </label>
-                    <button type="button" data-growth-toggle="${escapeHtml(card.cardId)}">${isActive ? "Išjungti vaikui" : "Įjungti vaikui"}</button>
-                    <button type="button" data-growth-preview="${escapeHtml(card.cardId)}">Peržiūrėti</button>
+                    <button type="button" data-growth-assign="${escapeHtml(card.cardId)}">Priskirti vaikui</button>
                   </div>
                 </div>
               </article>
@@ -4110,7 +4208,6 @@
         </div>
       `;
     }
-
     function undoLogItem(item) {
       if (typeof item === "string" || item.undone) return;
 
@@ -5193,34 +5290,43 @@
       if (category) {
         event.currentTarget.dataset.category = category.value;
         renderGrowthCardArchive();
-        return;
-      }
-      const shellsInput = event.target.closest("[data-growth-shells]");
-      if (shellsInput) {
-        saveGrowthAssignment(state.active, shellsInput.dataset.growthShells, {
-          shells: Math.max(0, Math.min(99, Number(shellsInput.value) || 0))
-        });
-        renderGrowthCardArchive();
       }
     });
     document.getElementById("growthCardArchive")?.addEventListener("click", event => {
-      const toggle = event.target.closest("[data-growth-toggle]");
-      if (toggle) {
-        const cardId = toggle.dataset.growthToggle;
-        const current = growthAssignments()[`${state.active}:${cardId}`];
-        saveGrowthAssignment(state.active, cardId, { active: !(current?.active === true) });
-        renderGrowthCardArchive();
+      const assign = event.target.closest("[data-growth-assign]");
+      if (assign) {
+        openGrowthAssignModal(assign.dataset.growthAssign);
         return;
       }
       const preview = event.target.closest("[data-growth-preview]");
-      if (preview) {
-        const card = growthLibrary().cards.find(item => item.cardId === preview.dataset.growthPreview);
-        if (!card) return;
-        const scenario = (card.dynamicScenarios || []).find(item => item.scenarioId === "DEFAULT");
-        alert(`${card.title}\n\n${card.fixedText?.shortMessage || ""}\n\n${scenario?.childMessage || ""}\n\n${scenario?.eveningGift || ""}`);
-      }
+      if (preview) alert("");
     });
-    document.getElementById("habitArchiveToggle")?.addEventListener("click", () => {
+    document.addEventListener("change", event => {
+      const childSelect = event.target.closest("[data-growth-assign-child]");
+      if (!childSelect || !growthAssignDraft) return;
+      growthAssignDraft.childId = childSelect.value;
+      const card = growthLibrary().cards.find(item => item.cardId === growthAssignDraft.cardId);
+      const existing = growthAssignments()[`${growthAssignDraft.childId}:${growthAssignDraft.cardId}`] || {};
+      growthAssignDraft.shells = Math.max(0, Math.min(99, Number(existing.shells || card?.points || 1)));
+      refreshGrowthAssignCount();
+    });
+    document.addEventListener("click", event => {
+      const delta = event.target.closest("[data-growth-shell-delta]");
+      if (delta && growthAssignDraft) {
+        growthAssignDraft.shells = Math.max(0, Math.min(99, growthAssignDraft.shells + Number(delta.dataset.growthShellDelta)));
+        refreshGrowthAssignCount();
+        return;
+      }
+      if (event.target.closest("[data-growth-assign-close]")) {
+        closeGrowthAssignModal();
+        return;
+      }
+      if (event.target.closest("[data-growth-assign-save]") && growthAssignDraft) {
+        saveGrowthAssignment(growthAssignDraft.childId, growthAssignDraft.cardId, { active: true, shells: growthAssignDraft.shells });
+        closeGrowthAssignModal();
+        renderGrowthCardArchive();
+      }
+    });    document.getElementById("habitArchiveToggle")?.addEventListener("click", () => {
       habitArchiveExpanded = !habitArchiveExpanded;
       renderHabitArchive();
     });

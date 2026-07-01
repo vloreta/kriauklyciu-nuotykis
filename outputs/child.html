@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -1186,15 +1186,18 @@
 
     .growth-card-trigger {
       position: absolute;
-      right: 42px;
-      bottom: 8px;
-      width: 30px;
-      height: 30px;
+      right: 14px;
+      bottom: 12px;
+      width: 38px;
+      height: 38px;
       border: 0;
       border-radius: 999px;
       background: rgba(255, 255, 255, .92);
       padding: 2px;
       box-shadow: 0 7px 16px rgba(31, 54, 71, .16);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .growth-card-trigger img {
@@ -1205,6 +1208,93 @@
       display: block;
     }
 
+    .task.growth-layered-task {
+      position: relative;
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      min-height: 112px;
+      padding: 12px 52px 12px 12px;
+      overflow: visible;
+      border-color: rgba(182, 153, 238, .4);
+      background: #fff8fd;
+    }
+
+    .growth-layered-card {
+      position: relative;
+      width: 112px;
+      aspect-ratio: 16 / 10;
+      min-height: 0;
+      height: auto;
+      border-radius: 8px;
+      overflow: hidden;
+      display: block;
+      background: #fff7fb;
+      border: 1px solid rgba(182, 153, 238, .22);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.75);
+    }
+
+    .growth-layered-card img.growth-layered-bg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .growth-layered-text {
+      position: static;
+      width: auto;
+      display: grid;
+      justify-items: start;
+      gap: 6px;
+      text-align: left;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .growth-layered-text::before { display: none; }
+
+    .growth-layered-title {
+      color: var(--ink);
+      font-size: .98rem;
+      line-height: 1.15;
+      font-weight: 1000;
+    }
+
+    .growth-layered-shells {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 5px;
+      min-height: 0;
+      padding: 0;
+      border-radius: 0;
+      color: #0a7894;
+      font-size: .9rem;
+      font-weight: 1000;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .growth-layered-shells img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+
+    @media (max-width: 640px) {
+      .task.growth-layered-task {
+        grid-template-columns: 96px minmax(0, 1fr);
+        min-height: 104px;
+        padding: 10px 46px 10px 10px;
+        gap: 10px;
+      }
+      .growth-layered-card { width: 96px; }
+      .growth-layered-title { font-size: .9rem; }
+      .growth-layered-shells { font-size: .84rem; }
+      .growth-card-trigger { width: 32px; height: 32px; right: 8px; bottom: 8px; }
+    }
     .growth-modal {
       position: fixed;
       inset: 0;
@@ -3058,7 +3148,7 @@
     function taskEffectiveShells(childId, task) {
       const card = growthCardForTask(task);
       const assignment = card ? growthAssignmentFor(childId, card.cardId) : null;
-      if (card && assignment?.active === true) return Math.max(0, Math.min(99, Number(assignment.shells) || task.shells));
+      if (card && assignment && assignment.active !== false) return Math.max(0, Math.min(99, Number(assignment.shells) || task.shells));
       return task.shells;
     }
 
@@ -3079,9 +3169,25 @@
       const card = growthCardForTask(task);
       if (!card || !isGrowthCardEnabledForTask(state.active, task)) return "";
       return `
-        <button class="growth-card-trigger" type="button" data-growth-card="${escapeHtml(card.cardId)}" aria-label="Atidaryti augimo kortelę">
-          <img src="${escapeHtml(card.shellIcon || "/icons/shell-growth.png")}" alt="">
-        </button>
+        <span class="growth-card-trigger" role="button" tabindex="0" data-growth-card="${escapeHtml(card.cardId)}" aria-label="Atidaryti augimo kortelę">
+          <img src="${escapeHtml(card.shellIcon || "/icons/shell-growth-pearl.png")}" alt="">
+        </span>
+      `;
+    }
+
+    function growthLayeredTaskMarkup(task, title, shells) {
+      const card = growthCardForTask(task);
+      if (!card || !isGrowthCardEnabledForTask(state.active, task)) return "";
+      const shellIcon = card.shellIcon || "/icons/shell-growth-pearl.png";
+      return `
+        <span class="growth-layered-card">
+          <img class="growth-layered-bg" src="${escapeHtml(card.image)}" alt="">
+        </span>
+        <span class="growth-layered-text">
+          <span class="growth-layered-title">${escapeHtml(title)}</span>
+          <span class="growth-layered-shells"><img src="${escapeHtml(shellIcon)}" alt=""> ${shells}</span>
+        </span>
+        ${growthCardMarkup(task)}
       `;
     }
 
@@ -3089,21 +3195,9 @@
       const card = growthCardForTask(task);
       const modal = document.getElementById("growthCardModal");
       if (!card || !modal) return;
-      const scenario = window.KrabukaiSelectGrowthScenario?.({
-        childId: state.active,
-        missionId: card.missionId,
-        date: state.selectedDate,
-        history: state.records,
-        card
-      }) || (card.dynamicScenarios || []).find(item => item.scenarioId === "DEFAULT");
-      recordGrowthOpening({ card, scenario });
+      recordGrowthOpening({ card, scenario: null });
       modal.innerHTML = `
         <article class="growth-modal-card">
-          <img src="${escapeHtml(card.image)}" alt="">
-          <h3 id="growthCardTitle">${escapeHtml(card.title)}</h3>
-          <p>${escapeHtml(card.fixedText?.shortMessage || "")}</p>
-          <p>${escapeHtml(scenario?.childMessage || "")}</p>
-          <p class="growth-gift">${escapeHtml(scenario?.eveningGift || "")}</p>
           <button class="action" type="button" data-close-growth>Uždaryti</button>
         </article>
       `;
@@ -4014,8 +4108,18 @@
         const button = document.createElement(state.editMode ? "div" : "button");
         if (!state.editMode) button.type = "button";
         const isDone = child.done[task.id] || taskWasDoneOnSelectedDay(child, task);
-        button.className = `task${isDone ? " done" : ""}${state.editMode ? " editing" : ""}`;
-        button.innerHTML = `
+        const growthCard = growthCardForTask(task);
+        button.className = `task${isDone ? " done" : ""}${state.editMode ? " editing" : ""}${growthCard && isGrowthCardEnabledForTask(state.active, task) ? " growth-layered-task" : ""}`;
+        button.innerHTML = growthCard && isGrowthCardEnabledForTask(state.active, task) ? `
+          ${growthLayeredTaskMarkup(task, title, shells)}
+          ${state.editMode && isToday ? `
+            <span class="task-edit-actions">
+              <button type="button" data-edit-task="${safeTaskId}" aria-label="Keisti užduotį ${escapeHtml(title)}">Keisti</button>
+              <button class="delete-task" type="button" data-delete-task="${safeTaskId}" aria-label="Trinti užduotį ${escapeHtml(title)}">Trinti</button>
+            </span>
+          ` : ""}
+          ${parentTipMarkup(task)}
+        ` : `
           <span class="task-icon" aria-hidden="true">${escapeHtml(task.icon)}</span>
           <span>
             <span class="task-title">${escapeHtml(title)}</span>
