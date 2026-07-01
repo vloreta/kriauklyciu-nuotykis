@@ -3359,6 +3359,17 @@
       return Object.keys(childProfiles(targetState));
     }
 
+    function childListItems(targetState = state) {
+      const profiles = childProfiles(targetState);
+      return Object.keys(profiles).map(childId => ({
+        id: childId,
+        name: profiles[childId]?.name || childId,
+        gender: profiles[childId]?.gender || "girl",
+        color: profiles[childId]?.color || "pink",
+        avatar: profiles[childId]?.avatar || (profiles[childId]?.gender === "boy" ? "👦" : "👧")
+      }));
+    }
+
     function childProfile(childId = state.active) {
       return childProfiles()[childId] || defaultChildProfiles.olivia;
     }
@@ -4113,13 +4124,13 @@
     let growthAssignDraft = null;
 
     function childOptionsMarkup(selectedId) {
-      return state.children.map(child => `<option value="${escapeHtml(child.id)}" ${child.id === selectedId ? "selected" : ""}>${escapeHtml(child.name)}</option>`).join("");
+      return childListItems().map(child => `<option value="${escapeHtml(child.id)}" ${child.id === selectedId ? "selected" : ""}>${escapeHtml(child.name)}</option>`).join("");
     }
 
     function openGrowthAssignModal(cardId) {
       const card = growthLibrary().cards.find(item => item.cardId === cardId);
       if (!card) return;
-      const childId = state.active || state.children[0]?.id;
+      const childId = state.active || childListItems()[0]?.id;
       const existing = growthAssignments()[`${childId}:${cardId}`] || {};
       growthAssignDraft = { cardId, childId, shells: Math.max(0, Math.min(99, Number(existing.shells || card.points || 1))) };
       let modal = document.getElementById("growthAssignModal");
@@ -4179,7 +4190,7 @@
         <div class="growth-archive-list">
           ${visibleCards.map(card => {
             const shellIcon = card.shellIcon || "/icons/shell-growth-pearl.png";
-            const assigned = state.children
+            const assigned = childListItems()
               .map(child => ({ child, assignment: assignments[`${child.id}:${card.cardId}`] }))
               .filter(item => item.assignment && item.assignment.active !== false);
             const summary = assigned.length
