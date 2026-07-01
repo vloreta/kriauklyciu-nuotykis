@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -3889,16 +3889,20 @@
       return typeof item === "string" ? item : item.text;
     }
 
-    function taskWasDoneOnSelectedDay(child, task) {
+    function taskWasDoneOnSelectedDay(child, task, childId = state.active) {
       if (child.done?.[task.id]) return true;
 
-      const latestTaskEntry = (child.log || []).find(item => typeof item !== "string" && item.taskId === task.id);
+      const latestTaskEntry = [...(child.log || [])]
+        .reverse()
+        .find(item => typeof item !== "string" && item.taskId === task.id && !item.undone);
       if (latestTaskEntry) return latestTaskEntry.kind === "complete";
 
       const title = taskTitle(task).toLowerCase();
-      return (child.log || []).some(item => {
+      const shells = taskEffectiveShells(childId, task);
+      return [...(child.log || [])].reverse().some(item => {
+        if (typeof item !== "string" && item.undone) return false;
         const text = logText(item).toLowerCase();
-        return text.includes(title) && text.includes(`+${task.shells}`);
+        return text.includes(title) && text.includes(`+${shells}`);
       });
     }
 
@@ -3927,7 +3931,8 @@
       const child = activeChild();
       const title = taskTitle(task);
       const shells = taskEffectiveShells(state.active, task);
-      if (child.done[task.id]) {
+      const isAlreadyDone = taskWasDoneOnSelectedDay(child, task, state.active);
+      if (isAlreadyDone) {
         child.done[task.id] = false;
         child.shells = Math.max(0, child.shells - shells);
         addLog(child, {
@@ -3939,6 +3944,7 @@
         addTaskEvent(child, task, "cancelled", -shells);
         save();
         render();
+        animateTreasureShell(state.active);
         const retryMessage = state.active === "olivia"
           ? "Nieko tokio, Olivia. Galime pabandyti dar kartą ir kriauklytė sugrįš."
           : state.active === "dominik"
@@ -4272,8 +4278,29 @@
       });
     }
 
+    function completedTaskShellTotal(childId, key) {
+      const day = ensureDay(key);
+      const child = day[childId];
+      if (!child) return 0;
+      return tasksForChildOnDate(childId, key).reduce((sum, task) => {
+        return taskWasDoneOnSelectedDay(child, task, childId) ? sum + taskEffectiveShells(childId, task) : sum;
+      }, 0);
+    }
+
+    function visibleChildShells(childId, key) {
+      const child = ensureDay(key)[childId];
+      if (!child) return 0;
+      const storedTotal = Number(child.shells) || 0;
+      const logTotal = (child.log || []).reduce((sum, item) => {
+        if (typeof item === "string" || item.undone) return sum;
+        return sum + (Number(item.delta) || 0);
+      }, 0);
+      const doneTotal = completedTaskShellTotal(childId, key);
+      return Math.max(0, storedTotal, logTotal, doneTotal);
+    }
+
     function childTotal(childId, keys) {
-      return keys.reduce((sum, key) => sum + (ensureDay(key)[childId]?.shells || 0), 0);
+      return keys.reduce((sum, key) => sum + visibleChildShells(childId, key), 0);
     }
 
     function renderWeekendPrize(weekScores) {
@@ -5178,4 +5205,3 @@
 </script>
 </body>
 </html>
-
