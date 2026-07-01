@@ -1,8 +1,3 @@
 ﻿{
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/child", "dest": "/child.html" },
-    { "src": "/parent", "dest": "/parent.html" },
-    { "src": "/admin/growth-library", "dest": "/admin/growth-library.html" }
-  ]
+  "cleanUrls": true
 }
