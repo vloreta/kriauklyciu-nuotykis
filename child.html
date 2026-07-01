@@ -3373,7 +3373,7 @@
     }
 
     function childProfile(childId = state.active) {
-      return childProfiles()[childId] || defaultChildProfiles.olivia;
+      return childProfiles()[childId] || defaultChildProfiles[childId] || defaultChildProfiles.olivia;
     }
 
     function childName(childId = state.active) {
@@ -4631,7 +4631,7 @@
     function renderRace(todayTotals) {
       const scene = document.getElementById("oceanScene");
       const lanes = document.getElementById("oceanLanes");
-      const ids = ["olivia", "dominik"].filter(childId => childProfiles()[childId]);
+      const ids = ["olivia", "dominik"];
       const laneHeight = 150;
       const mobileOcean = window.matchMedia("(max-width: 620px)").matches;
       scene.style.height = mobileOcean ? "" : `${Math.min(525, Math.max(220, ids.length * laneHeight))}px`;
@@ -4801,7 +4801,7 @@
       renderSurprises();
       renderPenaltyOptions();
       renderRace(todayTotals);
-      ["olivia", "dominik"].filter(childId => childProfiles()[childId]).forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
+      ["olivia", "dominik"].forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
     }
 
     // User interactions
@@ -5075,6 +5075,7 @@
 </script>
 </body>
 </html>
+
 
 
 
