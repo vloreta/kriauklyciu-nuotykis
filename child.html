@@ -3904,10 +3904,10 @@
         .filter(item => {
           if (typeof item !== "string" && item.undone) return false;
           const text = logText(item).toLowerCase();
-          return text.includes(title) && (text.includes(`+${shells}`) || text.includes(`-${shells}`));
+          return text.includes(title) && (text.includes(`(+${shells})`) || text.includes(`(-${shells})`));
         });
       if (!legacyTextEntries.length) return false;
-      return !logText(legacyTextEntries[0]).includes(`-${shells}`);
+      return logText(legacyTextEntries[0]).includes(`(+${shells})`);
     }
 
     function undoLogItem(item) {
