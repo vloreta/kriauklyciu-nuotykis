@@ -3129,8 +3129,7 @@
     }
 
     function growthCardForTask(task) {
-      const library = growthLibrary();
-      return library.cards.find(card => (growthMissionTaskIds[card.missionId] || []).includes(task.id) && !card.archived) || null;
+      return null;
     }
 
     function growthAssignmentFor(childId, cardId) {
@@ -5076,3 +5075,5 @@
 </script>
 </body>
 </html>
+
+
