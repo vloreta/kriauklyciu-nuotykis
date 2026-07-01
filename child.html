@@ -2843,7 +2843,7 @@
       const growthCount = child.growthEntry && typeof child.growthEntry === "object"
         ? Object.values(child.growthEntry).filter(value => String(value || "").trim()).length
         : 0;
-      return shells * 1000000 + logCount * 10000 + doneCount * 1000 + emotionLogCount * 100 + emotionCount * 10 + growthCount;
+      return logCount * 1000000 + emotionLogCount * 100000 + doneCount * 10000 + emotionCount * 1000 + growthCount * 100 + shells;
     }
 
     function stateCompleteness(data) {
