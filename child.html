@@ -3803,7 +3803,8 @@
       const max = maxDailyShells(childId);
       const halfway = Math.ceil(max / 2);
 
-      if (child.shells >= max && !child.dailyTreasureAwarded) {
+      const visibleShells = visibleChildShells(childId, state.selectedDate);
+      if (visibleShells >= max && !child.dailyTreasureAwarded) {
         child.dailyTreasureAwarded = true;
         addLog(child, {
           text: childId === "olivia"
@@ -3823,7 +3824,7 @@
         return "full";
       }
 
-      if (child.shells >= halfway && !child.halfwayTreasureNoticed) {
+      if (visibleShells >= halfway && !child.halfwayTreasureNoticed) {
         child.halfwayTreasureNoticed = true;
         addLog(child, {
           text: `${name}: pusė kelio iki perlo jau nueita`,
@@ -3890,20 +3891,23 @@
     }
 
     function taskWasDoneOnSelectedDay(child, task, childId = state.active) {
-      if (child.done?.[task.id]) return true;
-
-      const latestTaskEntry = [...(child.log || [])]
+      const taskEntries = [...(child.log || [])]
         .reverse()
-        .find(item => typeof item !== "string" && item.taskId === task.id && !item.undone);
-      if (latestTaskEntry) return latestTaskEntry.kind === "complete";
+        .filter(item => typeof item !== "string" && item.taskId === task.id && !item.undone);
+      if (taskEntries.length) return taskEntries[0].kind === "complete";
+      if (Object.prototype.hasOwnProperty.call(child.done || {}, task.id)) return Boolean(child.done[task.id]);
 
       const title = taskTitle(task).toLowerCase();
       const shells = taskEffectiveShells(childId, task);
-      return [...(child.log || [])].reverse().some(item => {
-        if (typeof item !== "string" && item.undone) return false;
-        const text = logText(item).toLowerCase();
-        return text.includes(title) && text.includes(`+${shells}`);
-      });
+      const legacyTextEntries = [...(child.log || [])]
+        .reverse()
+        .filter(item => {
+          if (typeof item !== "string" && item.undone) return false;
+          const text = logText(item).toLowerCase();
+          return text.includes(title) && (text.includes(`+${shells}`) || text.includes(`-${shells}`));
+        });
+      if (!legacyTextEntries.length) return false;
+      return !logText(legacyTextEntries[0]).includes(`-${shells}`);
     }
 
     function undoLogItem(item) {
@@ -4452,7 +4456,7 @@
       tasksForChild().forEach(task => {
         const option = document.createElement("option");
         option.value = task.id;
-        option.textContent = `${taskTitle(task)} (-${shells})`;
+        option.textContent = `${taskTitle(task)} (-${taskEffectiveShells(state.active, task)})`;
         select.appendChild(option);
       });
     }
@@ -4910,7 +4914,8 @@
         ? `${parseDate(state.selectedDate).getFullYear()} m. kalendorius`
         : formatDate(state.selectedDate);
       document.getElementById("activeName").textContent = activeName();
-      document.getElementById("activeTotal").textContent = `${child.shells} Jūros ${shellWord(child.shells)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
+      const activeTodayTotal = todayTotals[state.active] || 0;
+      document.getElementById("activeTotal").textContent = `${activeTodayTotal} Jūros ${shellWord(activeTodayTotal)} pasirinktą dieną. Savaitė: ${weekTotals[state.active] || 0} ${shellWord(weekTotals[state.active] || 0)}.`;
       renderEmotionIsland();
 
       if (state.view === "day") renderTasks();
