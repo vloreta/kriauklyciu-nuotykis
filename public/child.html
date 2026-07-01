@@ -576,18 +576,9 @@
       line-height: 1.2;
     }
 
-    .ocean-lanes {
-      display: grid;
-      min-height: 100%;
-    }
+    .ocean-lanes {`r`n      position: relative;`r`n      z-index: 5;`r`n      display: grid;`r`n      min-height: 100%;`r`n    }
 
-    .ocean-lane {
-      position: relative;
-      min-height: 105px;
-      overflow: hidden;
-      border: 0;
-      background: transparent;
-    }
+    .ocean-lane {`r`n      position: relative;`r`n      z-index: 6;`r`n      min-height: 105px;`r`n      overflow: visible;`r`n      border: 0;`r`n      background: transparent;`r`n    }
 
     .ocean-lane.active {
       background: transparent;
@@ -2411,7 +2402,24 @@
       </aside>
 
       <section class="panel ocean-scene" id="oceanScene" aria-label="Visų vaikų keliai iki perlo">
-        <div class="ocean-lanes" id="oceanLanes"></div>
+                <div class="ocean-lanes" id="oceanLanes">
+          <div class="ocean-lane active" data-child="olivia" data-color="pink" role="img" aria-label="Olivia kelias iki perlo">
+            <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">👧</span>Olivia</span>
+            <div class="guide-bubble" aria-live="polite"><span class="guide-avatar" aria-hidden="true">🧜‍♀️</span><span class="guide-text">Undinė laukia pirmosios Olivijos kriauklytės.</span></div>
+            <div class="race-track" aria-hidden="true" style="--progress: 0%; --progress-value: 0">
+              <span class="race-path"></span><span class="race-progress"></span><span class="race-crab">🦀</span><span class="treasure-shell"><span class="pearl"></span></span>
+            </div>
+            <span class="race-score">0 / 0 kriauklyčių</span>
+          </div>
+          <div class="ocean-lane" data-child="dominik" data-color="blue" role="img" aria-label="Dominik kelias iki perlo">
+            <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">👦</span>Dominik</span>
+            <div class="guide-bubble" aria-live="polite"><span class="guide-avatar" aria-hidden="true">🐉</span><span class="guide-text">Drakonas laukia pirmosios Dominik kriauklytės.</span></div>
+            <div class="race-track" aria-hidden="true" style="--progress: 0%; --progress-value: 0">
+              <span class="race-path"></span><span class="race-progress"></span><span class="race-crab">🦀</span><span class="treasure-shell"><span class="pearl"></span></span>
+            </div>
+            <span class="race-score">0 / 0 kriauklyčių</span>
+          </div>
+        </div>
       </section>
 
       <section class="panel main">
