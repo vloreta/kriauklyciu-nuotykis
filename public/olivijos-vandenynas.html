@@ -5,238 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Olivijos vandenynas</title>
   <style>
-    :root { color-scheme: light; --ink: #21303b; --muted: #5f7180; }
+    :root { color-scheme: light; --ink: #21303b; --muted: #5f7180; --pink: #f4a8c8; --teal: #1095ab; }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--ink);
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #e9fbff 0%, #f6fff7 100%);
-    }
-    main {
-      width: 100%;
-      margin: 0 auto;
-      padding: 18px 0 24px;
-    }
-    h1 {
-      margin: 0 16px 14px;
-      font-size: clamp(28px, 4vw, 54px);
-      line-height: 1;
-      letter-spacing: 0;
-    }
-    .olivia-ocean-stage {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      border-radius: 18px;
-    }
-    .olivia-ocean-image {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-    .olivia-track {
-      position: absolute;
-      left: 18px;
-      right: 94px;
-      top: 56%;
-      height: 42px;
-      transform: translateY(-50%);
-    }
-    .olivia-path {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 50%;
-      height: 7px;
-      transform: translateY(-50%);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .88);
-      box-shadow: 0 2px 8px rgba(22, 69, 89, .18);
-    }
-    .olivia-progress {
-      position: absolute;
-      left: 0;
-      top: 50%;
-      width: 0%;
-      height: 7px;
-      transform: translateY(-50%);
-      border-radius: 999px;
-      background: linear-gradient(90deg, #fff3a7, #ff8fc7);
-    }
-    .olivia-crab {
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      font-size: clamp(28px, 3.2vw, 48px);
-      line-height: 1;
-      filter: hue-rotate(315deg) saturate(1.75) brightness(1.08) drop-shadow(0 7px 8px rgba(18, 72, 95, .34));
-      z-index: 2;
-    }
-    .olivia-treasure-shell {
-      position: absolute;
-      right: 16px;
-      top: 56%;
-      width: clamp(58px, 7vw, 96px);
-      aspect-ratio: 1;
-      transform: translateY(-50%);
-      background: url("assets/pearl-shell-cutout.png") center / contain no-repeat;
-      filter: drop-shadow(0 10px 14px rgba(20, 73, 93, .28));
-    }
-    .olivia-score {
-      position: absolute;
-      right: 12px;
-      bottom: 14px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .92);
-      color: #22313d;
-      font-size: clamp(12px, 1.15vw, 16px);
-      font-weight: 800;
-      box-shadow: 0 4px 12px rgba(22, 69, 89, .12);
-    }
-    .emotion-island {
-      display: grid;
-      grid-template-columns: minmax(170px, 18%) minmax(0, max-content);
-      align-items: center;
-      justify-content: start;
-      column-gap: 10px;
-      margin: 10px 0 0;
-      padding: 10px 6px;
-      border-top: 1px solid rgba(14, 149, 171, .16);
-      border-bottom: 1px solid rgba(14, 149, 171, .18);
-      background: linear-gradient(135deg, rgba(244, 255, 252, .9), rgba(255, 253, 241, .82));
-    }
+    body { margin: 0; min-height: 100vh; color: var(--ink); font-family: Arial, sans-serif; background: linear-gradient(180deg, #e9fbff 0%, #f6fff7 100%); }
+    main { width: 100%; margin: 0 auto; padding: 18px 0 24px; }
+    h1 { margin: 0 16px 14px; font-size: clamp(28px, 4vw, 54px); line-height: 1; letter-spacing: 0; }
+    .olivia-ocean-stage { position: relative; width: 100%; overflow: hidden; border-radius: 18px; }
+    .olivia-ocean-image { display: block; width: 100%; height: auto; }
+    .olivia-track { position: absolute; left: 18px; right: 94px; top: 56%; height: 42px; transform: translateY(-50%); }
+    .olivia-path { position: absolute; left: 0; right: 0; top: 50%; height: 7px; transform: translateY(-50%); border-radius: 999px; background: rgba(255,255,255,.88); box-shadow: 0 2px 8px rgba(22,69,89,.18); }
+    .olivia-progress { position: absolute; left: 0; top: 50%; width: calc(var(--progress-value, 0) * 100%); height: 7px; transform: translateY(-50%); border-radius: 999px; background: linear-gradient(90deg, #fff3a7, #ff8fc7); }
+    .olivia-crab { position: absolute; left: calc(var(--progress-value, 0) * 100%); top: 50%; transform: translate(-50%, -50%); font-size: clamp(28px, 3.2vw, 48px); line-height: 1; filter: hue-rotate(315deg) saturate(1.75) brightness(1.08) drop-shadow(0 7px 8px rgba(18,72,95,.34)); z-index: 2; transition: left .28s ease; }
+    .olivia-treasure-shell { position: absolute; right: 16px; top: 56%; width: clamp(58px, 7vw, 96px); aspect-ratio: 1; transform: translateY(-50%); background: url("assets/pearl-shell-cutout.png") center / contain no-repeat; filter: drop-shadow(0 10px 14px rgba(20,73,93,.28)); }
+    .olivia-treasure-shell.collecting { animation: shellGlow .8s ease-in-out; }
+    @keyframes shellGlow { 0%,100% { filter: drop-shadow(0 10px 14px rgba(20,73,93,.28)); transform: translateY(-50%) scale(1); } 50% { filter: drop-shadow(0 0 22px rgba(255,255,255,.95)) drop-shadow(0 0 26px rgba(255,160,210,.75)); transform: translateY(-50%) scale(1.08); } }
+    .olivia-score { position: absolute; right: 12px; bottom: 14px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: #22313d; font-size: clamp(12px, 1.15vw, 16px); font-weight: 800; box-shadow: 0 4px 12px rgba(22,69,89,.12); }
+    .emotion-island { display: grid; grid-template-columns: minmax(170px,18%) minmax(0,max-content); align-items: center; justify-content: start; column-gap: 10px; margin: 10px 0 0; padding: 10px 6px; border-top: 1px solid rgba(14,149,171,.16); border-bottom: 1px solid rgba(14,149,171,.18); background: linear-gradient(135deg, rgba(244,255,252,.9), rgba(255,253,241,.82)); }
     .emotion-copy { text-align: left; }
-    .emotion-copy h3 {
-      margin: 0 0 4px;
-      font-size: 1.21rem;
-      line-height: 1.1;
-    }
-    .emotion-copy p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 1.02rem;
-      font-weight: 700;
-      line-height: 1.25;
-    }
-    .emotion-options {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: clamp(3px, .7vw, 10px);
-      align-items: start;
-      justify-items: center;
-    }
-    .emotion-button {
-      position: relative;
-      display: grid;
-      justify-items: center;
-      align-content: start;
-      gap: 1px;
-      min-width: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      color: var(--muted);
-      font: inherit;
-    }
-    .emotion-visual {
-      position: relative;
-      display: block;
-      width: clamp(118px, 13.5vw, 210px);
-      height: clamp(118px, 13.5vw, 210px);
-      overflow: hidden;
-      border-radius: 999px;
-    }
-    .emotion-button img {
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      object-fit: cover;
-      background: transparent;
-      display: block;
-    }
-    .emotion-button .emotion-label {
-      font-size: .7rem;
-      line-height: 1.1;
-      color: var(--muted);
-      margin-top: -2px;
-      font-weight: 800;
-    }
-    .emotion-button.selected::after {
-      content: "✓";
-      position: absolute;
-      top: 5px;
-      right: 7px;
-      width: 24px;
-      height: 24px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      background: #1095ab;
-      color: white;
-      font-size: 16px;
-      font-weight: 900;
-      box-shadow: 0 6px 12px rgba(16, 149, 171, .22);
-    }
-    .emotion-button.selected .emotion-visual::after {
-      content: "";
-      position: absolute;
-      inset: 8%;
-      border-radius: 999px;
-      border: 3px solid rgba(14, 149, 171, .42);
-      animation: emotionWave .72s ease-out;
-      pointer-events: none;
-    }
-    .emotion-inline-dialog {
-      width: min(260px, 100%);
-      margin-top: 4px;
-      padding: 8px 10px;
-      border-radius: 16px;
-      border: 1px solid rgba(14, 149, 171, .16);
-      background: linear-gradient(135deg, rgba(255, 250, 232, .96), rgba(238, 253, 255, .96));
-      box-shadow: 0 8px 18px rgba(31, 54, 71, .08);
-      color: var(--ink);
-      animation: emotionDialogIn .2s ease-out;
-    }
-    .emotion-inline-dialog p {
-      position: relative;
-      overflow: hidden;
-      margin: 0;
-      font-size: .78rem;
-      font-weight: 850;
-      line-height: 1.22;
-    }
-    .emotion-inline-dialog p + p {
-      margin-top: 3px;
-      color: var(--muted);
-      font-weight: 800;
-    }
-    .emotion-inline-dialog p::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .88), transparent);
-      transform: translateX(-120%);
-      animation: emotionTextWave .9s ease-out both;
-      pointer-events: none;
-    }
+    .emotion-copy h3 { margin: 0 0 4px; font-size: 1.21rem; line-height: 1.1; }
+    .emotion-copy p { margin: 0; color: var(--muted); font-size: 1.02rem; font-weight: 700; line-height: 1.25; }
+    .emotion-options { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: clamp(3px,.7vw,10px); align-items: start; justify-items: center; }
+    .emotion-button { position: relative; display: grid; justify-items: center; align-content: start; gap: 1px; min-width: 0; padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--muted); font: inherit; }
+    .emotion-visual { position: relative; display: block; width: clamp(118px,13.5vw,210px); height: clamp(118px,13.5vw,210px); overflow: hidden; border-radius: 999px; }
+    .emotion-button img { width: 100%; height: 100%; border-radius: 999px; object-fit: cover; background: transparent; display: block; }
+    .emotion-label { font-size: .7rem; line-height: 1.1; color: var(--muted); margin-top: -2px; font-weight: 800; }
+    .emotion-button.selected::after { content: "✓"; position: absolute; top: 5px; right: 7px; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; background: var(--teal); color: white; font-size: 16px; font-weight: 900; box-shadow: 0 6px 12px rgba(16,149,171,.22); }
+    .emotion-button.selected .emotion-visual::after { content: ""; position: absolute; inset: 8%; border-radius: 999px; border: 3px solid rgba(14,149,171,.42); animation: emotionWave .72s ease-out; pointer-events: none; }
+    .emotion-inline-dialog { width: min(260px,100%); margin-top: 4px; padding: 8px 10px; border-radius: 16px; border: 1px solid rgba(14,149,171,.16); background: linear-gradient(135deg, rgba(255,250,232,.96), rgba(238,253,255,.96)); box-shadow: 0 8px 18px rgba(31,54,71,.08); color: var(--ink); animation: emotionDialogIn .2s ease-out; }
+    .emotion-inline-dialog p { position: relative; overflow: hidden; margin: 0; font-size: .78rem; font-weight: 850; line-height: 1.22; }
+    .emotion-inline-dialog p + p { margin-top: 3px; color: var(--muted); font-weight: 800; }
+    .emotion-inline-dialog p::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.88), transparent); transform: translateX(-120%); animation: emotionTextWave .9s ease-out both; pointer-events: none; }
     .emotion-inline-dialog p:nth-child(2)::after { animation-delay: .32s; }
-    @keyframes emotionDialogIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes emotionTextWave {
-      0% { transform: translateX(-120%); }
-      100% { transform: translateX(120%); }
-    }
-    @keyframes emotionWave {
-      0% { opacity: .7; transform: scale(.72); }
-      100% { opacity: 0; transform: scale(1.18); }
-    }
+    @keyframes emotionDialogIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes emotionTextWave { 0% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+    @keyframes emotionWave { 0% { opacity: .7; transform: scale(.72); } 100% { opacity: 0; transform: scale(1.18); } }
+    .missions { padding: 18px clamp(10px, 2vw, 28px) 0; }
+    .missions-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .missions-head h2 { margin: 0; font-size: clamp(24px, 2.4vw, 38px); line-height: 1; }
+    .missions-total { color: var(--muted); font-weight: 800; }
+    .task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .task { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 14px; align-items: center; min-height: 112px; width: 100%; padding: 12px; border: 2px solid rgba(228, 237, 241, .95); border-radius: 9px; background: #fffdf3; text-align: left; cursor: pointer; box-shadow: 0 2px 6px rgba(32, 64, 82, .04); transition: border-color .18s ease, background .18s ease, transform .18s ease; }
+    .task:hover { transform: translateY(-1px); border-color: rgba(244,168,200,.72); }
+    .task.done { border-color: #f4a8c8; background: #fff0f7; }
+    .task-icon { display: grid; place-items: center; width: 86px; height: 86px; border-radius: 8px; background: #fff0f7; font-size: 43px; overflow: hidden; }
+    .task-title { display: block; color: #07131f; font-size: .95rem; font-weight: 900; line-height: 1.12; }
+    .task-shells { display: block; margin-top: 6px; color: #0c718a; font-weight: 900; font-size: .92rem; }
     @media (max-width: 760px) {
       main { padding-top: 10px; }
       h1 { margin: 0 10px 10px; }
@@ -245,9 +58,12 @@
       .olivia-treasure-shell { right: 8px; width: 62px; }
       .olivia-score { right: 8px; bottom: 8px; padding: 5px 8px; }
       .emotion-island { grid-template-columns: 1fr; row-gap: 6px; }
-      .emotion-options { grid-template-columns: repeat(5, minmax(54px, 1fr)); gap: 2px; }
-      .emotion-visual { width: clamp(64px, 17vw, 96px); height: clamp(64px, 17vw, 96px); }
+      .emotion-options { grid-template-columns: repeat(5,minmax(54px,1fr)); gap: 2px; }
+      .emotion-visual { width: clamp(64px,17vw,96px); height: clamp(64px,17vw,96px); }
       .emotion-inline-dialog { padding: 7px 8px; }
+      .task-grid { grid-template-columns: 1fr; gap: 10px; }
+      .task { grid-template-columns: 76px minmax(0,1fr); min-height: 98px; }
+      .task-icon { width: 76px; height: 76px; font-size: 38px; }
     }
   </style>
 </head>
@@ -256,23 +72,52 @@
     <h1>Olivijos vandenynas</h1>
     <section class="olivia-ocean-stage" aria-label="Olivijos kelias iki kriauklytės su perlu">
       <img class="olivia-ocean-image" src="assets/olivia-ocean.png" alt="Olivijos vandenynas">
-      <div class="olivia-track" aria-hidden="true">
-        <span class="olivia-path"></span>
-        <span class="olivia-progress"></span>
-        <span class="olivia-crab">🦀</span>
+      <div class="olivia-track" aria-hidden="true" id="oliviaTrack">
+        <span class="olivia-path"></span><span class="olivia-progress"></span><span class="olivia-crab">🦀</span>
       </div>
-      <span class="olivia-treasure-shell" aria-hidden="true"></span>
-      <span class="olivia-score">0 / 73</span>
+      <span class="olivia-treasure-shell" id="treasureShell" aria-hidden="true"></span>
+      <span class="olivia-score" id="oliviaScore">0 / 0</span>
     </section>
     <section class="emotion-island" aria-label="Krabukų emocijų sala">
-      <div class="emotion-copy">
-        <h3>Krabukų emocijų sala</h3>
-        <p>Kaip šiandien jaučiuosi?</p>
-      </div>
+      <div class="emotion-copy"><h3>Krabukų emocijų sala</h3><p>Kaip šiandien jaučiuosi?</p></div>
       <div class="emotion-options" id="emotionOptions"></div>
+    </section>
+    <section class="missions" aria-label="Olivijos užduotys">
+      <div class="missions-head"><h2>Olivijos užduotys</h2><span class="missions-total" id="missionsTotal">0 kriauklyčių</span></div>
+      <div class="task-grid" id="taskGrid"></div>
     </section>
   </main>
   <script>
+    const storageKey = "kriauklyciu-nuotykis";
+    const childId = "olivia";
+    const tasks = [
+      { id: "oliSleepAlone", icon: "🌙", title: "Pati užmigau be kitų", shells: 3 },
+      { id: "oliWakeUp", icon: "🌅", title: "Kai pažadino, tuoj pat pati atsikėliau", shells: 3 },
+      { id: "oliBed", icon: "🛏️", title: "Pati pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
+      { id: "oliGettingReady", icon: "🪞", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
+      { id: "oliToKindergarten", icon: "🚶‍♀️", title: "Gražiai elgiausi einant į darželį", shells: 1 },
+      { id: "oliKindergarten", icon: "🏫", title: "Gražiai elgiausi darželyje", shells: 1 },
+      { id: "oliFromKindergarten", icon: "🌤️", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
+      { id: "oliBagShoesJacket", icon: "🎒", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+      { id: "oliHands", icon: "🧼", title: "Pati nusiploviau rankas", shells: 1 },
+      { id: "oliTable", icon: "🍴", title: "Padėjau padengti stalą", shells: 1 },
+      { id: "oliMeal", icon: "🍲", title: "Gražiai sėdėjau valgant", shells: 5 },
+      { id: "oliThanksMeal", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
+      { id: "oliDishes", icon: "🧽", title: "Nunešiau indus po valgio", shells: 1 },
+      { id: "oliNoHurtBrother", icon: "🕊️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau brolio", shells: 5 },
+      { id: "oliPlayBrother", icon: "🧩", title: "Gražiai žaidžiau su broliu", shells: 2 },
+      { id: "oliNiceWordsBrother", icon: "💌", title: "Pasakiau broliui kažką malonaus", shells: 2 },
+      { id: "oliMom", icon: "👩‍👧", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
+      { id: "oliQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
+      { id: "oliOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
+      { id: "oliHelp", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+      { id: "oliThanksNeeded", icon: "💐", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
+      { id: "oliSorry", icon: "💗", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+      { id: "oliChooseActivity", icon: "🖍️", title: "Pati ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
+      { id: "oliPraise", icon: "⭐", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
+      { id: "oliSpeech", icon: "🎤", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
+      { id: "oliToysBooks", icon: "🧸", title: "Pati susidėjau savo žaislus ir knygutes", shells: 2 }
+    ];
     const emotions = [
       { id: "happy", label: "Linksma", image: "assets/emotion-happy.png", dialog: ["Labas!", "Papasakok, kas šiandien tave pradžiugino?"] },
       { id: "calm", label: "Rami", image: "assets/emotion-calm.png", dialog: ["Šiandien tu atrodai labai rami.", "Kas tau padėjo taip jaustis?"] },
@@ -280,28 +125,124 @@
       { id: "angry", label: "Pikta", image: "assets/emotion-angry.png", dialog: ["Oho, matau, kad šiandien pyksti.", "Kas nutiko?"] },
       { id: "scared", label: "Išsigandusi", image: "assets/emotion-scared.png", dialog: ["Aš irgi kartais išsigąstu.", "Kas šiandien tave išgąsdino?"] }
     ];
-    const options = document.getElementById("emotionOptions");
+    const emotionOptionsEl = document.getElementById("emotionOptions");
+    const taskGrid = document.getElementById("taskGrid");
+    const track = document.getElementById("oliviaTrack");
+    const score = document.getElementById("oliviaScore");
+    const totalEl = document.getElementById("missionsTotal");
+    const shell = document.getElementById("treasureShell");
     let selectedEmotion = null;
 
-    function renderEmotions() {
-      options.innerHTML = emotions.map(emotion => `
-        <button class="emotion-button${selectedEmotion === emotion.id ? " selected" : ""}" type="button" data-emotion="${emotion.id}" aria-pressed="${selectedEmotion === emotion.id}">
-          <span class="emotion-visual"><img src="${emotion.image}" alt=""></span>
-          <span class="emotion-label">${emotion.label}</span>
-          ${selectedEmotion === emotion.id ? `<span class="emotion-inline-dialog"><p>${emotion.dialog[0]}</p><p>${emotion.dialog[1]}</p></span>` : ""}
-        </button>
-      `).join("");
+    function dateKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
     }
-
-    options.addEventListener("click", event => {
+    function todayKey() { return dateKey(new Date()); }
+    function shellWord(count) {
+      const last = count % 10;
+      const lastTwo = count % 100;
+      if (lastTwo >= 10 && lastTwo <= 20) return "kriauklyčių";
+      if (last === 1) return "kriauklytė";
+      if (last >= 2 && last <= 9) return "kriauklytės";
+      return "kriauklyčių";
+    }
+    function readState() {
+      try { return JSON.parse(localStorage.getItem(storageKey) || "null") || {}; } catch { return {}; }
+    }
+    function writeState(state) {
+      state.updatedAt = new Date().toISOString();
+      localStorage.setItem(storageKey, JSON.stringify(state));
+      localStorage.setItem("kriauklyciu-nuotykis-backup-latest", JSON.stringify({ createdAt: new Date().toISOString(), data: state }));
+      localStorage.setItem(`kriauklyciu-nuotykis-backup-${todayKey()}`, JSON.stringify({ createdAt: new Date().toISOString(), data: state }));
+    }
+    function ensureDay(state) {
+      state.records = state.records || {};
+      const key = todayKey();
+      state.records[key] = state.records[key] || {};
+      state.records[key][childId] = state.records[key][childId] || { shells: 0, done: {}, log: [], emotions: [], emotionLog: [], activeEmotionDialog: null };
+      const child = state.records[key][childId];
+      child.done = child.done || {};
+      child.log = Array.isArray(child.log) ? child.log : [];
+      child.shells = Number(child.shells) || 0;
+      return child;
+    }
+    function taskDone(child, task) {
+      let done = Boolean(child.done?.[task.id]);
+      child.log.forEach(item => {
+        if (!item || typeof item === "string" || item.taskId !== task.id) return;
+        if (item.kind === "complete") done = true;
+        if (item.kind === "toggleOff" || item.kind === "cancelled") done = false;
+      });
+      return done;
+    }
+    function visibleShells(child) {
+      const logTotal = child.log.reduce((sum, item) => sum + (typeof item === "string" ? 0 : Number(item.delta) || 0), 0);
+      return Math.max(0, logTotal || child.shells || 0);
+    }
+    function maxShells() { return tasks.reduce((sum, task) => sum + task.shells, 0); }
+    function renderProgress() {
+      const state = readState();
+      const child = ensureDay(state);
+      const shells = visibleShells(child);
+      const max = maxShells();
+      const ratio = max > 0 ? Math.min(Math.max(shells / max, 0), 1) : 0;
+      track.style.setProperty("--progress-value", ratio);
+      score.textContent = `${shells} / ${max} ${shellWord(max)}`;
+      totalEl.textContent = `${shells} ${shellWord(shells)}`;
+    }
+    function animateShell() {
+      shell.classList.remove("collecting");
+      void shell.offsetWidth;
+      shell.classList.add("collecting");
+      setTimeout(() => shell.classList.remove("collecting"), 820);
+    }
+    function renderTasks() {
+      const state = readState();
+      const child = ensureDay(state);
+      taskGrid.innerHTML = tasks.map(task => {
+        const done = taskDone(child, task);
+        return `<button class="task${done ? " done" : ""}" type="button" data-task="${task.id}" aria-pressed="${done}"><span class="task-icon">${task.icon}</span><span><span class="task-title">${task.title}</span><span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span></span></button>`;
+      }).join("");
+      renderProgress();
+    }
+    function toggleTask(taskId) {
+      const task = tasks.find(item => item.id === taskId);
+      if (!task) return;
+      const state = readState();
+      const child = ensureDay(state);
+      const done = taskDone(child, task);
+      if (done) {
+        child.done[task.id] = false;
+        child.shells = Math.max(0, child.shells - task.shells);
+        child.log.push({ text: `Olivia: atšaukta - ${task.title} (-${task.shells})`, delta: -task.shells, taskId: task.id, kind: "toggleOff", at: new Date().toISOString(), taskTitleAtTime: task.title, taskShellsAtTime: task.shells });
+      } else {
+        child.done[task.id] = true;
+        child.shells += task.shells;
+        child.log.push({ text: `Olivia: ${task.title} (+${task.shells})`, delta: task.shells, taskId: task.id, kind: "complete", at: new Date().toISOString(), taskTitleAtTime: task.title, taskShellsAtTime: task.shells });
+      }
+      writeState(state);
+      renderTasks();
+      animateShell();
+    }
+    function renderEmotions() {
+      emotionOptionsEl.innerHTML = emotions.map(emotion => `<button class="emotion-button${selectedEmotion === emotion.id ? " selected" : ""}" type="button" data-emotion="${emotion.id}" aria-pressed="${selectedEmotion === emotion.id}"><span class="emotion-visual"><img src="${emotion.image}" alt=""></span><span class="emotion-label">${emotion.label}</span>${selectedEmotion === emotion.id ? `<span class="emotion-inline-dialog"><p>${emotion.dialog[0]}</p><p>${emotion.dialog[1]}</p></span>` : ""}</button>`).join("");
+    }
+    emotionOptionsEl.addEventListener("click", event => {
       const button = event.target.closest(".emotion-button");
       if (!button) return;
       const next = button.dataset.emotion;
       selectedEmotion = selectedEmotion === next ? null : next;
       renderEmotions();
     });
-
+    taskGrid.addEventListener("click", event => {
+      const button = event.target.closest(".task");
+      if (button) toggleTask(button.dataset.task);
+    });
+    window.addEventListener("storage", renderTasks);
     renderEmotions();
+    renderTasks();
   </script>
 </body>
 </html>
