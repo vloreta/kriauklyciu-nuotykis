@@ -3891,16 +3891,14 @@
     }
 
     function taskWasDoneOnSelectedDay(child, task, childId = state.active) {
-      const taskEntries = [...(child.log || [])]
-        .reverse()
+      const taskEntries = (child.log || [])
         .filter(item => typeof item !== "string" && item.taskId === task.id && !item.undone);
       if (taskEntries.length) return taskEntries[0].kind === "complete";
       if (Object.prototype.hasOwnProperty.call(child.done || {}, task.id)) return Boolean(child.done[task.id]);
 
       const title = taskTitle(task).toLowerCase();
       const shells = taskEffectiveShells(childId, task);
-      const legacyTextEntries = [...(child.log || [])]
-        .reverse()
+      const legacyTextEntries = (child.log || [])
         .filter(item => {
           if (typeof item !== "string" && item.undone) return false;
           const text = logText(item).toLowerCase();
@@ -4188,7 +4186,7 @@
         const safeTaskId = escapeHtml(task.id);
         const button = document.createElement(state.editMode ? "div" : "button");
         if (!state.editMode) button.type = "button";
-        const isDone = child.done[task.id] || taskWasDoneOnSelectedDay(child, task);
+        const isDone = taskWasDoneOnSelectedDay(child, task);
         const growthCard = growthCardForTask(task);
         button.className = `task${isDone ? " done" : ""}${state.editMode ? " editing" : ""}${growthCard && isGrowthCardEnabledForTask(state.active, task) ? " growth-layered-task" : ""}`;
         button.innerHTML = growthCard && isGrowthCardEnabledForTask(state.active, task) ? `
@@ -4295,12 +4293,15 @@
       const child = ensureDay(key)[childId];
       if (!child) return 0;
       const storedTotal = Number(child.shells) || 0;
-      const logTotal = (child.log || []).reduce((sum, item) => {
+      const logEntries = child.log || [];
+      const logTotal = logEntries.reduce((sum, item) => {
         if (typeof item === "string" || item.undone) return sum;
         return sum + (Number(item.delta) || 0);
       }, 0);
+      const hasDeltaHistory = logEntries.some(item => typeof item !== "string" && !item.undone && Number.isFinite(Number(item.delta)));
       const doneTotal = completedTaskShellTotal(childId, key);
-      return Math.max(0, storedTotal, logTotal, doneTotal);
+      if (hasDeltaHistory || doneTotal > 0) return Math.max(0, logTotal, doneTotal);
+      return Math.max(0, storedTotal);
     }
 
     function childTotal(childId, keys) {
