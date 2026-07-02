@@ -20,28 +20,106 @@
       padding: 18px 0 24px;
     }
     h1 {
-      margin: 0 0 14px;
+      margin: 0 16px 14px;
       font-size: clamp(28px, 4vw, 54px);
       line-height: 1;
       letter-spacing: 0;
+    }
+    .olivia-ocean-stage {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 18px;
     }
     .olivia-ocean-image {
       display: block;
       width: 100%;
       height: auto;
-      border-radius: 18px;
+    }
+    .olivia-track {
+      position: absolute;
+      left: 18px;
+      right: 94px;
+      top: 56%;
+      height: 42px;
+      transform: translateY(-50%);
+    }
+    .olivia-path {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 7px;
+      transform: translateY(-50%);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .88);
+      box-shadow: 0 2px 8px rgba(22, 69, 89, .18);
+    }
+    .olivia-progress {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 0%;
+      height: 7px;
+      transform: translateY(-50%);
+      border-radius: 999px;
+      background: linear-gradient(90deg, #fff3a7, #ff8fc7);
+    }
+    .olivia-crab {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(28px, 3.2vw, 48px);
+      line-height: 1;
+      filter: hue-rotate(315deg) saturate(1.75) brightness(1.08) drop-shadow(0 7px 8px rgba(18, 72, 95, .34));
+      z-index: 2;
+    }
+    .olivia-treasure-shell {
+      position: absolute;
+      right: 16px;
+      top: 56%;
+      width: clamp(58px, 7vw, 96px);
+      aspect-ratio: 1;
+      transform: translateY(-50%);
+      background: url("assets/pearl-shell-cutout.png") center / contain no-repeat;
+      filter: drop-shadow(0 10px 14px rgba(20, 73, 93, .28));
+    }
+    .olivia-score {
+      position: absolute;
+      right: 12px;
+      bottom: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .92);
+      color: #22313d;
+      font-size: clamp(12px, 1.15vw, 16px);
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(22, 69, 89, .12);
     }
     @media (max-width: 640px) {
-      main { width: 100%; padding-top: 10px; }
-      h1 { margin-bottom: 10px; }
-      .olivia-ocean-image { border-radius: 12px; }
+      main { padding-top: 10px; }
+      h1 { margin: 0 10px 10px; }
+      .olivia-ocean-stage { border-radius: 12px; }
+      .olivia-track { left: 12px; right: 68px; height: 34px; }
+      .olivia-treasure-shell { right: 8px; width: 62px; }
+      .olivia-score { right: 8px; bottom: 8px; padding: 5px 8px; }
     }
   </style>
 </head>
 <body>
   <main>
     <h1>Olivijos vandenynas</h1>
-    <img class="olivia-ocean-image" src="assets/olivia-ocean.png" alt="Olivijos vandenynas">
+    <section class="olivia-ocean-stage" aria-label="Olivijos kelias iki kriauklytės su perlu">
+      <img class="olivia-ocean-image" src="assets/olivia-ocean.png" alt="Olivijos vandenynas">
+      <div class="olivia-track" aria-hidden="true">
+        <span class="olivia-path"></span>
+        <span class="olivia-progress"></span>
+        <span class="olivia-crab">🦀</span>
+      </div>
+      <span class="olivia-treasure-shell" aria-hidden="true"></span>
+      <span class="olivia-score">0 / 73</span>
+    </section>
   </main>
 </body>
 </html>
