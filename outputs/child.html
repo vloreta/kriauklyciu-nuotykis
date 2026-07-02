@@ -1716,9 +1716,14 @@
         grid-row: 1;
       }
 
-      .main {
+      .olivia-ocean {
         grid-column: 1 / -1;
         grid-row: 2;
+      }
+
+      .main {
+        grid-column: 1 / -1;
+        grid-row: 3;
       }
     }
 
@@ -2075,6 +2080,27 @@
       padding: 0 12px;
     }
 
+
+    .olivia-ocean {
+      grid-column: 1 / -1;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .olivia-ocean[hidden] {
+      display: none !important;
+    }
+
+    .olivia-ocean img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      object-fit: contain;
+    }
     /* Responsive layout */
     @media (max-width: 560px) {
       #settingsDialog {
@@ -2104,6 +2130,11 @@
       }
 
       .children {
+        grid-row: 2;
+      }
+
+      .olivia-ocean {
+        grid-column: 1 / -1;
         grid-row: 2;
       }
 
@@ -2485,6 +2516,9 @@
         </div>
       </section>
 
+      <section class="panel olivia-ocean" id="oliviaOcean" aria-label="Olivijos vandenynas" hidden>
+        <img src="assets/olivia-ocean.png" alt="Olivijos vandenynas">
+      </section>
       <section class="panel main">
         <div id="childrenList"></div>
         <div class="section-head">
@@ -4732,6 +4766,12 @@
       showToast(`Pasirinkta staigmena: ${surprise}.`);
     }
 
+
+    function renderOliviaOcean() {
+      const ocean = document.getElementById("oliviaOcean");
+      if (!ocean) return;
+      ocean.hidden = state.active !== "olivia";
+    }
     function renderRace(todayTotals) {
       const scene = document.getElementById("oceanScene");
       const lanes = document.getElementById("oceanLanes");
@@ -4924,6 +4964,7 @@
       renderLog();
       renderReward(familyTodayTotal, weekTotals[state.active] || 0);
       renderWeekendPrize(weekTotals);
+      renderOliviaOcean();
       renderSurprises();
       renderPenaltyOptions();
       renderRace(todayTotals);
