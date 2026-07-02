@@ -173,17 +173,19 @@
       return child;
     }
     function taskDone(child, task) {
-      let done = Boolean(child.done?.[task.id]);
-      child.log.forEach(item => {
-        if (!item || typeof item === "string" || item.taskId !== task.id) return;
-        if (item.kind === "complete") done = true;
-        if (item.kind === "toggleOff" || item.kind === "cancelled") done = false;
-      });
-      return done;
+      const taskEntries = (child.log || [])
+        .filter(item => item && typeof item !== "string" && item.taskId === task.id && !item.undone)
+        .sort((a, b) => String(b.at || "").localeCompare(String(a.at || "")));
+      if (taskEntries.length) return taskEntries[0].kind === "complete";
+      return Boolean(child.done?.[task.id]);
     }
     function visibleShells(child) {
-      const logTotal = child.log.reduce((sum, item) => sum + (typeof item === "string" ? 0 : Number(item.delta) || 0), 0);
-      return Math.max(0, logTotal || child.shells || 0);
+      const logEntries = (child.log || []).filter(item => item && typeof item !== "string" && !item.undone);
+      const logTotal = logEntries.reduce((sum, item) => sum + (Number(item.delta) || 0), 0);
+      const hasDeltaHistory = logEntries.some(item => Number.isFinite(Number(item.delta)));
+      const doneTotal = tasks.reduce((sum, task) => taskDone(child, task) ? sum + task.shells : sum, 0);
+      if (hasDeltaHistory || doneTotal > 0) return Math.max(0, logTotal, doneTotal);
+      return Math.max(0, child.shells || 0);
     }
     function maxShells() { return tasks.reduce((sum, task) => sum + task.shells, 0); }
     function renderProgress() {
@@ -216,15 +218,17 @@
       if (!task) return;
       const state = readState();
       const child = ensureDay(state);
+      state.active = childId;
+      state.selectedDate = todayKey();
       const done = taskDone(child, task);
       if (done) {
         child.done[task.id] = false;
         child.shells = Math.max(0, child.shells - task.shells);
-        child.log.push({ text: `Olivia: atšaukta - ${task.title} (-${task.shells})`, delta: -task.shells, taskId: task.id, kind: "toggleOff", at: new Date().toISOString(), taskTitleAtTime: task.title, taskShellsAtTime: task.shells });
+        child.log.unshift({ text: `Olivia: atšaukta - ${task.title} (-${task.shells})`, delta: -task.shells, taskId: task.id, kind: "toggleOff", at: new Date().toISOString(), taskTitleAtTime: task.title, taskShellsAtTime: task.shells });
       } else {
         child.done[task.id] = true;
         child.shells += task.shells;
-        child.log.push({ text: `Olivia: ${task.title} (+${task.shells})`, delta: task.shells, taskId: task.id, kind: "complete", at: new Date().toISOString(), taskTitleAtTime: task.title, taskShellsAtTime: task.shells });
+        child.log.unshift({ text: `Olivia: ${task.title} (+${task.shells})`, delta: task.shells, taskId: task.id, kind: "complete", at: new Date().toISOString(), taskTitleAtTime: task.title, taskShellsAtTime: task.shells });
       }
       writeState(state);
       renderTasks();
