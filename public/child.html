@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -3566,6 +3566,14 @@
       showToast("Istorijos įrašas atšauktas.");
     }
 
+    let lastTaskToggle = { id: null, at: 0 };
+    function requestTaskComplete(task) {
+      const now = Date.now();
+      if (lastTaskToggle.id === task.id && now - lastTaskToggle.at < 260) return;
+      lastTaskToggle = { id: task.id, at: now };
+      completeTask(task);
+    }
+
     function completeTask(task) {
       if (state.editMode) return;
       const child = activeChild();
@@ -3579,7 +3587,8 @@
           text: `${activeName()}: atšaukta - ${title} (-${shells})`,
           delta: -shells,
           taskId: task.id,
-          kind: "toggleOff"
+          kind: "toggleOff",
+          at: new Date().toISOString()
         });
         addTaskEvent(child, task, "cancelled", -shells);
         save();
@@ -3601,7 +3610,8 @@
         text: `${activeName()}: ${title} (+${shells})`,
         delta: shells,
         taskId: task.id,
-        kind: "complete"
+        kind: "complete",
+        at: new Date().toISOString()
       });
       addTaskEvent(child, task, "completed", shells);
       const milestone = checkChildMilestones(state.active);
@@ -3823,6 +3833,7 @@
         const shells = taskEffectiveShells(state.active, task);
         const safeTaskId = escapeHtml(task.id);
         const button = document.createElement(state.editMode ? "div" : "button");
+        button.dataset.task = task.id;
         if (!state.editMode) button.type = "button";
         const isDone = taskWasDoneOnSelectedDay(child, task);
         const growthCard = growthCardForTask(task);
@@ -3852,7 +3863,19 @@
           ${growthCardMarkup(task)}
         `;
         if (!state.editMode) {
-          button.addEventListener("click", () => completeTask(task));
+          button.addEventListener("click", event => {
+            event.preventDefault();
+            requestTaskComplete(task);
+          });
+          button.addEventListener("pointerup", event => {
+            if (event.pointerType === "mouse" && event.button !== 0) return;
+            event.preventDefault();
+            requestTaskComplete(task);
+          });
+          button.addEventListener("touchend", event => {
+            event.preventDefault();
+            requestTaskComplete(task);
+          });
         }
         button.querySelector("[data-growth-card]")?.addEventListener("click", event => {
           event.preventDefault();
@@ -4852,3 +4875,6 @@
 </script>
 </body>
 </html>
+
+
+
