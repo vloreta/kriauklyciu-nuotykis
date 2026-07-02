@@ -10,33 +10,38 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #eef8e8, #c9f4ff);
       color: var(--ink);
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #e9fbff 0%, #f6fff7 100%);
     }
     main {
-      width: min(920px, 100%);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, .82);
-      border: 1px solid rgba(14, 149, 171, .18);
-      box-shadow: 0 18px 48px rgba(31, 54, 71, .14);
-      padding: clamp(28px, 7vw, 72px);
-      text-align: center;
+      width: min(1480px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 24px;
     }
     h1 {
-      margin: 0;
-      font-size: clamp(2.2rem, 8vw, 5rem);
+      margin: 0 0 14px;
+      font-size: clamp(28px, 4vw, 54px);
       line-height: 1;
       letter-spacing: 0;
+    }
+    .olivia-ocean-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 18px;
+    }
+    @media (max-width: 640px) {
+      main { width: calc(100% - 12px); padding-top: 10px; }
+      h1 { margin-bottom: 10px; }
+      .olivia-ocean-image { border-radius: 12px; }
     }
   </style>
 </head>
 <body>
   <main>
     <h1>Olivijos vandenynas</h1>
+    <img class="olivia-ocean-image" src="assets/olivia-ocean.png" alt="Olivijos vandenynas">
   </main>
 </body>
 </html>
