@@ -209,7 +209,7 @@
       const child = ensureDay(state);
       taskGrid.innerHTML = tasks.map(task => {
         const done = taskDone(child, task);
-        return `<button class="task${done ? " done" : ""}" type="button" data-task="${task.id}" aria-pressed="${done}"><span class="task-icon">${task.icon}</span><span><span class="task-title">${task.title}</span><span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span></span></button>`;
+        return `<button class="task${done ? " done" : ""}" type="button" data-task="${task.id}" aria-pressed="${done}" onclick="event.stopPropagation(); toggleTask('${task.id}')"><span class="task-icon">${task.icon}</span><span><span class="task-title">${task.title}</span><span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span></span></button>`;
       }).join("");
       renderProgress();
     }
