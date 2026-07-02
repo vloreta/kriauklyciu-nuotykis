@@ -46,7 +46,7 @@
     .missions-head h2 { margin: 0; font-size: clamp(24px, 2.4vw, 38px); line-height: 1; }
     .missions-total { color: var(--muted); font-weight: 800; }
     .task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-    .task { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 14px; align-items: center; min-height: 112px; width: 100%; padding: 12px; border: 2px solid rgba(228, 237, 241, .95); border-radius: 9px; background: #fffdf3; text-align: left; cursor: pointer; box-shadow: 0 2px 6px rgba(32, 64, 82, .04); transition: border-color .18s ease, background .18s ease, transform .18s ease; }
+    .task { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 14px; align-items: center; min-height: 112px; width: 100%; padding: 12px; border: 2px solid rgba(228, 237, 241, .95); border-radius: 9px; background: #fffdf3; text-align: left; cursor: pointer; touch-action: manipulation; user-select: none; box-shadow: 0 2px 6px rgba(32, 64, 82, .04); transition: border-color .18s ease, background .18s ease, transform .18s ease; }
     .task:hover { transform: translateY(-1px); border-color: rgba(244,168,200,.72); }
     .task.done { border-color: #f4a8c8; background: #fff0f7; }
     .task-icon { display: grid; place-items: center; width: 86px; height: 86px; border-radius: 8px; background: #fff0f7; font-size: 43px; overflow: hidden; }
@@ -209,7 +209,7 @@
       const child = ensureDay(state);
       taskGrid.innerHTML = tasks.map(task => {
         const done = taskDone(child, task);
-        return `<button class="task${done ? " done" : ""}" type="button" data-task="${task.id}" onclick="toggleTask('${task.id}')" aria-pressed="${done}"><span class="task-icon">${task.icon}</span><span><span class="task-title">${task.title}</span><span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span></span></button>`;
+        return `<button class="task${done ? " done" : ""}" type="button" data-task="${task.id}" aria-pressed="${done}"><span class="task-icon">${task.icon}</span><span><span class="task-title">${task.title}</span><span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span></span></button>`;
       }).join("");
       renderProgress();
     }
@@ -246,6 +246,26 @@
     });
 
 
+    window.toggleTask = toggleTask;
+    let lastTaskPressId = "";
+    let lastTaskPressAt = 0;
+    function handleTaskPress(event) {
+      const button = event.target.closest(".task[data-task]");
+      if (!button || !taskGrid.contains(button)) return;
+      const now = Date.now();
+      const taskId = button.dataset.task;
+      if (taskId === lastTaskPressId && now - lastTaskPressAt < 350) return;
+      lastTaskPressId = taskId;
+      lastTaskPressAt = now;
+      if (event.cancelable) event.preventDefault();
+      toggleTask(taskId);
+    }
+    taskGrid.addEventListener("click", handleTaskPress);
+    taskGrid.addEventListener("pointerup", handleTaskPress);
+    taskGrid.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      handleTaskPress(event);
+    });
     window.addEventListener("storage", renderTasks);
     renderEmotions();
     renderTasks();
