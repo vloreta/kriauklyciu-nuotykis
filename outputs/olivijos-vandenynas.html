@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Olivijos vandenynas</title>
   <style>
-    :root { color-scheme: light; --ink: #21303b; }
+    :root { color-scheme: light; --ink: #21303b; --muted: #5f7180; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -97,13 +97,157 @@
       font-weight: 800;
       box-shadow: 0 4px 12px rgba(22, 69, 89, .12);
     }
-    @media (max-width: 640px) {
+    .emotion-island {
+      display: grid;
+      grid-template-columns: minmax(170px, 18%) minmax(0, max-content);
+      align-items: center;
+      justify-content: start;
+      column-gap: 10px;
+      margin: 10px 0 0;
+      padding: 10px 6px;
+      border-top: 1px solid rgba(14, 149, 171, .16);
+      border-bottom: 1px solid rgba(14, 149, 171, .18);
+      background: linear-gradient(135deg, rgba(244, 255, 252, .9), rgba(255, 253, 241, .82));
+    }
+    .emotion-copy { text-align: left; }
+    .emotion-copy h3 {
+      margin: 0 0 4px;
+      font-size: 1.21rem;
+      line-height: 1.1;
+    }
+    .emotion-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .emotion-options {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: clamp(3px, .7vw, 10px);
+      align-items: start;
+      justify-items: center;
+    }
+    .emotion-button {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      align-content: start;
+      gap: 1px;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      font: inherit;
+    }
+    .emotion-visual {
+      position: relative;
+      display: block;
+      width: clamp(118px, 13.5vw, 210px);
+      height: clamp(118px, 13.5vw, 210px);
+      overflow: hidden;
+      border-radius: 999px;
+    }
+    .emotion-button img {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      object-fit: cover;
+      background: transparent;
+      display: block;
+    }
+    .emotion-button .emotion-label {
+      font-size: .7rem;
+      line-height: 1.1;
+      color: var(--muted);
+      margin-top: -2px;
+      font-weight: 800;
+    }
+    .emotion-button.selected::after {
+      content: "✓";
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: #1095ab;
+      color: white;
+      font-size: 16px;
+      font-weight: 900;
+      box-shadow: 0 6px 12px rgba(16, 149, 171, .22);
+    }
+    .emotion-button.selected .emotion-visual::after {
+      content: "";
+      position: absolute;
+      inset: 8%;
+      border-radius: 999px;
+      border: 3px solid rgba(14, 149, 171, .42);
+      animation: emotionWave .72s ease-out;
+      pointer-events: none;
+    }
+    .emotion-inline-dialog {
+      width: min(260px, 100%);
+      margin-top: 4px;
+      padding: 8px 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(14, 149, 171, .16);
+      background: linear-gradient(135deg, rgba(255, 250, 232, .96), rgba(238, 253, 255, .96));
+      box-shadow: 0 8px 18px rgba(31, 54, 71, .08);
+      color: var(--ink);
+      animation: emotionDialogIn .2s ease-out;
+    }
+    .emotion-inline-dialog p {
+      position: relative;
+      overflow: hidden;
+      margin: 0;
+      font-size: .78rem;
+      font-weight: 850;
+      line-height: 1.22;
+    }
+    .emotion-inline-dialog p + p {
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .emotion-inline-dialog p::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .88), transparent);
+      transform: translateX(-120%);
+      animation: emotionTextWave .9s ease-out both;
+      pointer-events: none;
+    }
+    .emotion-inline-dialog p:nth-child(2)::after { animation-delay: .32s; }
+    @keyframes emotionDialogIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes emotionTextWave {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(120%); }
+    }
+    @keyframes emotionWave {
+      0% { opacity: .7; transform: scale(.72); }
+      100% { opacity: 0; transform: scale(1.18); }
+    }
+    @media (max-width: 760px) {
       main { padding-top: 10px; }
       h1 { margin: 0 10px 10px; }
       .olivia-ocean-stage { border-radius: 12px; }
       .olivia-track { left: 12px; right: 68px; height: 34px; }
       .olivia-treasure-shell { right: 8px; width: 62px; }
       .olivia-score { right: 8px; bottom: 8px; padding: 5px 8px; }
+      .emotion-island { grid-template-columns: 1fr; row-gap: 6px; }
+      .emotion-options { grid-template-columns: repeat(5, minmax(54px, 1fr)); gap: 2px; }
+      .emotion-visual { width: clamp(64px, 17vw, 96px); height: clamp(64px, 17vw, 96px); }
+      .emotion-inline-dialog { padding: 7px 8px; }
     }
   </style>
 </head>
@@ -120,6 +264,44 @@
       <span class="olivia-treasure-shell" aria-hidden="true"></span>
       <span class="olivia-score">0 / 73</span>
     </section>
+    <section class="emotion-island" aria-label="Krabukų emocijų sala">
+      <div class="emotion-copy">
+        <h3>Krabukų emocijų sala</h3>
+        <p>Kaip šiandien jaučiuosi?</p>
+      </div>
+      <div class="emotion-options" id="emotionOptions"></div>
+    </section>
   </main>
+  <script>
+    const emotions = [
+      { id: "happy", label: "Linksma", image: "assets/emotion-happy.png", dialog: ["Labas!", "Papasakok, kas šiandien tave pradžiugino?"] },
+      { id: "calm", label: "Rami", image: "assets/emotion-calm.png", dialog: ["Šiandien tu atrodai labai rami.", "Kas tau padėjo taip jaustis?"] },
+      { id: "sad", label: "Liūdna", image: "assets/emotion-sad.png", dialog: ["Aš matau, kad šiandien truputį liūdna...", "Ar nori man papasakoti?"] },
+      { id: "angry", label: "Pikta", image: "assets/emotion-angry.png", dialog: ["Oho, matau, kad šiandien pyksti.", "Kas nutiko?"] },
+      { id: "scared", label: "Išsigandusi", image: "assets/emotion-scared.png", dialog: ["Aš irgi kartais išsigąstu.", "Kas šiandien tave išgąsdino?"] }
+    ];
+    const options = document.getElementById("emotionOptions");
+    let selectedEmotion = null;
+
+    function renderEmotions() {
+      options.innerHTML = emotions.map(emotion => `
+        <button class="emotion-button${selectedEmotion === emotion.id ? " selected" : ""}" type="button" data-emotion="${emotion.id}" aria-pressed="${selectedEmotion === emotion.id}">
+          <span class="emotion-visual"><img src="${emotion.image}" alt=""></span>
+          <span class="emotion-label">${emotion.label}</span>
+          ${selectedEmotion === emotion.id ? `<span class="emotion-inline-dialog"><p>${emotion.dialog[0]}</p><p>${emotion.dialog[1]}</p></span>` : ""}
+        </button>
+      `).join("");
+    }
+
+    options.addEventListener("click", event => {
+      const button = event.target.closest(".emotion-button");
+      if (!button) return;
+      const next = button.dataset.emotion;
+      selectedEmotion = selectedEmotion === next ? null : next;
+      renderEmotions();
+    });
+
+    renderEmotions();
+  </script>
 </body>
 </html>
