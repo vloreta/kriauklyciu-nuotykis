@@ -247,25 +247,12 @@
 
 
     window.toggleTask = toggleTask;
-    let lastTaskPressId = "";
-    let lastTaskPressAt = 0;
-    function handleTaskPress(event) {
+    function handleTaskClick(event) {
       const button = event.target.closest(".task[data-task]");
       if (!button || !taskGrid.contains(button)) return;
-      const now = Date.now();
-      const taskId = button.dataset.task;
-      if (taskId === lastTaskPressId && now - lastTaskPressAt < 350) return;
-      lastTaskPressId = taskId;
-      lastTaskPressAt = now;
-      if (event.cancelable) event.preventDefault();
-      toggleTask(taskId);
+      toggleTask(button.dataset.task);
     }
-    taskGrid.addEventListener("click", handleTaskPress);
-    taskGrid.addEventListener("pointerup", handleTaskPress);
-    taskGrid.addEventListener("keydown", event => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      handleTaskPress(event);
-    });
+    taskGrid.addEventListener("click", handleTaskClick);
     window.addEventListener("storage", renderTasks);
     renderEmotions();
     renderTasks();
