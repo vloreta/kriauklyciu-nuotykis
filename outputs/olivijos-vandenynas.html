@@ -10,6 +10,8 @@
     body { margin: 0; min-height: 100vh; color: var(--ink); font-family: Arial, sans-serif; background: linear-gradient(180deg, #e9fbff 0%, #f6fff7 100%); }
     main { width: 100%; margin: 0 auto; padding: 18px 0 24px; }
     h1 { margin: 0 16px 14px; font-size: clamp(28px, 4vw, 54px); line-height: 1; letter-spacing: 0; }
+    .back-to-child { position: fixed; top: 14px; right: 14px; z-index: 20; display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(14,149,171,.22); background: rgba(255,255,255,.92); color: #0c718a; font-weight: 900; text-decoration: none; box-shadow: 0 8px 22px rgba(31,54,71,.14); backdrop-filter: blur(8px); }
+    .back-to-child:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(31,54,71,.18); }
     .olivia-ocean-stage { position: relative; width: 100%; overflow: hidden; border-radius: 18px; }
     .olivia-ocean-image { display: block; width: 100%; height: auto; }
     .olivia-track { position: absolute; left: 18px; right: 94px; top: 56%; height: 42px; transform: translateY(-50%); }
@@ -52,6 +54,7 @@
     .task-shells { display: block; margin-top: 6px; color: #0c718a; font-weight: 900; font-size: .92rem; }
     @media (max-width: 760px) {
       main { padding-top: 10px; }
+      .back-to-child { top: 10px; right: 10px; min-height: 38px; padding: 8px 11px; font-size: .9rem; }
       h1 { margin: 0 10px 10px; }
       .olivia-ocean-stage { border-radius: 12px; }
       .olivia-track { left: 12px; right: 68px; height: 34px; }
@@ -68,6 +71,7 @@
   </style>
 </head>
 <body>
+  <a class="back-to-child" href="child" aria-label="Grįžti į vaikų puslapį">← Vaikų puslapis</a>
   <main>
     <h1>Olivijos vandenynas</h1>
     <section class="olivia-ocean-stage" aria-label="Olivijos kelias iki kriauklytės su perlu">
