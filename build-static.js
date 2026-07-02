@@ -7,6 +7,7 @@ const include = [
   'index.html',
   'child.html',
   'parent.html',
+  'olivijos-vandenynas.html',
   'restore-data.html',
   'cloud-config.js',
   'supabase-schema.sql',
