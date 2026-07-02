@@ -248,9 +248,29 @@
 
 
     window.toggleTask = toggleTask;
+    let lastTaskToggle = { id: null, at: 0 };
+    function requestTaskToggle(taskId) {
+      const now = Date.now();
+      if (lastTaskToggle.id === taskId && now - lastTaskToggle.at < 260) return;
+      lastTaskToggle = { id: taskId, at: now };
+      toggleTask(taskId);
+    }
     function bindTaskClicks() {
       taskGrid.querySelectorAll(".task[data-task]").forEach(button => {
-        button.addEventListener("click", () => toggleTask(button.dataset.task));
+        const taskId = button.dataset.task;
+        button.onclick = event => {
+          event.preventDefault();
+          requestTaskToggle(taskId);
+        };
+        button.onpointerup = event => {
+          if (event.pointerType === "mouse" && event.button !== 0) return;
+          event.preventDefault();
+          requestTaskToggle(taskId);
+        };
+        button.ontouchend = event => {
+          event.preventDefault();
+          requestTaskToggle(taskId);
+        };
       });
     }
     window.addEventListener("storage", renderTasks);
