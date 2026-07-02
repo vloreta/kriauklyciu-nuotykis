@@ -209,9 +209,10 @@
       const child = ensureDay(state);
       taskGrid.innerHTML = tasks.map(task => {
         const done = taskDone(child, task);
-        return `<button class="task${done ? " done" : ""}" type="button" data-task="${task.id}" aria-pressed="${done}" onclick="event.stopPropagation(); toggleTask('${task.id}')"><span class="task-icon">${task.icon}</span><span><span class="task-title">${task.title}</span><span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span></span></button>`;
+        return `<button class="task${done ? " done" : ""}" type="button" data-task="${task.id}" aria-pressed="${done}" ><span class="task-icon">${task.icon}</span><span><span class="task-title">${task.title}</span><span class="task-shells">+${task.shells} ${shellWord(task.shells)}</span></span></button>`;
       }).join("");
       renderProgress();
+      bindTaskClicks();
     }
     function toggleTask(taskId) {
       const task = tasks.find(item => item.id === taskId);
@@ -247,12 +248,11 @@
 
 
     window.toggleTask = toggleTask;
-    function handleTaskClick(event) {
-      const button = event.target.closest(".task[data-task]");
-      if (!button || !taskGrid.contains(button)) return;
-      toggleTask(button.dataset.task);
+    function bindTaskClicks() {
+      taskGrid.querySelectorAll(".task[data-task]").forEach(button => {
+        button.addEventListener("click", () => toggleTask(button.dataset.task));
+      });
     }
-    taskGrid.addEventListener("click", handleTaskClick);
     window.addEventListener("storage", renderTasks);
     renderEmotions();
     renderTasks();
