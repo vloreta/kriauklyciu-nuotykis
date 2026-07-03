@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -3837,6 +3837,7 @@
         if (!state.editMode) button.type = "button";
         const isDone = taskWasDoneOnSelectedDay(child, task);
         const growthCard = growthCardForTask(task);
+        const canToggleTaskFromChildPage = state.active !== "olivia";
         button.className = `task${isDone ? " done" : ""}${state.editMode ? " editing" : ""}${growthCard && isGrowthCardEnabledForTask(state.active, task) ? " growth-layered-task" : ""}`;
         button.innerHTML = growthCard && isGrowthCardEnabledForTask(state.active, task) ? `
           ${growthLayeredTaskMarkup(task, title, shells)}
@@ -3862,7 +3863,7 @@
           ${parentTipMarkup(task)}
           ${growthCardMarkup(task)}
         `;
-        if (!state.editMode) {
+        if (!state.editMode && canToggleTaskFromChildPage) {
           button.addEventListener("click", event => {
             event.preventDefault();
             requestTaskComplete(task);
@@ -4875,6 +4876,3 @@
 </script>
 </body>
 </html>
-
-
-
