@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -251,28 +251,34 @@
     let lastTaskToggle = { id: null, at: 0 };
     function requestTaskToggle(taskId) {
       const now = Date.now();
-      if (lastTaskToggle.id === taskId && now - lastTaskToggle.at < 260) return;
+      if (lastTaskToggle.id === taskId && now - lastTaskToggle.at < 650) return;
       lastTaskToggle = { id: taskId, at: now };
       toggleTask(taskId);
     }
+    function taskButtonFromEvent(event) {
+      const target = event.target && event.target.closest ? event.target.closest(".task[data-task]") : null;
+      return target && taskGrid.contains(target) ? target : null;
+    }
+    function activateTaskFromEvent(event) {
+      const button = taskButtonFromEvent(event);
+      if (!button) return;
+      if (event.type === "pointerdown" && event.pointerType === "mouse" && event.button !== 0) return;
+      event.preventDefault();
+      requestTaskToggle(button.dataset.task);
+    }
     function bindTaskClicks() {
       taskGrid.querySelectorAll(".task[data-task]").forEach(button => {
-        const taskId = button.dataset.task;
-        button.onclick = event => {
-          event.preventDefault();
-          requestTaskToggle(taskId);
-        };
-        button.onpointerup = event => {
-          if (event.pointerType === "mouse" && event.button !== 0) return;
-          event.preventDefault();
-          requestTaskToggle(taskId);
-        };
-        button.ontouchend = event => {
-          event.preventDefault();
-          requestTaskToggle(taskId);
-        };
+        button.onclick = null;
+        button.onpointerup = null;
+        button.ontouchend = null;
       });
     }
+    taskGrid.addEventListener("pointerdown", activateTaskFromEvent, true);
+    taskGrid.addEventListener("click", activateTaskFromEvent, true);
+    taskGrid.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      activateTaskFromEvent(event);
+    }, true);
     window.addEventListener("storage", renderTasks);
     renderEmotions();
     renderTasks();
