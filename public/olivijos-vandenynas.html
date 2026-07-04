@@ -186,10 +186,14 @@
       const logTotal = logEntries.reduce((sum, item) => sum + (Number(item.delta) || 0), 0);
       const hasDeltaHistory = logEntries.some(item => Number.isFinite(Number(item.delta)));
       const doneTotal = tasks.reduce((sum, task) => taskDone(child, task) ? sum + task.shells : sum, 0);
-      if (hasDeltaHistory || doneTotal > 0) return Math.max(0, logTotal, doneTotal);
+      if (doneTotal > 0 || hasDeltaHistory) return Math.max(0, doneTotal);
       return Math.max(0, child.shells || 0);
     }
     function maxShells() { return tasks.reduce((sum, task) => sum + task.shells, 0); }
+    function syncShellsFromDone(child) {
+      child.shells = tasks.reduce((sum, task) => taskDone(child, task) ? sum + task.shells : sum, 0);
+      return child.shells;
+    }
     function renderProgress() {
       const state = readState();
       const child = ensureDay(state);
@@ -228,13 +232,12 @@
       const done = taskDone(child, task);
       if (done) {
         child.done[task.id] = false;
-        child.shells = Math.max(0, child.shells - task.shells);
         child.log.unshift({ text: `Olivia: atšaukta - ${task.title} (-${task.shells})`, delta: -task.shells, taskId: task.id, kind: "toggleOff", at: new Date().toISOString(), taskTitleAtTime: task.title, taskShellsAtTime: task.shells });
       } else {
         child.done[task.id] = true;
-        child.shells += task.shells;
         child.log.unshift({ text: `Olivia: ${task.title} (+${task.shells})`, delta: task.shells, taskId: task.id, kind: "complete", at: new Date().toISOString(), taskTitleAtTime: task.title, taskShellsAtTime: task.shells });
       }
+      syncShellsFromDone(child);
       writeState(state);
       renderTasks();
       animateShell();
@@ -253,15 +256,23 @@
 
     window.toggleTask = toggleTask;
     let lastTaskActivation = 0;
+    let lastTaskId = "";
     function runTaskToggle(taskId) {
       const now = Date.now();
-      if (now - lastTaskActivation < 180) return;
+      if (taskId === lastTaskId && now - lastTaskActivation < 180) return;
+      lastTaskId = taskId;
       lastTaskActivation = now;
       toggleTask(taskId);
     }
     function bindTaskClicks() {
       taskGrid.querySelectorAll(".task[data-task]").forEach(button => {
         button.onclick = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          runTaskToggle(button.dataset.task);
+        };
+        button.onpointerup = event => {
+          if (event.pointerType === "touch") return;
           event.preventDefault();
           event.stopPropagation();
           runTaskToggle(button.dataset.task);
