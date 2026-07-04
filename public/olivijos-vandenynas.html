@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -248,13 +248,6 @@
 
 
     window.toggleTask = toggleTask;
-    let lastTaskToggle = { id: null, at: 0 };
-    function requestTaskToggle(taskId) {
-      const now = Date.now();
-      if (lastTaskToggle.id === taskId && now - lastTaskToggle.at < 650) return;
-      lastTaskToggle = { id: taskId, at: now };
-      toggleTask(taskId);
-    }
     function taskButtonFromEvent(event) {
       const target = event.target && event.target.closest ? event.target.closest(".task[data-task]") : null;
       return target && taskGrid.contains(target) ? target : null;
@@ -262,19 +255,18 @@
     function activateTaskFromEvent(event) {
       const button = taskButtonFromEvent(event);
       if (!button) return;
-      if (event.type === "pointerdown" && event.pointerType === "mouse" && event.button !== 0) return;
       event.preventDefault();
-      requestTaskToggle(button.dataset.task);
+      toggleTask(button.dataset.task);
     }
     function bindTaskClicks() {
       taskGrid.querySelectorAll(".task[data-task]").forEach(button => {
         button.onclick = null;
+        button.onpointerdown = null;
         button.onpointerup = null;
         button.ontouchend = null;
       });
     }
-    taskGrid.addEventListener("pointerdown", activateTaskFromEvent, true);
-    taskGrid.addEventListener("click", activateTaskFromEvent, true);
+    taskGrid.addEventListener("click", activateTaskFromEvent);
     taskGrid.addEventListener("keydown", event => {
       if (event.key !== "Enter" && event.key !== " ") return;
       activateTaskFromEvent(event);
