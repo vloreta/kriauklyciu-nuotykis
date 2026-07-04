@@ -132,6 +132,8 @@
     const emotionOptionsEl = document.getElementById("emotionOptions");
     const taskGrid = document.getElementById("taskGrid");
     const track = document.getElementById("oliviaTrack");
+    const progressBar = track.querySelector(".olivia-progress");
+    const crab = track.querySelector(".olivia-crab");
     const score = document.getElementById("oliviaScore");
     const totalEl = document.getElementById("missionsTotal");
     const shell = document.getElementById("treasureShell");
@@ -195,6 +197,8 @@
       const max = maxShells();
       const ratio = max > 0 ? Math.min(Math.max(shells / max, 0), 1) : 0;
       track.style.setProperty("--progress-value", ratio);
+      progressBar.style.width = `${ratio * 100}%`;
+      crab.style.left = `${ratio * 100}%`;
       score.textContent = `${shells} / ${max} ${shellWord(max)}`;
       totalEl.textContent = `${shells} ${shellWord(shells)}`;
     }
@@ -248,29 +252,28 @@
 
 
     window.toggleTask = toggleTask;
-    function taskButtonFromEvent(event) {
-      const target = event.target && event.target.closest ? event.target.closest(".task[data-task]") : null;
-      return target && taskGrid.contains(target) ? target : null;
-    }
-    function activateTaskFromEvent(event) {
-      const button = taskButtonFromEvent(event);
-      if (!button) return;
-      event.preventDefault();
-      toggleTask(button.dataset.task);
+    let lastTaskActivation = 0;
+    function runTaskToggle(taskId) {
+      const now = Date.now();
+      if (now - lastTaskActivation < 180) return;
+      lastTaskActivation = now;
+      toggleTask(taskId);
     }
     function bindTaskClicks() {
       taskGrid.querySelectorAll(".task[data-task]").forEach(button => {
-        button.onclick = null;
-        button.onpointerdown = null;
-        button.onpointerup = null;
-        button.ontouchend = null;
+        button.onclick = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          runTaskToggle(button.dataset.task);
+        };
+        button.onkeydown = event => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          event.stopPropagation();
+          runTaskToggle(button.dataset.task);
+        };
       });
     }
-    taskGrid.addEventListener("click", activateTaskFromEvent);
-    taskGrid.addEventListener("keydown", event => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      activateTaskFromEvent(event);
-    }, true);
     window.addEventListener("storage", renderTasks);
     renderEmotions();
     renderTasks();
