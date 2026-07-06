@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 
 const root = __dirname;
@@ -8,6 +8,7 @@ const include = [
   'child.html',
   'parent.html',
   'olivijos-vandenynas.html',
+  'dominyko-vandenynas.html',
   'restore-data.html',
   'cloud-config.js',
   'supabase-schema.sql',
