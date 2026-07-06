@@ -1072,6 +1072,21 @@
       margin-bottom: 12px;
     }
 
+
+    .edit-dialog {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(31, 54, 71, .28);
+    }
+
+    .edit-dialog.open {
+      display: flex;
+    }
     .task-tools {
       display: flex;
       justify-content: flex-end;
@@ -1678,13 +1693,13 @@
     }
 
     .child-page .task-grid {
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)) !important;
       gap: 18px;
     }
 
     .child-page .task {
-      min-height: 148px;
-      font-size: 1.08rem;
+      min-height: 156px;
+      font-size: 1.12rem;
       grid-template-columns: 104px 1fr;
       gap: 16px;
       padding: 16px;
@@ -1701,20 +1716,20 @@
     .child-page .task-grid.pink .task-icon,
     .child-page .task-grid.boy .task-icon,
     .child-page .task-grid.blue .task-icon {
-      width: 104px;
-      height: 104px;
-      font-size: 3.8rem;
+      width: 112px;
+      height: 112px;
+      font-size: 4rem;
     }
 
     .child-page .task-grid.girl .task-title,
     .child-page .task-grid.pink .task-title,
     .child-page .task-grid.boy .task-title,
     .child-page .task-grid.blue .task-title {
-      font-size: 1rem;
+      font-size: 1.06rem;
     }
 
     .child-page .task-shells {
-      font-size: 1.02rem;
+      font-size: 1.08rem;
     }
 
     .child-page .children,
@@ -1960,7 +1975,6 @@
         align-items: stretch;
         flex-direction: column;
       }
-
       .task-tools {
         justify-content: flex-start;
       }
