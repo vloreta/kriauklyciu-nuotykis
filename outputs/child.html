@@ -1655,10 +1655,10 @@
 
     /* Child screen: keep daily actions visible, move admin controls away. */
     .child-page .app {
-      width: 100vw;
+      width: calc(100% - 16px);
       max-width: none;
-      margin: 0;
-      padding: 8px 8px 22px;
+      margin: 0 auto;
+      padding: 8px 0 28px;
     }
 
     .child-page .hero {
@@ -1674,41 +1674,47 @@
     }
 
     .child-page .main {
-      padding: 20px;
+      padding: 24px;
     }
 
     .child-page .task-grid {
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
     }
 
     .child-page .task {
-      min-height: 124px;
-      font-size: 1.02rem;
-      grid-template-columns: 86px 1fr;
+      min-height: 148px;
+      font-size: 1.08rem;
+      grid-template-columns: 104px 1fr;
+      gap: 16px;
+      padding: 16px;
     }
 
     .child-page .task-grid.girl .task,
     .child-page .task-grid.pink .task,
     .child-page .task-grid.boy .task,
     .child-page .task-grid.blue .task {
-      grid-template-columns: 86px 1fr;
+      grid-template-columns: 104px 1fr;
     }
 
     .child-page .task-grid.girl .task-icon,
     .child-page .task-grid.pink .task-icon,
     .child-page .task-grid.boy .task-icon,
     .child-page .task-grid.blue .task-icon {
-      width: 86px;
-      height: 86px;
-      font-size: 3.35rem;
+      width: 104px;
+      height: 104px;
+      font-size: 3.8rem;
     }
 
     .child-page .task-grid.girl .task-title,
     .child-page .task-grid.pink .task-title,
     .child-page .task-grid.boy .task-title,
     .child-page .task-grid.blue .task-title {
-      font-size: .88rem;
+      font-size: 1rem;
+    }
+
+    .child-page .task-shells {
+      font-size: 1.02rem;
     }
 
     .child-page .children,
