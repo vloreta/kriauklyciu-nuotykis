@@ -42,6 +42,17 @@
     @keyframes dominikShellGlow { 0%,100% { filter: drop-shadow(0 10px 14px rgba(20,73,93,.28)); transform: translateY(-50%) scale(1); } 35% { filter: drop-shadow(0 0 28px rgba(255,255,255,1)) drop-shadow(0 0 34px rgba(120,210,255,.95)); transform: translateY(-50%) scale(1.12); } 65% { filter: drop-shadow(0 0 22px rgba(255,255,255,.95)) drop-shadow(0 0 28px rgba(120,255,170,.85)); transform: translateY(-50%) scale(1.06); } }
     .dominik-score { position: absolute; right: 12px; bottom: 14px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: #22313d; font-size: clamp(12px, 1.15vw, 16px); font-weight: 800; box-shadow: 0 4px 12px rgba(22,69,89,.12); z-index: 5; }
     .dominik-ocean-image { display: block; width: 100%; height: auto; }
+    .dominik-tasks-section { padding: 18px clamp(12px, 2vw, 28px) 32px; background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(246,255,247,.92)); }
+    .dominik-tasks-header { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .dominik-tasks-header h2 { margin: 0; font-size: clamp(24px, 3vw, 42px); line-height: 1; letter-spacing: 0; }
+    .dominik-daily-total { color: var(--muted); font-size: clamp(14px, 1.4vw, 18px); font-weight: 900; }
+    .dominik-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .dominik-task-card { min-height: 118px; display: grid; grid-template-columns: 78px minmax(0, 1fr); align-items: center; gap: 14px; padding: 14px; border: 2px solid rgba(15, 136, 168, .12); border-radius: 10px; background: #fffdf1; color: var(--ink); text-align: left; cursor: pointer; box-shadow: 0 8px 18px rgba(24, 70, 88, .08); transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease; }
+    .dominik-task-card:hover { transform: translateY(-1px); border-color: rgba(16,149,171,.35); box-shadow: 0 12px 24px rgba(24, 70, 88, .12); }
+    .dominik-task-card.done { background: #eaf9ef; border-color: rgba(36, 190, 101, .55); box-shadow: inset 0 0 0 1px rgba(36, 190, 101, .16), 0 10px 24px rgba(24,70,88,.1); }
+    .dominik-task-icon { width: 78px; height: 78px; display: grid; place-items: center; border-radius: 9px; background: #eefbff; font-size: 38px; line-height: 1; }
+    .dominik-task-title { display: block; font-size: clamp(14px, 1.15vw, 18px); line-height: 1.08; font-weight: 900; }
+    .dominik-task-shells { display: block; margin-top: 7px; color: #007692; font-size: clamp(13px, 1vw, 16px); font-weight: 900; }
     @media (max-width: 760px) {
       main { padding-top: 10px; }
       .back-to-child { top: 10px; right: 10px; min-height: 38px; padding: 8px 11px; font-size: .9rem; }
@@ -54,6 +65,10 @@
       .emotion-options { grid-template-columns: repeat(5,minmax(54px,1fr)); gap: 2px; }
       .emotion-visual { width: clamp(64px,17vw,96px); height: clamp(64px,17vw,96px); }
       .emotion-inline-dialog { padding: 7px 8px; }
+      .dominik-tasks-section { padding: 14px 10px 24px; }
+      .dominik-task-grid { grid-template-columns: 1fr; gap: 10px; }
+      .dominik-task-card { min-height: 104px; grid-template-columns: 68px minmax(0,1fr); padding: 12px; }
+      .dominik-task-icon { width: 68px; height: 68px; font-size: 32px; }
     }
   </style>
 </head>
@@ -73,45 +88,94 @@
       <div class="emotion-copy"><h3>Krabukų emocijų sala</h3><p>Kaip šiandien jaučiuosi?</p></div>
       <div class="emotion-options" id="emotionOptions"></div>
     </section>
+    <section class="dominik-tasks-section" aria-label="Dominyko užduotys">
+      <div class="dominik-tasks-header">
+        <h2>Dominyko užduotys</h2>
+        <strong class="dominik-daily-total" id="dominikDailyTotal">0 kriauklyčių</strong>
+      </div>
+      <div class="dominik-task-grid" id="dominikTaskGrid"></div>
+    </section>
   </main>
   <script>
     const storageKey = "kriauklyciu-nuotykis";
     const dominikTasks = [
-      { id: "domSleepAlone", shells: 3 }, { id: "domWakeUp", shells: 3 }, { id: "domBed", shells: 1 },
-      { id: "domGettingReady", shells: 1 }, { id: "domToKindergarten", shells: 1 }, { id: "domKindergarten", shells: 1 },
-      { id: "domFromKindergarten", shells: 1 }, { id: "domBagShoesJacket", shells: 1 }, { id: "domHands", shells: 1 },
-      { id: "domTable", shells: 1 }, { id: "domMeal", shells: 5 }, { id: "domThanksMeal", shells: 1 },
-      { id: "domDishes", shells: 1 }, { id: "domNoHurtSister", shells: 5 }, { id: "domPlaySister", shells: 2 },
-      { id: "domNiceWordsSister", shells: 2 }, { id: "domMom", shells: 2 }, { id: "domQuietVoice", shells: 5 },
-      { id: "domOutsidePlay", shells: 2 }, { id: "domHelp", shells: 2 }, { id: "domThanksNeeded", shells: 1 },
-      { id: "domSorry", shells: 2 }, { id: "domChooseActivity", shells: 1 }, { id: "domPraise", shells: 5 },
-      { id: "domSpeech", shells: 3 }, { id: "domToysBooks", shells: 2 }
+      { id: "domSleepAlone", icon: "🌌", title: "Pats užmigau be kitų", shells: 3 },
+      { id: "domWakeUp", icon: "🌞", title: "Kai pažadino, tuoj pat pats atsikėliau", shells: 3 },
+      { id: "domBed", icon: "🛏️", title: "Pats pasiklojau lovą, susilanksčiau ryte pižamą", shells: 1 },
+      { id: "domGettingReady", icon: "🧢", title: "Gražiai elgiausi ruošiantis į darželį", shells: 1 },
+      { id: "domToKindergarten", icon: "🚶‍♂️", title: "Gražiai elgiausi einant į darželį", shells: 1 },
+      { id: "domKindergarten", icon: "🏫", title: "Gražiai elgiausi darželyje", shells: 1 },
+      { id: "domFromKindergarten", icon: "🌤️", title: "Gražiai elgiausi grįžtant iš darželio", shells: 1 },
+      { id: "domBagShoesJacket", icon: "🎒", title: "Kuprinę, batus, striukę padėjau į vietą", shells: 1 },
+      { id: "domHands", icon: "🧼", title: "Pats nusiploviau rankas", shells: 1 },
+      { id: "domTable", icon: "🍽️", title: "Padėjau padengti stalą", shells: 1 },
+      { id: "domMeal", icon: "🍝", title: "Gražiai sėdėjau valgant", shells: 5 },
+      { id: "domThanksMeal", icon: "🙏", title: "Pasakiau „ačiū“, kai pavalgiau", shells: 1 },
+      { id: "domDishes", icon: "🧽", title: "Nunešiau indus po valgio", shells: 1 },
+      { id: "domNoHurtSister", icon: "🛡️", title: "Neerzinau, nemušiau, nestumdžiau, neužgavau sesės", shells: 5 },
+      { id: "domPlaySister", icon: "🎲", title: "Gražiai žaidžiau su sese", shells: 2 },
+      { id: "domNiceWordsSister", icon: "💬", title: "Pasakiau sesei kažką malonaus", shells: 2 },
+      { id: "domMom", icon: "👩‍👦", title: "Gražiai elgiausi, neerzinau mamytės", shells: 2 },
+      { id: "domQuietVoice", icon: "🤫", title: "Stengiausi tyliau ir ramiau kalbėti", shells: 5 },
+      { id: "domOutsidePlay", icon: "🚲", title: "Gražiai elgiausi pasivaikščiojant, žaidimų aikštelėje, su dviračiais", shells: 2 },
+      { id: "domHelp", icon: "🤝", title: "Padėjau kitam", shells: 2 },
+      { id: "domThanksNeeded", icon: "🙌", title: "Pasakiau „ačiū“, kai reikėjo", shells: 1 },
+      { id: "domSorry", icon: "💙", title: "Atsiprašiau, kai reikėjo", shells: 2 },
+      { id: "domChooseActivity", icon: "🧱", title: "Pats ėmiau piešti, skaityti, rašyti, žaisti, lipdyti ir t. t.", shells: 1 },
+      { id: "domPraise", icon: "🏅", title: "Mamos, tėčio, močiutės, Ernesto, auklėtojos pagyrimas", shells: 5 },
+      { id: "domSpeech", icon: "🎙️", title: "Atlikau kalbos pratimus, stengiausi aiškiai tarti garsus", shells: 3 },
+      { id: "domToysBooks", icon: "🧸", title: "Pats susidėjau savo žaislus ir knygutes", shells: 2 }
     ];
     const dominikTrack = document.getElementById("dominikTrack");
     const dominikProgress = dominikTrack?.querySelector(".dominik-progress");
     const dominikCrab = dominikTrack?.querySelector(".dominik-crab");
     const dominikScore = document.getElementById("dominikScore");
     const dominikShell = document.getElementById("dominikTreasureShell");
+    const dominikTaskGrid = document.getElementById("dominikTaskGrid");
+    const dominikDailyTotal = document.getElementById("dominikDailyTotal");
     function currentDateKey() { return new Date().toISOString().slice(0, 10); }
     function readDominikState() { try { return JSON.parse(localStorage.getItem(storageKey) || "null") || {}; } catch { return {}; } }
+    function saveDominikState(state) {
+      state.updatedAt = new Date().toISOString();
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+    function taskTitle(task) { return task.title || task.id; }
+    function taskShells(task) { return Math.max(0, Number(task.shells) || 0); }
+    function dominikTasksForState(state = readDominikState()) {
+      const defaults = Object.fromEntries(dominikTasks.map(task => [task.id, task]));
+      const custom = Array.isArray(state.customTasks?.dominik) && state.customTasks.dominik.length ? state.customTasks.dominik : dominikTasks;
+      return custom.map(task => ({ ...(defaults[task.id] || {}), ...task, icon: task.icon || defaults[task.id]?.icon || "🐚" }));
+    }
+    function ensureDominikDay(state, key = currentDateKey()) {
+      if (!state.records) state.records = {};
+      if (!state.records[key]) state.records[key] = {};
+      if (!state.records[key].dominik) state.records[key].dominik = { shells: 0, done: {}, log: [] };
+      const day = state.records[key].dominik;
+      if (!day.done) day.done = {};
+      if (!Array.isArray(day.log)) day.log = [];
+      if (!Array.isArray(day.events)) day.events = [];
+      day.shells = Math.max(0, Number(day.shells) || 0);
+      return day;
+    }
     function shellWord(count) { const last = count % 10; const lastTwo = count % 100; if (lastTwo >= 11 && lastTwo <= 19) return "kriaukly\u010di\u0173"; if (last === 1) return "kriauklyt\u0117"; if (last >= 2 && last <= 9) return "kriauklyt\u0117s"; return "kriaukly\u010di\u0173"; }
     function isDominikTaskDone(day, task) {
       const entries = (day?.log || []).filter(item => item && typeof item !== "string" && item.taskId === task.id && !item.undone).sort((a, b) => String(b.at || "").localeCompare(String(a.at || "")));
       if (entries.length) return entries[0].kind === "complete";
       return Boolean(day?.done?.[task.id]);
     }
-    function dominikMaxShells() { return dominikTasks.reduce((sum, task) => sum + task.shells, 0); }
-    function dominikVisibleShells(day) {
-      const doneTotal = dominikTasks.reduce((sum, task) => isDominikTaskDone(day, task) ? sum + task.shells : sum, 0);
+    function dominikMaxShells(state = readDominikState()) { return dominikTasksForState(state).reduce((sum, task) => sum + taskShells(task), 0); }
+    function dominikVisibleShells(day, state = readDominikState()) {
+      const tasks = dominikTasksForState(state);
+      const doneTotal = tasks.reduce((sum, task) => isDominikTaskDone(day, task) ? sum + taskShells(task) : sum, 0);
       if (doneTotal > 0) return doneTotal;
       return Math.max(0, Number(day?.shells) || 0);
     }
     function renderDominikProgress() {
       const state = readDominikState();
-      const key = state.selectedDate || currentDateKey();
-      const day = state.records?.[key]?.dominik || state.records?.[currentDateKey()]?.dominik || {};
-      const shells = dominikVisibleShells(day);
-      const max = dominikMaxShells();
+      const key = currentDateKey();
+      const day = state.records?.[key]?.dominik || {};
+      const shells = dominikVisibleShells(day, state);
+      const max = dominikMaxShells(state);
       const ratio = max > 0 ? Math.min(Math.max(shells / max, 0), 1) : 0;
       if (dominikTrack) dominikTrack.style.setProperty("--progress-value", ratio);
       if (dominikProgress) dominikProgress.style.width = `${ratio * 100}%`;
@@ -125,13 +189,56 @@
       dominikShell.classList.add("collecting");
       setTimeout(() => dominikShell.classList.remove("collecting"), 820);
     }
+    function renderDominikTasks() {
+      if (!dominikTaskGrid) return;
+      const state = readDominikState();
+      const key = currentDateKey();
+      const day = state.records?.[key]?.dominik || {};
+      const tasks = dominikTasksForState(state);
+      const shells = dominikVisibleShells(day, state);
+      if (dominikDailyTotal) dominikDailyTotal.textContent = `${shells} ${shellWord(shells)}`;
+      dominikTaskGrid.innerHTML = "";
+      tasks.forEach(task => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `dominik-task-card${isDominikTaskDone(day, task) ? " done" : ""}`;
+        button.dataset.task = task.id;
+        button.innerHTML = `<span class="dominik-task-icon">${task.icon || "🐚"}</span><span><span class="dominik-task-title">${taskTitle(task)}</span><span class="dominik-task-shells">+${taskShells(task)} ${shellWord(taskShells(task))}</span></span>`;
+        button.addEventListener("click", () => toggleDominikTask(task));
+        dominikTaskGrid.appendChild(button);
+      });
+    }
+    function toggleDominikTask(task) {
+      const state = readDominikState();
+      const key = currentDateKey();
+      const day = ensureDominikDay(state, key);
+      const title = taskTitle(task);
+      const shells = taskShells(task);
+      const wasDone = isDominikTaskDone(day, task);
+      if (wasDone) {
+        day.done[task.id] = false;
+        day.shells = Math.max(0, day.shells - shells);
+        day.log.push({ text: `Dominik: atšaukta - ${title} (-${shells})`, delta: -shells, taskId: task.id, kind: "toggleOff", at: new Date().toISOString() });
+        day.events.push({ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, date: key, action: "cancelled", taskId: task.id, taskTitleAtTime: title, taskShellsAtTime: shells, delta: -shells });
+      } else {
+        day.done[task.id] = true;
+        day.shells += shells;
+        day.log.push({ text: `Dominik: ${title} (+${shells})`, delta: shells, taskId: task.id, kind: "complete", at: new Date().toISOString() });
+        day.events.push({ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, date: key, action: "completed", taskId: task.id, taskTitleAtTime: title, taskShellsAtTime: shells, delta: shells });
+      }
+      saveDominikState(state);
+      renderDominikProgress();
+      renderDominikTasks();
+      flashDominikShell();
+    }
     window.renderDominikProgress = renderDominikProgress;
     window.flashDominikShell = flashDominikShell;
-    window.addEventListener("storage", renderDominikProgress);
+    window.addEventListener("storage", () => { renderDominikProgress(); renderDominikTasks(); });
     document.addEventListener("click", event => {
       if (event.target.closest(".task[data-task], [data-task]")) setTimeout(() => { renderDominikProgress(); flashDominikShell(); }, 80);
     });
     renderDominikProgress();
+    renderDominikTasks();
     const emotions = [
       { id: "happy", label: "Linksmas", image: "assets/emotion-happy.png", dialog: ["Labas!", "Papasakok, kas šiandien tave pradžiugino?"] },
       { id: "calm", label: "Ramus", image: "assets/emotion-calm.png", dialog: ["Šiandien tu atrodai labai ramus.", "Kas tau padėjo taip jaustis?"] },
