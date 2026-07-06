@@ -94,7 +94,7 @@
     const dominikShell = document.getElementById("dominikTreasureShell");
     function currentDateKey() { return new Date().toISOString().slice(0, 10); }
     function readDominikState() { try { return JSON.parse(localStorage.getItem(storageKey) || "null") || {}; } catch { return {}; } }
-    function shellWord(count) { const last = count % 10; const lastTwo = count % 100; if (lastTwo >= 11 && lastTwo <= 19) return "kriauklyÄiÅ³"; if (last === 1) return "kriauklytÄ—"; if (last >= 2 && last <= 9) return "kriauklytÄ—s"; return "kriauklyÄiÅ³"; }
+    function shellWord(count) { const last = count % 10; const lastTwo = count % 100; if (lastTwo >= 11 && lastTwo <= 19) return "kriaukly\u010di\u0173"; if (last === 1) return "kriauklyt\u0117"; if (last >= 2 && last <= 9) return "kriauklyt\u0117s"; return "kriaukly\u010di\u0173"; }
     function isDominikTaskDone(day, task) {
       const entries = (day?.log || []).filter(item => item && typeof item !== "string" && item.taskId === task.id && !item.undone).sort((a, b) => String(b.at || "").localeCompare(String(a.at || "")));
       if (entries.length) return entries[0].kind === "complete";
