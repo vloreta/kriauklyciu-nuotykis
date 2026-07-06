@@ -1654,6 +1654,13 @@
     }
 
     /* Child screen: keep daily actions visible, move admin controls away. */
+    .child-page .app {
+      width: 100vw;
+      max-width: none;
+      margin: 0;
+      padding: 8px 8px 22px;
+    }
+
     .child-page .hero {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
@@ -1663,7 +1670,7 @@
     }
 
     .child-page .ocean-scene {
-      height: 380px;
+      height: 430px;
     }
 
     .child-page .main {
@@ -1671,13 +1678,37 @@
     }
 
     .child-page .task-grid {
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
     }
 
     .child-page .task {
-      min-height: 124px;
-      font-size: 1.02rem;
+      min-height: 136px;
+      font-size: 1.08rem;
+      grid-template-columns: 96px 1fr;
+    }
+
+    .child-page .task-grid.girl .task,
+    .child-page .task-grid.pink .task,
+    .child-page .task-grid.boy .task,
+    .child-page .task-grid.blue .task {
+      grid-template-columns: 96px 1fr;
+    }
+
+    .child-page .task-grid.girl .task-icon,
+    .child-page .task-grid.pink .task-icon,
+    .child-page .task-grid.boy .task-icon,
+    .child-page .task-grid.blue .task-icon {
+      width: 96px;
+      height: 96px;
+      font-size: 3.75rem;
+    }
+
+    .child-page .task-grid.girl .task-title,
+    .child-page .task-grid.pink .task-title,
+    .child-page .task-grid.boy .task-title,
+    .child-page .task-grid.blue .task-title {
+      font-size: .98rem;
     }
 
     .child-page .children,
