@@ -3674,10 +3674,21 @@
     let lastTaskToggle = { id: null, at: 0 };
     function requestTaskComplete(task) {
       const now = Date.now();
-      if (lastTaskToggle.id === task.id && now - lastTaskToggle.at < 260) return;
+      if (lastTaskToggle.id === task.id && now - lastTaskToggle.at < 80) return;
       lastTaskToggle = { id: task.id, at: now };
       completeTask(task);
     }
+
+    contentArea.addEventListener("click", event => {
+      if (state.editMode || contentArea.className.indexOf("task-grid") === -1) return;
+      if (event.target.closest("[data-growth-card], [data-parent-tip], [data-edit-task], [data-delete-task]")) return;
+      const taskButton = event.target.closest("[data-task]");
+      if (!taskButton || !contentArea.contains(taskButton)) return;
+      const task = tasksForChild().find(item => item.id === taskButton.dataset.task);
+      if (!task) return;
+      event.preventDefault();
+      requestTaskComplete(task);
+    });
 
     function completeTask(task) {
       if (state.editMode) return;
@@ -3968,12 +3979,7 @@
           ${parentTipMarkup(task)}
           ${growthCardMarkup(task)}
         `;
-        if (!state.editMode && canToggleTaskFromChildPage) {
-          button.addEventListener("click", event => {
-            event.preventDefault();
-            requestTaskComplete(task);
-          });
-        }
+        if (!state.editMode && canToggleTaskFromChildPage) button.dataset.toggleTask = "true";
         button.querySelector("[data-growth-card]")?.addEventListener("click", event => {
           event.preventDefault();
           event.stopPropagation();
