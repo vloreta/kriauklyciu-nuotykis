@@ -204,23 +204,11 @@
         button.className = `dominik-task-card${isDominikTaskDone(day, task) ? " done" : ""}`;
         button.dataset.task = task.id;
         button.innerHTML = `<span class="dominik-task-icon">${task.icon || "🐚"}</span><span><span class="dominik-task-title">${taskTitle(task)}</span><span class="dominik-task-shells">+${taskShells(task)} ${shellWord(taskShells(task))}</span></span>`;
-                button.onclick = event => {
-          event.preventDefault();
-          event.stopPropagation();
-          runDominikTaskToggle(button.dataset.task);
-        };
-        button.onpointerup = event => {
-          if (event.pointerType === "touch") return;
-          event.preventDefault();
-          event.stopPropagation();
-          runDominikTaskToggle(button.dataset.task);
-        };
-        button.onkeydown = event => {
+        button.addEventListener("keydown", event => {
           if (event.key !== "Enter" && event.key !== " ") return;
           event.preventDefault();
-          event.stopPropagation();
           runDominikTaskToggle(button.dataset.task);
-        };
+        });
         dominikTaskGrid.appendChild(button);
       });
     }
@@ -261,6 +249,12 @@
       lastDominikTaskActivation = now;
       toggleDominikTask(taskId);
     }
+    dominikTaskGrid.addEventListener("click", event => {
+      const card = event.target.closest(".dominik-task-card[data-task]");
+      if (!card || !dominikTaskGrid.contains(card)) return;
+      event.preventDefault();
+      runDominikTaskToggle(card.dataset.task);
+    });
     window.addEventListener("storage", () => { renderDominikProgress(); renderDominikTasks(); });
     document.addEventListener("click", event => {
       if (event.target.closest(".dominik-task-card[data-task]")) return;
