@@ -4706,7 +4706,7 @@
       scoreBox.innerHTML = "";
       entries.forEach(([childId, score]) => {
         const item = document.createElement("span");
-        item.textContent = `${childName(childId)}: ${score} ${shellWord(score)}`;
+        item.textContent = `Savaitė: ${childName(childId)} - ${score} ${shellWord(score)}`;
         scoreBox.appendChild(item);
       });
 
@@ -5147,7 +5147,7 @@
         lane.dataset.child = childId;
         lane.dataset.color = profile.color || (profile.gender === "girl" ? "pink" : "blue");
         lane.setAttribute("role", "img");
-        lane.setAttribute("aria-label", `${profile.name} kelias iki perlo: ${shells} iš ${max}`);
+        lane.setAttribute("aria-label", `${profile.name} šiandienos kelias iki perlo: ${shells} iš ${max}`);
         const safeChildId = escapeHtml(childId);
         lane.innerHTML = `
           <span class="ocean-label"><span class="ocean-icon" aria-hidden="true">${escapeHtml(profile.avatar)}</span>${escapeHtml(profile.name)}</span>
@@ -5162,7 +5162,7 @@
             <span class="race-crab">🦀</span>
             <span class="treasure-shell"><span class="pearl"></span></span>
           </div>
-          <span class="race-score" id="${safeChildId}RaceScore">${shells} / ${max} ${shellWord(max)}</span>
+          <span class="race-score" id="${safeChildId}RaceScore">Šiandien: ${shells} / ${max}</span>
         `;
         lanes.appendChild(lane);
       });
