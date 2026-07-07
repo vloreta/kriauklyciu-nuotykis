@@ -2957,8 +2957,10 @@
           const sourceUpdatedAt = childRecordUpdatedAt(sourceChild);
           const currentCompleteness = childRecordCompleteness(currentChild);
           const sourceCompleteness = childRecordCompleteness(sourceChild);
-          if (currentUpdatedAt && sourceUpdatedAt && currentUpdatedAt >= sourceUpdatedAt && currentCompleteness >= sourceCompleteness) return;
-          if (sourceUpdatedAt > currentUpdatedAt || sourceCompleteness > currentCompleteness) {
+          const currentShells = Number(currentChild?.shells || 0);
+          const sourceShells = Number(sourceChild?.shells || 0);
+          if (currentUpdatedAt && sourceUpdatedAt && currentUpdatedAt >= sourceUpdatedAt && currentCompleteness >= sourceCompleteness && currentShells >= sourceShells) return;
+          if (sourceUpdatedAt > currentUpdatedAt || sourceCompleteness > currentCompleteness || sourceShells > currentShells) {
             merged.records[date][childId] = sourceChild;
           }
         });
@@ -5625,12 +5627,16 @@
       showToast("Pradėta nauja savaitė. Istorija išsaugota.");
     });
 
-    render();
-    restoreBundledRecovery();
-    checkCloudCopyForRestore();
-    setInterval(autoSave, 30000);
-    setInterval(checkCloudCopyForRestore, 5000);
-    setInterval(refreshCalendarDay, 60000);
+    async function startApp() {
+      await restoreBundledRecovery();
+      await checkCloudCopyForRestore();
+      render();
+      setInterval(autoSave, 30000);
+      setInterval(checkCloudCopyForRestore, 5000);
+      setInterval(refreshCalendarDay, 60000);
+    }
+
+    startApp();
     window.addEventListener("pagehide", autoSave);
     window.addEventListener("focus", () => {
       checkCloudCopyForRestore();
