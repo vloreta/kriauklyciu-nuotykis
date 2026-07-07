@@ -2761,8 +2761,10 @@
           const currentChild = merged.records[date][childId];
           const currentUpdatedAt = childRecordUpdatedAt(currentChild);
           const sourceUpdatedAt = childRecordUpdatedAt(sourceChild);
-          if (currentUpdatedAt && sourceUpdatedAt && currentUpdatedAt >= sourceUpdatedAt) return;
-          if (sourceUpdatedAt > currentUpdatedAt || childRecordCompleteness(sourceChild) > childRecordCompleteness(currentChild)) {
+          const currentCompleteness = childRecordCompleteness(currentChild);
+          const sourceCompleteness = childRecordCompleteness(sourceChild);
+          if (currentUpdatedAt && sourceUpdatedAt && currentUpdatedAt >= sourceUpdatedAt && currentCompleteness >= sourceCompleteness) return;
+          if (sourceUpdatedAt > currentUpdatedAt || sourceCompleteness > currentCompleteness) {
             merged.records[date][childId] = sourceChild;
           }
         });
@@ -4979,7 +4981,6 @@
     });
 
     render();
-    save();
     restoreBundledRecovery();
     checkCloudCopyForRestore();
     setInterval(autoSave, 30000);
