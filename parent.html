@@ -2868,6 +2868,11 @@
       cloudSaveTimer = setTimeout(() => writeCloudCopy(snapshot), 150);
     }
 
+    function shouldForceCloudRestore() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("forceCloud") === "1" || params.get("cloud") === "force";
+    }
+
     async function checkCloudCopyForRestore() {
       if (!cloudConfigured() || cloudLoadInProgress) return;
       cloudLoadInProgress = true;
@@ -2878,13 +2883,17 @@
         const cloudState = rows?.[0]?.dataJson;
         if (!isRestorableState(cloudState)) return;
         const normalizedCloud = normalizeState(cloudState);
-        const merged = mergeRicherRecords(state, normalizedCloud);
+        const forceCloud = shouldForceCloudRestore();
+        const merged = forceCloud ? normalizedCloud : mergeRicherRecords(state, normalizedCloud);
         const cloudIsNewer = Date.parse(normalizedCloud.updatedAt || rows[0].updatedAt || "") > Date.parse(state.updatedAt || "");
         const recordsChanged = JSON.stringify(merged.records || {}) !== JSON.stringify(state.records || {});
-        if (recordsChanged || cloudIsNewer) {
+        if (recordsChanged || cloudIsNewer || forceCloud) {
           ensureAllBackups(state);
-          if (recordsChanged) state.records = merged.records;
-          if (cloudIsNewer) {
+          if (forceCloud) {
+            localStorage.setItem(`${backupKeyPrefix}${todayKey()}-before-force-cloud-${Date.now()}`, JSON.stringify(createBackupEnvelope(state, "before-force-cloud")));
+          }
+          if (recordsChanged || forceCloud) state.records = merged.records;
+          if (cloudIsNewer || forceCloud) {
             ["customTasks", "childProfiles", "appSettings", "emotionSettings", "weekendPrize", "surprises", "penalties"].forEach(key => {
               if (normalizedCloud[key] !== undefined) state[key] = normalizedCloud[key];
             });
@@ -2895,6 +2904,7 @@
           lastSavedSnapshot = JSON.stringify(state);
           ensureAllBackups(state);
           render();
+          if (forceCloud) showToast("Debesies duomenys įkelti į šį įrenginį.");
         }
       } catch {
         // Debesis yra papildoma kopija; localStorage turi veikti ir be jo.
