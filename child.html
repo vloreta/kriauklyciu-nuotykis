@@ -3925,6 +3925,8 @@
       `;
     }
 
+    let lastTaskPointerToggleAt = 0;
+
     function renderTasks() {
       const child = activeChild();
       contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
@@ -3968,30 +3970,42 @@
           ${growthCardMarkup(task)}
         `;
         if (!state.editMode && canToggleTaskFromChildPage) {
-          let touchStartX = 0;
-          let touchStartY = 0;
-          let touchMoved = false;
-          let lastTouchToggleAt = 0;
-          button.addEventListener("touchstart", event => {
-            const touch = event.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            touchMoved = false;
-          }, { passive: true });
-          button.addEventListener("touchmove", event => {
-            const touch = event.touches[0];
-            if (Math.abs(touch.clientX - touchStartX) > 10 || Math.abs(touch.clientY - touchStartY) > 10) {
-              touchMoved = true;
+          let pressStartX = 0;
+          let pressStartY = 0;
+          let pressMoved = false;
+          let handledPointerTap = false;
+          const tapMoveLimit = 12;
+          button.addEventListener("pointerdown", event => {
+            pressStartX = event.clientX;
+            pressStartY = event.clientY;
+            pressMoved = false;
+            handledPointerTap = event.pointerType !== "mouse";
+          });
+          button.addEventListener("pointermove", event => {
+            if (Math.abs(event.clientX - pressStartX) > tapMoveLimit || Math.abs(event.clientY - pressStartY) > tapMoveLimit) {
+              pressMoved = true;
             }
-          }, { passive: true });
-          button.addEventListener("touchend", event => {
-            if (touchMoved) return;
-            lastTouchToggleAt = Date.now();
+          });
+          button.addEventListener("pointerup", event => {
+            if (!handledPointerTap || pressMoved) return;
+            lastTaskPointerToggleAt = Date.now();
             event.preventDefault();
             requestTaskComplete(task);
           });
+          button.addEventListener("pointercancel", () => {
+            pressMoved = true;
+            handledPointerTap = false;
+          });
           button.addEventListener("click", event => {
-            if (Date.now() - lastTouchToggleAt < 450) return;
+            if (Date.now() - lastTaskPointerToggleAt < 650) {
+              event.preventDefault();
+              return;
+            }
+            if (handledPointerTap) {
+              event.preventDefault();
+              handledPointerTap = false;
+              return;
+            }
             event.preventDefault();
             requestTaskComplete(task);
           });
