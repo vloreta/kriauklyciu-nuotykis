@@ -3932,7 +3932,7 @@
         if (!state.editMode) button.type = "button";
         const isDone = taskWasDoneOnSelectedDay(child, task);
         const growthCard = growthCardForTask(task);
-        const canToggleTaskFromChildPage = state.active !== "olivia";
+        const canToggleTaskFromChildPage = true;
         button.className = `task${isDone ? " done" : ""}${state.editMode ? " editing" : ""}${growthCard && isGrowthCardEnabledForTask(state.active, task) ? " growth-layered-task" : ""}`;
         button.innerHTML = growthCard && isGrowthCardEnabledForTask(state.active, task) ? `
           ${growthLayeredTaskMarkup(task, title, shells)}
@@ -4253,14 +4253,6 @@
           </span>
         `;
         button.addEventListener("click", () => {
-          if (childId === "olivia") {
-            window.location.href = "olivijos-vandenynas";
-            return;
-          }
-          if (childId === "dominik") {
-            window.location.href = "dominyko-vandenynas";
-            return;
-          }
           state.active = childId;
           save();
           render();
