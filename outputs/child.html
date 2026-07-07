@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="lt">
 <head>
   <meta charset="utf-8">
@@ -2752,6 +2752,52 @@
       return Number.isFinite(time) ? time : 0;
     }
 
+    function logEntryKey(item) {
+      if (typeof item === "string") return item;
+      return item?.id || `${item?.at || ""}|${item?.kind || ""}|${item?.taskId || ""}|${item?.delta || 0}|${item?.text || ""}`;
+    }
+
+    function mergeChildRecord(currentChild, sourceChild) {
+      if (!currentChild) return sourceChild;
+      if (!sourceChild) return currentChild;
+      const currentUpdatedAt = childRecordUpdatedAt(currentChild);
+      const sourceUpdatedAt = childRecordUpdatedAt(sourceChild);
+      const currentShells = Number(currentChild.shells || 0);
+      const sourceShells = Number(sourceChild.shells || 0);
+      const currentCompleteness = childRecordCompleteness(currentChild);
+      const sourceCompleteness = childRecordCompleteness(sourceChild);
+
+      if (currentUpdatedAt > sourceUpdatedAt && sourceShells > currentShells) {
+        const mergedChild = JSON.parse(JSON.stringify(sourceChild));
+        const sourceLogKeys = new Set((mergedChild.log || []).map(logEntryKey));
+        const localNewLogs = (currentChild.log || [])
+          .filter(item => typeof item !== "string")
+          .filter(item => !sourceLogKeys.has(logEntryKey(item)))
+          .filter(item => Date.parse(item.at || "") > sourceUpdatedAt);
+
+        localNewLogs.reverse().forEach(item => {
+          mergedChild.shells = Math.max(0, Number(mergedChild.shells || 0) + Number(item.delta || 0));
+          if (!mergedChild.done) mergedChild.done = {};
+          if (item.taskId && item.kind === "complete") mergedChild.done[item.taskId] = true;
+          if (item.taskId && item.kind === "toggleOff") mergedChild.done[item.taskId] = false;
+          mergedChild.log = [item, ...(mergedChild.log || [])].slice(0, 12);
+        });
+
+        const eventKeys = new Set((mergedChild.events || []).map(logEntryKey));
+        const localNewEvents = (currentChild.events || [])
+          .filter(item => !eventKeys.has(logEntryKey(item)))
+          .filter(item => Date.parse(item.at || "") > sourceUpdatedAt);
+        mergedChild.events = [...(mergedChild.events || []), ...localNewEvents];
+        mergedChild.updatedAt = currentChild.updatedAt || sourceChild.updatedAt;
+        mergedChild.lastActionAt = currentChild.lastActionAt || sourceChild.lastActionAt;
+        return mergedChild;
+      }
+
+      if (currentUpdatedAt && sourceUpdatedAt && currentUpdatedAt >= sourceUpdatedAt && currentCompleteness >= sourceCompleteness && currentShells >= sourceShells) return currentChild;
+      if (sourceUpdatedAt > currentUpdatedAt || sourceCompleteness > currentCompleteness || sourceShells > currentShells) return sourceChild;
+      return currentChild;
+    }
+
     function mergeRicherRecords(target, source) {
       if (!isRestorableState(target) || !isRestorableState(source)) return target;
       const merged = { ...target, records: { ...(target.records || {}) } };
@@ -2759,16 +2805,7 @@
         if (!merged.records[date]) merged.records[date] = {};
         Object.entries(day || {}).forEach(([childId, sourceChild]) => {
           const currentChild = merged.records[date][childId];
-          const currentUpdatedAt = childRecordUpdatedAt(currentChild);
-          const sourceUpdatedAt = childRecordUpdatedAt(sourceChild);
-          const currentCompleteness = childRecordCompleteness(currentChild);
-          const sourceCompleteness = childRecordCompleteness(sourceChild);
-          const currentShells = Number(currentChild?.shells || 0);
-          const sourceShells = Number(sourceChild?.shells || 0);
-          if (currentUpdatedAt && sourceUpdatedAt && currentUpdatedAt >= sourceUpdatedAt && currentCompleteness >= sourceCompleteness && currentShells >= sourceShells) return;
-          if (sourceUpdatedAt > currentUpdatedAt || sourceCompleteness > currentCompleteness || sourceShells > currentShells) {
-            merged.records[date][childId] = sourceChild;
-          }
+          merged.records[date][childId] = mergeChildRecord(currentChild, sourceChild);
         });
       });
       return merged;
