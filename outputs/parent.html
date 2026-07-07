@@ -2524,7 +2524,7 @@
     </form>
   </div>
 
-  <script src="cloud-config.js?v=sync-2"></script>
+  <script src="cloud-config.js?v=sync-4"></script>
   <script>
     // Default content and application state
     const emotionOptions = [
@@ -2822,8 +2822,8 @@
 
     function currentCloudConfig() {
       return {
-        supabaseUrl: localStorage.getItem(cloudUrlStorageKey) || cloudConfig.supabaseUrl,
-        supabaseAnonKey: localStorage.getItem(cloudAnonKeyStorageKey) || cloudConfig.supabaseAnonKey,
+        supabaseUrl: cloudConfig.supabaseUrl || localStorage.getItem(cloudUrlStorageKey),
+        supabaseAnonKey: cloudConfig.supabaseAnonKey || localStorage.getItem(cloudAnonKeyStorageKey),
         tableName: cloudConfig.tableName
       };
     }
@@ -4872,8 +4872,8 @@
     function openSettings() {
       document.getElementById("settingsTitle").value = state.appSettings.title;
       document.getElementById("settingsSubtitle").value = state.appSettings.subtitle;
-      document.getElementById("settingsSupabaseUrl").value = localStorage.getItem(cloudUrlStorageKey) || cloudConfig.supabaseUrl;
-      document.getElementById("settingsSupabaseAnonKey").value = localStorage.getItem(cloudAnonKeyStorageKey) || cloudConfig.supabaseAnonKey;
+      document.getElementById("settingsSupabaseUrl").value = cloudConfig.supabaseUrl || localStorage.getItem(cloudUrlStorageKey) || "";
+      document.getElementById("settingsSupabaseAnonKey").value = cloudConfig.supabaseAnonKey || localStorage.getItem(cloudAnonKeyStorageKey) || "";
       renderChildSettings();
       openDialog(document.getElementById("settingsDialog"), document.getElementById("settingsTitle"));
     }
