@@ -2731,6 +2731,12 @@
       return recovered;
     }
 
+    function childRecordUpdatedAt(child) {
+      const value = child?.updatedAt || child?.lastActionAt || child?.modifiedAt;
+      const time = value ? Date.parse(value) : 0;
+      return Number.isFinite(time) ? time : 0;
+    }
+
     function mergeRicherRecords(target, source) {
       if (!isRestorableState(target) || !isRestorableState(source)) return target;
       const merged = { ...target, records: { ...(target.records || {}) } };
@@ -2738,6 +2744,9 @@
         if (!merged.records[date]) merged.records[date] = {};
         Object.entries(day || {}).forEach(([childId, sourceChild]) => {
           const currentChild = merged.records[date][childId];
+          const currentUpdatedAt = childRecordUpdatedAt(currentChild);
+          const sourceUpdatedAt = childRecordUpdatedAt(sourceChild);
+          if (currentUpdatedAt && currentUpdatedAt >= sourceUpdatedAt) return;
           if (childRecordCompleteness(sourceChild) > childRecordCompleteness(currentChild)) {
             merged.records[date][childId] = sourceChild;
           }
