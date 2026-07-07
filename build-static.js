@@ -12,6 +12,7 @@ const include = [
   'restore-data.html',
   'cloud-config.js',
   'supabase-schema.sql',
+  'api',
   'assets',
   'cards',
   'icons',

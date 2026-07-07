@@ -2524,7 +2524,7 @@
     </form>
   </div>
 
-  <script src="cloud-config.js?v=sync-4"></script>
+  <script src="cloud-config.js?v=sync-5"></script>
   <script>
     // Default content and application state
     const emotionOptions = [
@@ -2838,19 +2838,21 @@
       };
     }
 
+    function cloudProxyUrl() {
+      return `/api/family-data?familyKey=${encodeURIComponent(familyKey())}`;
+    }
+
     async function writeCloudCopy(data) {
       if (!cloudConfigured() || !isRestorableState(data)) return;
       try {
-        const config = currentCloudConfig();
         const payload = {
           familyKey: familyKey(),
           dataJson: data,
           updatedAt: new Date().toISOString()
         };
-        const url = `${config.supabaseUrl.replace(/\/$/, "")}/rest/v1/${config.tableName}?on_conflict=familyKey`;
-        const response = await fetch(url, {
+        const response = await fetch(cloudProxyUrl(), {
           method: "POST",
-          headers: cloudHeaders(),
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
         showToast(response.ok ? "Debesies kopija išsaugota" : "Debesies kopija dar neišsaugota");
@@ -2870,9 +2872,7 @@
       if (!cloudConfigured() || cloudLoadInProgress) return;
       cloudLoadInProgress = true;
       try {
-        const config = currentCloudConfig();
-        const url = `${config.supabaseUrl.replace(/\/$/, "")}/rest/v1/${config.tableName}?familyKey=eq.${encodeURIComponent(familyKey())}&select=dataJson,updatedAt&limit=1`;
-        const response = await fetch(url, { headers: cloudHeaders() });
+        const response = await fetch(cloudProxyUrl(), { cache: "no-store" });
         if (!response.ok) return;
         const rows = await response.json();
         const cloudState = rows?.[0]?.dataJson;
