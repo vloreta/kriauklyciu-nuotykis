@@ -3624,10 +3624,10 @@
     }
 
     function taskWasDoneOnSelectedDay(child, task, childId = state.active) {
+      if (Object.prototype.hasOwnProperty.call(child.done || {}, task.id)) return Boolean(child.done[task.id]);
       const taskEntries = (child.log || [])
         .filter(item => typeof item !== "string" && item.taskId === task.id && !item.undone);
       if (taskEntries.length) return taskEntries[0].kind === "complete";
-      if (Object.prototype.hasOwnProperty.call(child.done || {}, task.id)) return Boolean(child.done[task.id]);
 
       const title = taskTitle(task).toLowerCase();
       const shells = taskEffectiveShells(childId, task);
@@ -3959,16 +3959,30 @@
           ${growthCardMarkup(task)}
         `;
         if (!state.editMode && canToggleTaskFromChildPage) {
-          button.addEventListener("click", event => {
-            event.preventDefault();
-            requestTaskComplete(task);
-          });
-          button.addEventListener("pointerup", event => {
-            if (event.pointerType === "mouse" && event.button !== 0) return;
-            event.preventDefault();
-            requestTaskComplete(task);
-          });
+          let touchStartX = 0;
+          let touchStartY = 0;
+          let touchMoved = false;
+          let lastTouchToggleAt = 0;
+          button.addEventListener("touchstart", event => {
+            const touch = event.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchMoved = false;
+          }, { passive: true });
+          button.addEventListener("touchmove", event => {
+            const touch = event.touches[0];
+            if (Math.abs(touch.clientX - touchStartX) > 10 || Math.abs(touch.clientY - touchStartY) > 10) {
+              touchMoved = true;
+            }
+          }, { passive: true });
           button.addEventListener("touchend", event => {
+            if (touchMoved) return;
+            lastTouchToggleAt = Date.now();
+            event.preventDefault();
+            requestTaskComplete(task);
+          });
+          button.addEventListener("click", event => {
+            if (Date.now() - lastTouchToggleAt < 450) return;
             event.preventDefault();
             requestTaskComplete(task);
           });
