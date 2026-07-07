@@ -2501,9 +2501,11 @@
     const cloudConfig = {
       supabaseUrl: window.KRIAUKLYCIU_CLOUD_CONFIG?.supabaseUrl || "",
       supabaseAnonKey: window.KRIAUKLYCIU_CLOUD_CONFIG?.supabaseAnonKey || "",
-      tableName: window.KRIAUKLYCIU_CLOUD_CONFIG?.tableName || "family_data"
+      tableName: window.KRIAUKLYCIU_CLOUD_CONFIG?.tableName || "family_data",
+      familyKey: window.KRIAUKLYCIU_CLOUD_CONFIG?.familyKey || "kriauklyciu-nuotykis-main-family"
     };
     let cloudSaveTimer = null;
+    let cloudLoadInProgress = false;
 
     // Persistence and date helpers
     function readSavedState(key) {
@@ -2608,9 +2610,8 @@
     }
 
     function familyKey() {
-      let key = localStorage.getItem(familyKeyStorageKey);
-      if (key) return key;
-      key = crypto?.randomUUID ? crypto.randomUUID() : `family-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      const urlKey = new URLSearchParams(window.location.search).get("familyKey");
+      const key = urlKey || cloudConfig.familyKey || "kriauklyciu-nuotykis-main-family";
       localStorage.setItem(familyKeyStorageKey, key);
       return key;
     }
@@ -2663,11 +2664,12 @@
       if (!cloudConfigured()) return;
       clearTimeout(cloudSaveTimer);
       const snapshot = JSON.parse(JSON.stringify(data));
-      cloudSaveTimer = setTimeout(() => writeCloudCopy(snapshot), 700);
+      cloudSaveTimer = setTimeout(() => writeCloudCopy(snapshot), 150);
     }
 
     async function checkCloudCopyForRestore() {
-      if (!cloudConfigured()) return;
+      if (!cloudConfigured() || cloudLoadInProgress) return;
+      cloudLoadInProgress = true;
       try {
         const config = currentCloudConfig();
         const url = `${config.supabaseUrl.replace(/\/$/, "")}/rest/v1/${config.tableName}?familyKey=eq.${encodeURIComponent(familyKey())}&select=dataJson,updatedAt&limit=1`;
@@ -2676,16 +2678,28 @@
         const rows = await response.json();
         const cloudState = rows?.[0]?.dataJson;
         if (!isRestorableState(cloudState)) return;
-        const cloudIsFuller = stateCompleteness(cloudState) > stateCompleteness(state);
-        const cloudIsNewer = rows[0].updatedAt && state.updatedAt && new Date(rows[0].updatedAt) > new Date(state.updatedAt);
-        if ((cloudIsFuller || cloudIsNewer) && confirm("Debesyje rasta naujesnė arba pilnesnė kopija. Atkurti ją?")) {
-          Object.keys(state).forEach(key => delete state[key]);
-          Object.assign(state, normalizeState(cloudState));
-          save();
+        const normalizedCloud = normalizeState(cloudState);
+        const merged = mergeRicherRecords(state, normalizedCloud);
+        const cloudIsNewer = Date.parse(normalizedCloud.updatedAt || rows[0].updatedAt || "") > Date.parse(state.updatedAt || "");
+        const recordsChanged = JSON.stringify(merged.records || {}) !== JSON.stringify(state.records || {});
+        if (recordsChanged || cloudIsNewer) {
+          ensureAllBackups(state);
+          if (recordsChanged) state.records = merged.records;
+          if (cloudIsNewer) {
+            ["customTasks", "childProfiles", "appSettings", "emotionSettings", "weekendPrize", "surprises", "penalties"].forEach(key => {
+              if (normalizedCloud[key] !== undefined) state[key] = normalizedCloud[key];
+            });
+            state.updatedAt = normalizedCloud.updatedAt || state.updatedAt;
+          }
+          localStorage.setItem(storageKey, JSON.stringify(state));
+          lastSavedSnapshot = JSON.stringify(state);
+          ensureAllBackups(state);
           render();
         }
       } catch {
         // Debesis yra papildoma kopija; localStorage turi veikti ir be jo.
+      } finally {
+        cloudLoadInProgress = false;
       }
     }
 
@@ -3609,11 +3623,14 @@
     }
 
     function addLog(child, entry) {
+      const now = new Date().toISOString();
       const normalized = typeof entry === "string"
         ? entry
-        : { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, undone: false, ...entry };
+        : { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, undone: false, at: entry.at || now, ...entry };
       child.log.unshift(normalized);
       child.log = child.log.slice(0, 12);
+      child.updatedAt = now;
+      child.lastActionAt = now;
     }
 
     function addTaskEvent(child, task, action, delta) {
@@ -3625,7 +3642,8 @@
         taskId: task.id,
         taskTitleAtTime: taskTitle(task),
         taskShellsAtTime: Math.abs(delta),
-        delta
+        delta,
+        at: new Date().toISOString()
       });
     }
 
@@ -4964,12 +4982,19 @@
     restoreBundledRecovery();
     checkCloudCopyForRestore();
     setInterval(autoSave, 30000);
+    setInterval(checkCloudCopyForRestore, 5000);
     setInterval(refreshCalendarDay, 60000);
     window.addEventListener("pagehide", autoSave);
-    window.addEventListener("focus", refreshCalendarDay);
+    window.addEventListener("focus", () => {
+      checkCloudCopyForRestore();
+      refreshCalendarDay();
+    });
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) autoSave();
-      else refreshCalendarDay();
+      else {
+        checkCloudCopyForRestore();
+        refreshCalendarDay();
+      }
     });
 </script>
 </body>
