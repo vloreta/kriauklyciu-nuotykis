@@ -47,7 +47,7 @@
     .dominik-tasks-header h2 { margin: 0; font-size: clamp(24px, 3vw, 42px); line-height: 1; letter-spacing: 0; }
     .dominik-daily-total { color: var(--muted); font-size: clamp(14px, 1.4vw, 18px); font-weight: 900; }
     .dominik-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-    .dominik-task-card { min-height: 118px; display: grid; grid-template-columns: 78px minmax(0, 1fr); align-items: center; gap: 14px; padding: 14px; border: 2px solid rgba(15, 136, 168, .12); border-radius: 10px; background: #fffdf1; color: var(--ink); text-align: left; cursor: pointer; box-shadow: 0 8px 18px rgba(24, 70, 88, .08); transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease; }
+    .dominik-task-card { position: relative; z-index: 2; touch-action: manipulation; pointer-events: auto; user-select: none; min-height: 118px; display: grid; grid-template-columns: 78px minmax(0, 1fr); align-items: center; gap: 14px; padding: 14px; border: 2px solid rgba(15, 136, 168, .12); border-radius: 10px; background: #fffdf1; color: var(--ink); text-align: left; cursor: pointer; box-shadow: 0 8px 18px rgba(24, 70, 88, .08); transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease; }
     .dominik-task-card:hover { transform: translateY(-1px); border-color: rgba(16,149,171,.35); box-shadow: 0 12px 24px rgba(24, 70, 88, .12); }
     .dominik-task-card.done { background: #eaf9ef; border-color: rgba(36, 190, 101, .55); box-shadow: inset 0 0 0 1px rgba(36, 190, 101, .16), 0 10px 24px rgba(24,70,88,.1); }
     .dominik-task-icon { width: 78px; height: 78px; display: grid; place-items: center; border-radius: 9px; background: #eefbff; font-size: 38px; line-height: 1; }
@@ -67,7 +67,7 @@
       .emotion-inline-dialog { padding: 7px 8px; }
       .dominik-tasks-section { padding: 14px 10px 24px; }
       .dominik-task-grid { grid-template-columns: 1fr; gap: 10px; }
-      .dominik-task-card { min-height: 104px; grid-template-columns: 68px minmax(0,1fr); padding: 12px; }
+      .dominik-task-card { position: relative; z-index: 2; touch-action: manipulation; pointer-events: auto; user-select: none; min-height: 104px; grid-template-columns: 68px minmax(0,1fr); padding: 12px; }
       .dominik-task-icon { width: 68px; height: 68px; font-size: 32px; }
     }
   </style>
@@ -204,12 +204,30 @@
         button.className = `dominik-task-card${isDominikTaskDone(day, task) ? " done" : ""}`;
         button.dataset.task = task.id;
         button.innerHTML = `<span class="dominik-task-icon">${task.icon || "🐚"}</span><span><span class="dominik-task-title">${taskTitle(task)}</span><span class="dominik-task-shells">+${taskShells(task)} ${shellWord(taskShells(task))}</span></span>`;
-        button.addEventListener("click", () => toggleDominikTask(task));
+                button.onclick = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          runDominikTaskToggle(button.dataset.task);
+        };
+        button.onpointerup = event => {
+          if (event.pointerType === "touch") return;
+          event.preventDefault();
+          event.stopPropagation();
+          runDominikTaskToggle(button.dataset.task);
+        };
+        button.onkeydown = event => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          event.stopPropagation();
+          runDominikTaskToggle(button.dataset.task);
+        };
         dominikTaskGrid.appendChild(button);
       });
     }
-    function toggleDominikTask(task) {
+    function toggleDominikTask(taskId) {
       const state = readDominikState();
+      const task = dominikTasksForState(state).find(item => item.id === taskId);
+      if (!task) return;
       const key = currentDateKey();
       const day = ensureDominikDay(state, key);
       const title = taskTitle(task);
@@ -231,10 +249,21 @@
       renderDominikTasks();
       flashDominikShell();
     }
-    window.renderDominikProgress = renderDominikProgress;
+        window.renderDominikProgress = renderDominikProgress;
     window.flashDominikShell = flashDominikShell;
+    window.toggleDominikTask = toggleDominikTask;
+    let lastDominikTaskActivation = 0;
+    let lastDominikTaskId = "";
+    function runDominikTaskToggle(taskId) {
+      const now = Date.now();
+      if (taskId === lastDominikTaskId && now - lastDominikTaskActivation < 180) return;
+      lastDominikTaskId = taskId;
+      lastDominikTaskActivation = now;
+      toggleDominikTask(taskId);
+    }
     window.addEventListener("storage", () => { renderDominikProgress(); renderDominikTasks(); });
     document.addEventListener("click", event => {
+      if (event.target.closest(".dominik-task-card[data-task]")) return;
       if (event.target.closest(".task[data-task], [data-task]")) setTimeout(() => { renderDominikProgress(); flashDominikShell(); }, 80);
     });
     renderDominikProgress();
@@ -262,3 +291,4 @@
   </script>
 </body>
 </html>
+
