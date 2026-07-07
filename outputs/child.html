@@ -2331,7 +2331,7 @@
     </form>
   </div>
 
-  <script src="cloud-config.js?v=ff76d92-sync"></script>
+  <script src="cloud-config.js?v=sync-2"></script>
   <script>
     // Default content and application state
     const emotionOptions = [
@@ -4075,6 +4075,7 @@
       const child = ensureDay(key)[childId];
       if (!child) return 0;
       const storedTotal = Number(child.shells) || 0;
+      if (Number.isFinite(storedTotal)) return Math.max(0, storedTotal);
       const logEntries = child.log || [];
       const logTotal = logEntries.reduce((sum, item) => {
         if (typeof item === "string" || item.undone) return sum;
