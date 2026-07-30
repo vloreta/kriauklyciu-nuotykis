@@ -4046,6 +4046,21 @@
       `;
     }
 
+    function renderEmotionHistory(child) {
+      const entries = Array.isArray(child.emotionLog) ? child.emotionLog : [];
+      if (!entries.length) return "";
+      return `
+        <div class="growth-summary" aria-label="Emocijų pasirinkimų istorija">
+          ${entries.map(entry => {
+            const emotion = emotionById(entry.emotionId);
+            const label = entry.label || emotion?.label || entry.emotionId;
+            const action = entry.action === "unselect" ? "Atžymėta emocija" : "Pasirinkta emocija";
+            return `<div><strong>${escapeHtml(action)}</strong><span>${escapeHtml(label)}</span></div>`;
+          }).join("")}
+        </div>
+      `;
+    }
+
     function renderTasks() {
       const child = activeChild();
       contentArea.className = `task-grid ${childGender()} ${childProfile().color || ""}`;
@@ -4133,6 +4148,7 @@
       log.innerHTML = "";
       document.getElementById("logTitle").textContent = formatDate(state.selectedDate);
       log.insertAdjacentHTML("beforeend", renderEmotionSummary(child));
+      log.insertAdjacentHTML("beforeend", renderEmotionHistory(child));
       if (!child.log.length) {
         log.insertAdjacentHTML("beforeend", `<div class="empty">Dar nėra pažymėtų darbelių.</div>`);
         return;
