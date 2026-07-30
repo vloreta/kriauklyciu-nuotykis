@@ -3208,6 +3208,18 @@
     const saved = mergeSavedRecords(readPrimaryStateWithRecovery(), readSavedState(legacyStorageKey));
     const state = normalizeState(saved);
     let lastSavedSnapshot = JSON.stringify(state);
+    function syncStateFromStorage() {
+      const freshState = normalizeState(readSavedState(storageKey));
+      Object.keys(state).forEach(key => delete state[key]);
+      Object.assign(state, freshState);
+      ensureCustomTasks();
+      lastSavedSnapshot = JSON.stringify(state);
+      render();
+    }
+
+    window.addEventListener("storage", event => {
+      if (event.key === storageKey && event.newValue) syncStateFromStorage();
+    });
     let pendingUndoSnapshot = null;
     let undoFlushTimer = null;
     let isRestoringUndo = false;

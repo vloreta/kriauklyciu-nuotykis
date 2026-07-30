@@ -2001,6 +2001,18 @@
     const saved = mergeSavedRecords(readPrimaryStateWithRecovery(), readSavedState(legacyStorageKey));
     const state = normalizeState(saved);
     let lastSavedSnapshot = JSON.stringify(state);
+    function syncStateFromStorage() {
+      const freshState = normalizeState(readSavedState(storageKey));
+      Object.keys(state).forEach(key => delete state[key]);
+      Object.assign(state, freshState);
+      ensureCustomTasks();
+      lastSavedSnapshot = JSON.stringify(state);
+      render();
+    }
+
+    window.addEventListener("storage", event => {
+      if (event.key === storageKey && event.newValue) syncStateFromStorage();
+    });
     ensureDailyBackup(state);
 
     const contentArea = document.getElementById("contentArea");
@@ -2254,15 +2266,6 @@
         };
       }
       if (state.taskSchemaVersion < 4) {
-        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
-        state.taskSchemaVersion = 4;
-        save();
-      }
-      if (
-        taskIdSignature(state.customTasks.olivia) !== taskIdSignature(defaultChildTasks.olivia) ||
-        taskFullSignature(state.customTasks.olivia) !== taskFullSignature(defaultChildTasks.olivia)
-      ) {
-        state.customTasks.olivia = cloneTasks(defaultChildTasks.olivia);
         state.taskSchemaVersion = 4;
         save();
       }
