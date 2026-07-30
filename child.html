@@ -2688,7 +2688,7 @@
         const forceCloud = shouldForceCloudRestore();
         const merged = forceCloud ? normalizedCloud : mergeRicherRecords(state, normalizedCloud);
         const cloudIsNewer = Date.parse(normalizedCloud.updatedAt || rows[0].updatedAt || "") > Date.parse(state.updatedAt || "");
-        const cloudTasksAreNewer = Date.parse(normalizedCloud.customTasksUpdatedAt || "") > Date.parse(state.customTasksUpdatedAt || "");
+        const cloudTasksAreNewer = (Date.parse(normalizedCloud.customTasksUpdatedAt || "") || 0) > (Date.parse(state.customTasksUpdatedAt || "") || 0);
         const recordsChanged = JSON.stringify(merged.records || {}) !== JSON.stringify(state.records || {});
         if (recordsChanged || cloudIsNewer || cloudTasksAreNewer || forceCloud) {
           ensureAllBackups(state);
