@@ -2475,6 +2475,7 @@
       weekendPrizeSettings: defaultWeekendPrizeSettings,
       surpriseSettings: defaultSurpriseSettings,
       customTasks: null,
+      customTasksUpdatedAt: "",
       taskSchemaVersion: 3,
       childProfiles: defaultChildProfiles,
       appSettings: defaultAppSettings,
@@ -2687,15 +2688,20 @@
         const forceCloud = shouldForceCloudRestore();
         const merged = forceCloud ? normalizedCloud : mergeRicherRecords(state, normalizedCloud);
         const cloudIsNewer = Date.parse(normalizedCloud.updatedAt || rows[0].updatedAt || "") > Date.parse(state.updatedAt || "");
+        const cloudTasksAreNewer = Date.parse(normalizedCloud.customTasksUpdatedAt || "") > Date.parse(state.customTasksUpdatedAt || "");
         const recordsChanged = JSON.stringify(merged.records || {}) !== JSON.stringify(state.records || {});
-        if (recordsChanged || cloudIsNewer || forceCloud) {
+        if (recordsChanged || cloudIsNewer || cloudTasksAreNewer || forceCloud) {
           ensureAllBackups(state);
           if (forceCloud) {
             localStorage.setItem(`${backupKeyPrefix}${todayKey()}-before-force-cloud-${Date.now()}`, JSON.stringify(createBackupEnvelope(state, "before-force-cloud")));
           }
           if (recordsChanged || forceCloud) state.records = merged.records;
+          if (cloudTasksAreNewer || forceCloud) {
+            state.customTasks = normalizedCloud.customTasks;
+            state.customTasksUpdatedAt = normalizedCloud.customTasksUpdatedAt || state.customTasksUpdatedAt;
+          }
           if (cloudIsNewer || forceCloud) {
-            ["customTasks", "childProfiles", "appSettings", "emotionSettings", "weekendPrize", "surprises", "penalties"].forEach(key => {
+            ["childProfiles", "appSettings", "emotionSettings", "weekendPrize", "surprises", "penalties"].forEach(key => {
               if (normalizedCloud[key] !== undefined) state[key] = normalizedCloud[key];
             });
             state.updatedAt = normalizedCloud.updatedAt || state.updatedAt;
@@ -3205,6 +3211,7 @@
             : [...defaultSurpriseSettings.surprises]
         },
         customTasks: raw.customTasks || null,
+        customTasksUpdatedAt: raw.customTasksUpdatedAt || "",
         taskSchemaVersion: raw.taskSchemaVersion || 0,
         childProfiles: raw.childProfiles
           ? { ...raw.childProfiles }
