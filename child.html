@@ -2498,7 +2498,7 @@
     const cloudAnonKeyStorageKey = "kriauklyciu-nuotykis-supabase-anon-key";
     const backupFormat = "kriauklyciu-nuotykis-backup";
     const backupVersion = 1;
-    const retainedAutomaticBackups = 20;
+    const retainedAutomaticBackups = 5;
     const cloudConfig = {
       supabaseUrl: window.KRIAUKLYCIU_CLOUD_CONFIG?.supabaseUrl || "",
       supabaseAnonKey: window.KRIAUKLYCIU_CLOUD_CONFIG?.supabaseAnonKey || "",
@@ -3110,13 +3110,35 @@
       modal.innerHTML = "";
     }
 
+    function freeStorageForPrimaryState() {
+      localStorage.removeItem(undoStorageKey);
+      const backupKeys = safetyBackupKeys();
+      backupKeys.forEach(key => {
+        if (key !== latestBackupKey) localStorage.removeItem(key);
+      });
+    }
+
+    function writePrimaryState(serializedState) {
+      try {
+        localStorage.setItem(storageKey, serializedState);
+      } catch {
+        freeStorageForPrimaryState();
+        try {
+          localStorage.setItem(storageKey, serializedState);
+        } catch {
+          localStorage.removeItem(latestBackupKey);
+          localStorage.setItem(storageKey, serializedState);
+        }
+      }
+    }
+
     function save() {
       try {
         protectStateBeforeSave();
         ensureDailyBackup(readSavedState(storageKey) || state);
         state.updatedAt = new Date().toISOString();
         const serializedState = JSON.stringify(state);
-        localStorage.setItem(storageKey, serializedState);
+        writePrimaryState(serializedState);
         ensureAllBackups(state);
         saveCloudCopy(state);
         lastSavedSnapshot = serializedState;
