@@ -2869,6 +2869,24 @@
       cloudSaveTimer = setTimeout(() => writeCloudCopy(snapshot), 150);
     }
 
+    async function saveTaskConfigCloud() {
+      try {
+        const response = await fetch(cloudProxyUrl(), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            taskConfig: {
+              customTasks: state.customTasks,
+              customTasksUpdatedAt: state.customTasksUpdatedAt
+            }
+          })
+        });
+        if (!response.ok) showToast("Užduoties nepavyko išsaugoti debesyje");
+      } catch {
+        showToast("Užduoties nepavyko išsaugoti debesyje");
+      }
+    }
+
     function shouldForceCloudRestore() {
       const params = new URLSearchParams(window.location.search);
       return params.get("forceCloud") === "1" || params.get("cloud") === "force";
@@ -4463,8 +4481,10 @@
           shells: Math.round(nextShells),
           createdAt: todayKey()
         });
+        state.customTasksUpdatedAt = new Date().toISOString();
         closeTaskEditor();
         save();
+        saveTaskConfigCloud();
         render();
         showToast("Nauja užduotis pridėta.");
         return;
@@ -4485,6 +4505,7 @@
       }
       closeTaskEditor();
       save();
+      saveTaskConfigCloud();
       render();
       showToast("Užduotis pakeista.");
     }
