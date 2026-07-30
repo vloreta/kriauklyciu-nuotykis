@@ -3277,7 +3277,7 @@
 
     function writeUndoStack(stack) {
       try {
-        localStorage.setItem(undoStorageKey, JSON.stringify(stack.slice(-50)));
+        localStorage.setItem(undoStorageKey, JSON.stringify(stack.slice(-5)));
       } catch {
         // Undo is a safety layer; saving the main state must still continue.
       }
