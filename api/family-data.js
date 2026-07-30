@@ -38,9 +38,34 @@ module.exports = async function handler(req, res) {
 
     if (req.method === "POST") {
       const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
+      let dataJson = body.dataJson;
+
+      if (body.taskConfig && typeof body.taskConfig === "object") {
+        const readUrl = `${supabaseUrl}/rest/v1/${tableName}?familyKey=eq.${encodeURIComponent(familyKey)}&select=dataJson&limit=1`;
+        const readResponse = await fetch(readUrl, { headers });
+        if (!readResponse.ok) {
+          const text = await readResponse.text();
+          res.statusCode = readResponse.status;
+          res.end(text);
+          return;
+        }
+        const rows = await readResponse.json();
+        const existing = rows?.[0]?.dataJson;
+        if (!existing || typeof existing !== "object") {
+          send(res, 404, { error: "Family data not found" });
+          return;
+        }
+        dataJson = {
+          ...existing,
+          customTasks: body.taskConfig.customTasks,
+          customTasksUpdatedAt: body.taskConfig.customTasksUpdatedAt,
+          updatedAt: new Date().toISOString()
+        };
+      }
+
       const payload = {
         familyKey,
-        dataJson: body.dataJson,
+        dataJson,
         updatedAt: new Date().toISOString()
       };
       const url = `${supabaseUrl}/rest/v1/${tableName}?on_conflict=familyKey`;

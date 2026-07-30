@@ -1822,6 +1822,7 @@
       weekendPrizeSettings: defaultWeekendPrizeSettings,
       surpriseSettings: defaultSurpriseSettings,
       customTasks: null,
+      customTasksUpdatedAt: "",
       taskSchemaVersion: 3,
       childProfiles: defaultChildProfiles,
       appSettings: defaultAppSettings,
@@ -2042,6 +2043,50 @@
       if (currentSnapshot !== lastSavedSnapshot) save();
     }
 
+    function familyKey() {
+      return new URLSearchParams(window.location.search).get("familyKey") || "kriauklyciu-nuotykis-main-family";
+    }
+
+    function cloudProxyUrl() {
+      return `/api/family-data?familyKey=${encodeURIComponent(familyKey())}`;
+    }
+
+    async function saveTaskConfigCloud() {
+      try {
+        const response = await fetch(cloudProxyUrl(), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            taskConfig: {
+              customTasks: state.customTasks,
+              customTasksUpdatedAt: state.customTasksUpdatedAt
+            }
+          })
+        });
+        showToast(response.ok ? "Užduotis išsaugota" : "Užduoties nepavyko išsaugoti debesyje");
+      } catch {
+        showToast("Užduoties nepavyko išsaugoti debesyje");
+      }
+    }
+
+    async function syncTaskConfigFromCloud() {
+      try {
+        const response = await fetch(cloudProxyUrl(), { cache: "no-store" });
+        if (!response.ok) return;
+        const rows = await response.json();
+        const cloudState = rows?.[0]?.dataJson;
+        const cloudTime = Date.parse(cloudState?.customTasksUpdatedAt || "") || 0;
+        const localTime = Date.parse(state.customTasksUpdatedAt || "") || 0;
+        if (!cloudState?.customTasks || cloudTime <= localTime) return;
+        state.customTasks = cloudState.customTasks;
+        state.customTasksUpdatedAt = cloudState.customTasksUpdatedAt;
+        save();
+        render();
+      } catch {
+        // Vietiniai duomenys lieka veikti ir laikinai nepasiekus debesies.
+      }
+    }
+
     function todayKey() {
       return dateKey(new Date());
     }
@@ -2115,6 +2160,7 @@
             : [...defaultSurpriseSettings.surprises]
         },
         customTasks: raw.customTasks || null,
+        customTasksUpdatedAt: raw.customTasksUpdatedAt || "",
         taskSchemaVersion: raw.taskSchemaVersion || 0,
         childProfiles: raw.childProfiles
           ? { ...raw.childProfiles }
@@ -2568,12 +2614,14 @@
       const oldShells = task.shells;
       task.title = cleanTitle;
       task.shells = Math.round(nextShells);
+      state.customTasksUpdatedAt = new Date().toISOString();
       const child = activeChild();
       if (child.done[task.id]) {
         child.shells = Math.max(0, child.shells + task.shells - oldShells);
       }
       closeTaskEditor();
       save();
+      saveTaskConfigCloud();
       render();
       showToast("Užduotis pakeista.");
     }
@@ -3492,7 +3540,9 @@
     save();
     restoreBundledRecovery();
     setInterval(autoSave, 30000);
+    setInterval(syncTaskConfigFromCloud, 5000);
     setInterval(refreshCalendarDay, 60000);
+    syncTaskConfigFromCloud();
     window.addEventListener("pagehide", autoSave);
     window.addEventListener("focus", refreshCalendarDay);
     document.addEventListener("visibilitychange", () => {
