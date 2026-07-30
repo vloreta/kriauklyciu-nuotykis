@@ -3008,7 +3008,7 @@
           if (!mergedChild.done) mergedChild.done = {};
           if (item.taskId && item.kind === "complete") mergedChild.done[item.taskId] = true;
           if (item.taskId && item.kind === "toggleOff") mergedChild.done[item.taskId] = false;
-          mergedChild.log = [item, ...(mergedChild.log || [])].slice(0, 12);
+          mergedChild.log = [item, ...(mergedChild.log || [])];
         });
 
         const eventKeys = new Set((mergedChild.events || []).map(logEntryKey));
@@ -4054,7 +4054,6 @@
         ? entry
         : { id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, undone: false, at: entry.at || now, ...entry };
       child.log.unshift(normalized);
-      child.log = child.log.slice(0, 12);
       child.updatedAt = now;
       child.lastActionAt = now;
     }
@@ -4782,7 +4781,8 @@
       }
       child.log.forEach(item => {
         const reversible = typeof item !== "string"
-          && !item.undone;
+          && !item.undone
+          && item.kind !== "weekendPrize";
         const row = document.createElement(reversible ? "button" : "div");
         row.className = `log-item${reversible ? " clickable" : ""}${typeof item !== "string" && item.undone ? " undone" : ""}`;
         row.textContent = logText(item);
@@ -4874,23 +4874,39 @@
       const winnerId = leaders.length === 1 ? leaders[0] : null;
       const winner = winnerId ? childName(winnerId) : "Visi vaikai";
       const prize = document.getElementById("weekendPrizeSelect").value;
-      state.weekendPrizes[weekKey] = { winner, prize };
+      const selectedAt = new Date().toISOString();
+      state.weekendPrizes[weekKey] = {
+        winner,
+        winnerId,
+        prize,
+        date: state.selectedDate,
+        selectedAt,
+        scores: weekScores
+      };
 
-      if (winnerId) {
-        addLog(ensureDay(state.selectedDate)[winnerId], {
-          text: `${winner}: didysis savaitgalio prizas - ${prize}`,
-          delta: 0,
-          kind: "weekendPrize"
-        });
-      } else {
+      Object.values(state.records || {}).forEach(day => {
         childIds().forEach(childId => {
-          addLog(ensureDay(state.selectedDate)[childId], {
-            text: `Bendras savaitgalio prizas - ${prize}`,
-            delta: 0,
-            kind: "weekendPrize"
-          });
+          const child = day?.[childId];
+          if (!Array.isArray(child?.log)) return;
+          child.log = child.log.filter(item => typeof item === "string" || item.kind !== "weekendPrize" || item.weekKey !== weekKey);
         });
-      }
+      });
+
+      childIds().forEach(childId => {
+        const scoreText = childIds().map(id => `${childName(id)} ${weekScores[id] || 0}`).join(", ");
+        addLog(ensureDay(state.selectedDate)[childId], {
+          id: `weekendPrize-${weekKey}-${childId}`,
+          text: `Savaitgalio prizas: ${prize}. Pasirinko: ${winner}. Savaitės rezultatai: ${scoreText}.`,
+          delta: 0,
+          kind: "weekendPrize",
+          weekKey,
+          prizeDate: state.selectedDate,
+          prize,
+          winner,
+          scores: weekScores,
+          at: selectedAt
+        });
+      });
 
       save();
       render();
