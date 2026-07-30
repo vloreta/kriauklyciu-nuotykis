@@ -5264,7 +5264,7 @@
       showToast(`Pasirinkta staigmena: ${surprise}.`);
     }
 
-    function renderRace(todayTotals) {
+    function renderRace(todayTotals, weekTotals) {
       const scene = document.getElementById("oceanScene");
       const lanes = document.getElementById("oceanLanes");
       const ids = childIds();
@@ -5276,6 +5276,7 @@
 
       ids.forEach(childId => {
         const shells = todayTotals[childId] || 0;
+        const weekShells = weekTotals[childId] || 0;
         const profile = childProfile(childId);
         const max = maxDailyShells(childId);
         const percent = max > 0 ? Math.min(Math.max(shells / max, 0), 1) * 100 : 0;
@@ -5299,7 +5300,7 @@
             <span class="race-crab">🦀</span>
             <span class="treasure-shell"><span class="pearl"></span></span>
           </div>
-          <span class="race-score" id="${safeChildId}RaceScore">Šiandien: ${shells}</span>
+          <span class="race-score" id="${safeChildId}RaceScore">Šiandien: ${shells} · Savaitė: ${weekShells}</span>
         `;
         lanes.appendChild(lane);
       });
@@ -5446,7 +5447,7 @@
       renderSurprises();
       renderPenaltyOptions();
       renderHabitArchive();
-      renderRace(todayTotals);
+      renderRace(todayTotals, weekTotals);
       childIds().forEach(childId => renderMilestoneBadge(childId, todayTotals[childId] || 0));
     }
 
