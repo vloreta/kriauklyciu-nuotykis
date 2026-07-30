@@ -4848,11 +4848,10 @@
       }
 
       if (total === 0) {
-        status.textContent = "Dar renkami savaitės taškai.";
+        status.textContent = "Taškai lygūs. Pasirinkite bendrą šeimos prizą.";
         button.textContent = "Pasirinkti prizą";
-        button.disabled = true;
-        select.disabled = true;
-        return;
+        button.disabled = false;
+        select.disabled = false;
       }
 
       status.textContent = winnerId
@@ -4871,8 +4870,6 @@
       const weekScores = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, weekKeys)]));
       const entries = Object.entries(weekScores);
       const total = entries.reduce((sum, [, score]) => sum + score, 0);
-      if (total === 0) return;
-
       const maxScore = Math.max(...entries.map(([, score]) => score), 0);
       const leaders = entries.filter(([, score]) => score === maxScore).map(([childId]) => childId);
       const winnerId = leaders.length === 1 ? leaders[0] : null;
