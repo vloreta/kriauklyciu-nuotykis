@@ -1994,48 +1994,43 @@
       }
 
       .ocean-label {
-        left: 10px;
-        top: 20px;
+        left: 8px;
+        top: 16px;
         transform: none;
-        padding: 6px 10px;
+        padding: 4px 9px;
+        font-size: 0.82rem;
       }
 
       .ocean-icon {
-        width: 26px;
-        height: 26px;
+        display: none;
       }
 
       .race-track {
-        left: 28px;
-        right: 74px;
+        left: 6px;
+        right: 4px;
         top: 66%;
       }
 
-      .guide-bubble {
-        left: 10px;
-        right: 10px;
-        top: 8px;
-        bottom: auto;
-        max-width: none;
-        min-height: 42px;
-        grid-template-columns: 28px minmax(0, 1fr);
-        padding: 6px 9px;
+      .race-path {
+        right: 82px;
       }
 
       .ocean-lane .guide-bubble {
-        left: 116px;
-        right: 8px;
-        top: 8px;
+        display: none;
       }
 
-      .guide-avatar {
-        width: 28px;
-        height: 28px;
-        font-size: 1rem;
+      .ocean-lane.active .guide-bubble,
+      .ocean-lane[data-child="dominik"] .guide-bubble {
+        display: none;
       }
 
-      .guide-text {
-        font-size: 0.74rem;
+      .race-progress {
+        left: 0;
+        width: calc((100% - 82px) * var(--progress-value, 0));
+      }
+
+      .race-crab {
+        left: calc((100% - 82px) * var(--progress-value, 0));
       }
 
       .race-crab {
@@ -2059,7 +2054,7 @@
       }
 
       .treasure-shell {
-        right: 10px;
+        right: 0;
         width: 76px;
         height: 62px;
       }
