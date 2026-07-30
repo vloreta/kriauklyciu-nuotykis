@@ -4224,9 +4224,9 @@
           select.appendChild(historicOption);
         }
         status.textContent = `Šios savaitės prizas: ${selected.winner} pasirinko „${selected.prize}“.`;
-        button.textContent = "Prizas pasirinktas";
-        button.disabled = true;
-        select.disabled = true;
+        button.textContent = "Pakeisti prizą";
+        button.disabled = false;
+        select.disabled = false;
         select.value = selected.prize;
         return;
       }
@@ -4248,7 +4248,6 @@
 
     function chooseWeekendPrize() {
       const weekKey = startOfWeek(state.selectedDate);
-      if (state.weekendPrizes[weekKey]) return;
 
       const weekKeys = getWeekKeys(state.selectedDate);
       const weekScores = Object.fromEntries(childIds().map(childId => [childId, childTotal(childId, weekKeys)]));
