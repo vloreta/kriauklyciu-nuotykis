@@ -3,6 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    try {
+      const physicalShortSide = Math.min(window.screen.width, window.screen.height);
+      if (navigator.maxTouchPoints > 0 && physicalShortSide <= 900) {
+        document.documentElement.classList.add("phone-ocean-layout");
+      }
+    } catch (_) {}
+  </script>
   <title>Kraiklyčių nuotykiai</title>
   <style>
     /* Foundation and shared controls */
@@ -2118,6 +2126,57 @@
       .child-page .treasure-shell {
         right: 0;
       }
+    }
+
+    /* Reliable fallback for iPhone Safari when it exposes a desktop-sized viewport. */
+    .phone-ocean-layout .child-page .ocean-label {
+      left: 8px;
+      top: 16px;
+      transform: none;
+      padding: 4px 9px;
+      font-size: 0.82rem;
+    }
+
+    .phone-ocean-layout .child-page .ocean-icon,
+    .phone-ocean-layout .child-page .ocean-lane .guide-bubble,
+    .phone-ocean-layout .child-page .ocean-lane.active .guide-bubble,
+    .phone-ocean-layout .child-page .ocean-lane[data-child="dominik"] .guide-bubble,
+    .phone-ocean-layout .child-page .milestone-badge.full {
+      display: none;
+    }
+
+    .phone-ocean-layout .child-page .race-track {
+      left: 6px;
+      right: 4px;
+    }
+
+    .phone-ocean-layout .child-page .race-path {
+      right: 82px;
+    }
+
+    .phone-ocean-layout .child-page .race-progress {
+      left: 0;
+      width: calc((100% - 82px) * var(--progress-value, 0));
+    }
+
+    .phone-ocean-layout .child-page .race-crab {
+      left: calc((100% - 82px) * var(--progress-value, 0));
+    }
+
+    .phone-ocean-layout .child-page .ocean-lane[data-child="olivia"] .race-path {
+      right: 0;
+    }
+
+    .phone-ocean-layout .child-page .ocean-lane[data-child="olivia"] .race-progress {
+      width: calc(100% * var(--progress-value, 0));
+    }
+
+    .phone-ocean-layout .child-page .ocean-lane[data-child="olivia"] .race-crab {
+      left: calc(100% * var(--progress-value, 0));
+    }
+
+    .phone-ocean-layout .child-page .treasure-shell {
+      right: 0;
     }
 
     @media (prefers-reduced-motion: reduce) {
