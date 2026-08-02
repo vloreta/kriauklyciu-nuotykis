@@ -2094,6 +2094,10 @@
         right: 82px;
       }
 
+      .child-page .ocean-lane[data-child="olivia"] .race-path {
+        right: 0;
+      }
+
       .child-page .race-progress {
         left: 0;
         width: calc((100% - 82px) * var(--progress-value, 0));
@@ -2101,6 +2105,14 @@
 
       .child-page .race-crab {
         left: calc((100% - 82px) * var(--progress-value, 0));
+      }
+
+      .child-page .ocean-lane[data-child="olivia"] .race-progress {
+        width: calc(100% * var(--progress-value, 0));
+      }
+
+      .child-page .ocean-lane[data-child="olivia"] .race-crab {
+        left: calc(100% * var(--progress-value, 0));
       }
 
       .child-page .treasure-shell {
