@@ -2067,6 +2067,47 @@
       }
     }
 
+    /* Phone ocean layout also applies when mobile Safari requests a desktop-width page. */
+    @media (hover: none) and (pointer: coarse) {
+      .child-page .ocean-label {
+        left: 8px;
+        top: 16px;
+        transform: none;
+        padding: 4px 9px;
+        font-size: 0.82rem;
+      }
+
+      .child-page .ocean-icon,
+      .child-page .ocean-lane .guide-bubble,
+      .child-page .ocean-lane.active .guide-bubble,
+      .child-page .ocean-lane[data-child="dominik"] .guide-bubble,
+      .child-page .milestone-badge.full {
+        display: none;
+      }
+
+      .child-page .race-track {
+        left: 6px;
+        right: 4px;
+      }
+
+      .child-page .race-path {
+        right: 82px;
+      }
+
+      .child-page .race-progress {
+        left: 0;
+        width: calc((100% - 82px) * var(--progress-value, 0));
+      }
+
+      .child-page .race-crab {
+        left: calc((100% - 82px) * var(--progress-value, 0));
+      }
+
+      .child-page .treasure-shell {
+        right: 0;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
